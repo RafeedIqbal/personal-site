@@ -1,0 +1,6 @@
+# >>> id8-managed:gitignore:start
+# id8 sensitive local files
+.env
+.mcp.json
+.codex/config.toml
+# <<< id8-managed:gitignore:end
