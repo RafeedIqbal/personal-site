@@ -208,6 +208,7 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
                     ["cat about.txt", "education & background"],
                     ["cat experience.log", "work history"],
                     ["ls projects/", "list projects"],
+                    ["ls websites/", "list deployed websites"],
                     ["cat projects/<name>", "project details"],
                     ["env", "skills & tools"],
                     ["contact --help", "contact information"],

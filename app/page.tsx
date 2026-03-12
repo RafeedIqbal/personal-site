@@ -9,6 +9,7 @@ import Hero from "../sections/Hero";
 import About from "../sections/About";
 import Experience from "../sections/Experience";
 import Projects from "../sections/Projects";
+import Websites from "../sections/Websites";
 import Skills from "../sections/Skills";
 import Contact from "../sections/Contact";
 
@@ -107,6 +108,8 @@ export default function Page() {
                 <Experience />
                 <hr className="hidden md:block border-[#1a1a1a]" />
                 <Projects />
+                <hr className="hidden md:block border-[#1a1a1a]" />
+                <Websites />
                 <hr className="hidden md:block border-[#1a1a1a]" />
                 <Skills />
                 <hr className="hidden md:block border-[#1a1a1a]" />

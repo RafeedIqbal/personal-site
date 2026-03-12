@@ -65,7 +65,7 @@ export interface Project {
   name: string;
   stack: string[];
   description: string;
-  url?: string;
+  githubUrl?: string;
 }
 
 export const PROJECTS: Project[] = [
@@ -75,7 +75,7 @@ export const PROJECTS: Project[] = [
     stack: ["Next.js", "FastAPI", "PostgreSQL"],
     description:
       "AI-powered platform that transforms natural language prompts into production-deployed full-stack web applications. Orchestrates a 10-node state machine pipeline handling requirements generation, code generation, security scanning, and automated deployment to Vercel.",
-    url: "https://id8-landing.vercel.app",
+    githubUrl: "https://github.com/RafeedIqbal/id8",
   },
   {
     slug: "e-predict",
@@ -83,6 +83,7 @@ export const PROJECTS: Project[] = [
     stack: ["Next.js", "Flask", "ML"],
     description:
       "AI-driven energy consumption forecasting tool using machine learning models. Flask backend for data processing and model deployment; Next.js frontend with interactive visualizations for anomaly detection.",
+    githubUrl: "https://github.com/RafeedIqbal/E-Predict",
   },
   {
     slug: "syncmaster",
@@ -90,6 +91,71 @@ export const PROJECTS: Project[] = [
     stack: ["Next.js", "AWS", "TypeScript"],
     description:
       "Web app for the City of Hamilton Water Division to digitize workflows, improving documentation management and contractor efficiency. Built with Next.js, TypeScript, DynamoDB, Cognito, and Lambda.",
+    githubUrl: "https://github.com/RafeedIqbal/SyncMaster",
+  },
+];
+
+export interface Website {
+  slug: string;
+  name: string;
+  url: string;
+  githubUrl: string;
+}
+
+export const WEBSITES: Website[] = [
+  {
+    slug: "rafeed-dev",
+    name: "rafeed.dev",
+    url: "https://rafeed.dev",
+    githubUrl: "https://github.com/RafeedIqbal/personal-site",
+  },
+  {
+    slug: "icontraining",
+    name: "www.icontraining.app",
+    url: "https://www.icontraining.app/",
+    githubUrl: "https://github.com/rafeed-iconfitness/Icon-website-vercel",
+  },
+  {
+    slug: "id8-feature-requests",
+    name: "id8-feature-requests.vercel.app",
+    url: "https://id8-feature-requests.vercel.app",
+    githubUrl: "https://github.com/RafeedIqbal/id8-feature-requests",
+  },
+  {
+    slug: "kanban-team",
+    name: "kanban-team-id8.vercel.app",
+    url: "https://kanban-team-id8.vercel.app",
+    githubUrl: "https://github.com/RafeedIqbal/kanban-team",
+  },
+  {
+    slug: "simple-expense",
+    name: "simple-expense-id8.vercel.app",
+    url: "https://simple-expense-id8.vercel.app/",
+    githubUrl: "https://github.com/RafeedIqbal/simple-expense",
+  },
+  {
+    slug: "ramadantrack",
+    name: "ramadantrack.vercel.app",
+    url: "https://ramadantrack.vercel.app",
+    githubUrl: "https://github.com/RafeedIqbal/RamadanTrack",
+  },
+  {
+    slug: "habitflow",
+    name: "habitflow-16.vercel.app",
+    url: "https://habitflow-16.vercel.app/",
+    githubUrl: "https://github.com/RafeedIqbal/habitflow",
+  },
+  {
+    slug: "basenote-site",
+    name: "basenote-site.vercel.app",
+    url: "https://basenote-site.vercel.app/",
+    githubUrl: "https://github.com/RafeedIqbal/basenote-site",
+  },
+  {
+    slug: "arizmi-site",
+    name: "arizmi-site-y16w.vercel.app",
+    url: "https://arizmi-site-y16w.vercel.app/",
+    githubUrl: "https://github.com/RafeedIqbal/arizmi-site",
   },
 ];
 

@@ -5,7 +5,7 @@ import { PROJECTS } from "../lib/content";
 
 export default function Projects() {
   return (
-    <section id="projects" className="space-y-6 scroll-mt-16">
+    <section id="projects" className="section-panel space-y-6 scroll-mt-16">
       <CommandBlock command="ls -la projects/" delay={0.05}>
         <div className="space-y-0">
           {/* Desktop: file listing table */}
@@ -32,14 +32,14 @@ export default function Projects() {
                     </td>
                     <td className="py-2.5 text-[#aaaaaa] text-sm leading-relaxed">
                       <p>{project.description}</p>
-                      {project.url && (
+                      {project.githubUrl && (
                         <a
-                          href={project.url}
+                          href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-white hover:underline inline-flex items-center gap-1 mt-1"
+                          className="text-xs text-white hover:underline inline-flex items-center gap-1 mt-2"
                         >
-                          [↗] {project.url}
+                          [github] repo
                         </a>
                       )}
                     </td>
@@ -70,14 +70,14 @@ export default function Projects() {
                 <p className="text-sm text-[#aaaaaa] leading-relaxed">
                   {project.description}
                 </p>
-                {project.url && (
+                {project.githubUrl && (
                   <a
-                    href={project.url}
+                    href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-white hover:underline flex items-center gap-1"
                   >
-                    [↗] view_project
+                    [github] view_repo
                   </a>
                 )}
               </div>

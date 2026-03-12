@@ -8,6 +8,7 @@ const LINES = [
   "Loading rafeed.sh...",
   "Reading experience.log...",
   "Mounting projects/...",
+  "Mounting websites/...",
   "Done.",
 ];
 

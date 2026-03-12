@@ -5,6 +5,7 @@ const TREE_ITEMS = [
   { href: "#about", label: "about.txt" },
   { href: "#experience", label: "experience.log" },
   { href: "#projects", label: "projects/" },
+  { href: "#websites", label: "websites/" },
   { href: "#env", label: "skills.env" },
   { href: "#contact", label: "contact.sh" },
 ];

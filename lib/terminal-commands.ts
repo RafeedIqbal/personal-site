@@ -1,4 +1,4 @@
-import { PROFILE, EDUCATION, EXPERIENCE, PROJECTS, SKILLS } from "./content";
+import { PROFILE, EDUCATION, EXPERIENCE, PROJECTS, SKILLS, WEBSITES } from "./content";
 import {
   getTerminalGameDefinition,
   getTerminalGamesListText,
@@ -25,6 +25,7 @@ export const AVAILABLE_COMMANDS = [
   "cat experience.log",
   "ls projects/",
   "ls -la projects/",
+  "ls websites/",
   "cat projects/id8",
   "cat projects/e-predict",
   "cat projects/syncmaster",
@@ -48,6 +49,7 @@ const HELP_TEXT = `Available commands:
   cat about.txt       education & background
   cat experience.log  work history
   ls projects/        list projects
+  ls websites/        list deployed websites
   cat projects/<name> project details (id8, e-predict, syncmaster)
   env                 skills & environment
   contact --help      contact information
@@ -146,17 +148,33 @@ McMaster B.Eng Software Engineering graduate (${EDUCATION.gpa} GPA).`,
     };
   }
 
+  if (cmd === "ls websites/" || cmd === "ls websites" || cmd === "ls -la websites/") {
+    return {
+      output: WEBSITES.map(
+        (website) =>
+          `lrwxrwxrwx  rafeed  ${website.url.length}  ${website.name} -> ${website.url}`
+      ).join("\n"),
+      scrollTarget: "websites",
+    };
+  }
+
   for (const project of PROJECTS) {
     if (
       cmd === `cat projects/${project.slug}` ||
       cmd === `cat projects/${project.slug}.md` ||
       cmd === `cd projects/${project.slug}`
     ) {
+      const metadata = [
+        `Stack:       ${project.stack.join(", ")}`,
+        project.githubUrl ? `GitHub:      ${project.githubUrl}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
       return {
         output: `${project.name.toUpperCase()}
 ${"=".repeat(project.name.length)}
-Stack:       ${project.stack.join(", ")}
-${project.url ? `URL:         ${project.url}` : ""}
+${metadata}
 
 ${project.description}`,
         scrollTarget: "projects",
@@ -207,6 +225,7 @@ Options:
       output: `drwxr-xr-x  about.txt
 drwxr-xr-x  experience.log
 drwxr-xr-x  projects/
+drwxr-xr-x  websites/
 drwxr-xr-x  skills.env
 drwxr-xr-x  contact.sh`,
     };
