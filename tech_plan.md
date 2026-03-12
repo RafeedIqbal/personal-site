@@ -37,27 +37,26 @@ No backend. No database. No auth. Pure static site.
 ## File Structure
 
 ```
-id8-src/
-  app/
-    layout.tsx              # Root layout: font, metadata, dark body bg
-    page.tsx                # Single page — renders all sections in order
-    globals.css             # Tailwind v4 base, CSS custom props
-  components/
-    TerminalWindow.tsx      # Chrome wrapper (decorative dots, title bar)
-    BootSequence.tsx        # Animated load sequence on first render
-    CommandBlock.tsx        # Reusable: `$ command` + output reveal
-    InteractiveTerminal.tsx # Input prompt at bottom — user can type commands
-    Nav.tsx                 # Sticky sidebar with clickable command shortcuts
-  sections/
-    Hero.tsx                # whoami — name, title, tagline, social links
-    About.tsx               # cat about.txt — bio + education
-    Experience.tsx          # cat experience.log — work history
-    Projects.tsx            # ls projects/ — project cards
-    Skills.tsx              # env — skills list
-    Contact.tsx             # contact --help — email/LinkedIn/GitHub
-  lib/
-    terminal-commands.ts    # Command registry for interactive terminal
-    content.ts              # All resume data as typed constants
+app/
+  layout.tsx              # Root layout: font, metadata, dark body bg
+  page.tsx                # Single page — renders all sections in order
+  globals.css             # Tailwind v4 base, CSS custom props
+components/
+  TerminalWindow.tsx      # Chrome wrapper (decorative dots, title bar)
+  BootSequence.tsx        # Animated load sequence on first render
+  CommandBlock.tsx        # Reusable: `$ command` + output reveal
+  InteractiveTerminal.tsx # Input prompt at bottom — user can type commands
+  Nav.tsx                 # Sticky sidebar with clickable command shortcuts
+sections/
+  Hero.tsx                # whoami — name, title, tagline, social links
+  About.tsx               # cat about.txt — bio + education
+  Experience.tsx          # cat experience.log — work history
+  Projects.tsx            # ls projects/ — project cards
+  Skills.tsx              # env — skills list
+  Contact.tsx             # contact --help — email/LinkedIn/GitHub
+lib/
+  terminal-commands.ts    # Command registry for interactive terminal
+  content.ts              # All resume data as typed constants
 ```
 
 ---

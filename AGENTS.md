@@ -1,18 +1,18 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository is centered on the Next.js app in `id8-src/`. Work from that directory for app changes.
+This repository is centered on the Next.js app in the repository root. Work from the root for app changes.
 
-- `id8-src/app/`: App Router entry points, layout, and global CSS.
-- `id8-src/components/`: reusable UI pieces such as the terminal and navigation.
-- `id8-src/sections/`: page-level content blocks (`Hero.tsx`, `Projects.tsx`, etc.).
-- `id8-src/lib/`: content and command helpers.
-- `id8-src/public/`: static assets.
+- `app/`: App Router entry points, layout, and global CSS.
+- `components/`: reusable UI pieces such as the terminal and navigation.
+- `sections/`: page-level content blocks (`Hero.tsx`, `Projects.tsx`, etc.).
+- `lib/`: content and command helpers.
+- `public/`: static assets.
 
 Root-level files like `prd.md`, `tech_plan.md`, `screens/`, and `Resume/` are supporting docs and assets, not runtime code.
 
 ## Build, Test, and Development Commands
-Run commands from `id8-src/`.
+Run commands from the repository root.
 
 - `npm run dev`: start the local dev server at `http://localhost:3000`.
 - `npm run build`: create the production build.
@@ -22,7 +22,6 @@ Run commands from `id8-src/`.
 Example:
 
 ```bash
-cd id8-src
 npm run dev
 ```
 
@@ -32,7 +31,7 @@ Use TypeScript with strict typing and React function components. Follow the exis
 - 2-space indentation, semicolons, and double quotes.
 - `PascalCase` for components and section files, `camelCase` for variables, props, and helpers.
 - Prefer the `@/*` path alias when imports would otherwise become noisy.
-- Keep shared theme tokens in `id8-src/app/globals.css` and use Tailwind utility classes for component styling.
+- Keep shared theme tokens in `app/globals.css` and use Tailwind utility classes for component styling.
 
 Run `npm run lint` before opening a PR.
 
@@ -56,4 +55,4 @@ PRs should include:
 - the commands you ran, such as `npm run lint`.
 
 ## Security & Configuration Tips
-Do not commit secrets or local tooling config. Root `.gitignore` already excludes `.env`, `.mcp.json`, and `.codex/config.toml`; app-level ignores exclude `.next/`, `node_modules/`, and other generated files.
+Do not commit secrets or local tooling config. Root `.gitignore` excludes `.env`, `.mcp.json`, `.codex/config.toml`, `.id8/`, `.next/`, `node_modules/`, and other generated files.
