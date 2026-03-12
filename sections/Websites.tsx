@@ -19,27 +19,24 @@ export default function Websites() {
                     <td className="py-2.5 pr-4 text-[#555555] text-xs">rafeed</td>
                     <td className="py-2.5 pr-4 text-[#444444] text-xs">{website.url.length}</td>
                     <td className="py-2.5 pr-6 whitespace-nowrap align-top">
-                      <span className="font-bold text-white">{website.name}</span>
+                      <a
+                        href={website.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-bold text-white hover:underline"
+                      >
+                        {website.name}
+                      </a>
                     </td>
-                    <td className="py-2.5 text-[#aaaaaa] text-sm leading-relaxed break-all">
-                      <div className="flex flex-col gap-1">
-                        <a
-                          href={website.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-white hover:underline"
-                        >
-                          [↗] {website.url}
-                        </a>
-                        <a
-                          href={website.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-[#888888] hover:text-white hover:underline"
-                        >
-                          [github] {website.githubUrl}
-                        </a>
-                      </div>
+                    <td className="py-2.5 text-xs">
+                      <a
+                        href={website.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#888888] hover:text-white hover:underline"
+                      >
+                        [github]
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -53,25 +50,22 @@ export default function Websites() {
                 key={website.slug}
                 className="border border-[#333333] bg-[#0a0a0a] p-4 space-y-3"
               >
-                <h3 className="font-bold text-white">./{website.name}</h3>
-                <div className="flex flex-col gap-2 text-xs">
-                  <a
-                    href={website.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white hover:underline flex items-center gap-1 break-all"
-                  >
-                    [↗] visit_site
-                  </a>
-                  <a
-                    href={website.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#aaaaaa] hover:text-white hover:underline flex items-center gap-1 break-all"
-                  >
-                    [github] view_repo
-                  </a>
-                </div>
+                <a
+                  href={website.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block font-bold text-white hover:underline"
+                >
+                  ./{website.name}
+                </a>
+                <a
+                  href={website.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex text-xs text-[#888888] hover:text-white hover:underline"
+                >
+                  [github] view_repo
+                </a>
               </div>
             ))}
           </div>
