@@ -5,7 +5,7 @@ import { EXPERIENCE } from "../lib/content";
 
 export default function Experience() {
   return (
-    <section id="experience" className="section-panel space-y-6 scroll-mt-16">
+    <section id="experience" className="space-y-6 scroll-mt-16">
       <CommandBlock command="cat experience.log" delay={0.05}>
         <div className="space-y-8 text-sm">
           {EXPERIENCE.map((exp, i) => (

@@ -5,7 +5,7 @@ import { PROFILE } from "../lib/content";
 
 export default function Contact() {
   return (
-    <section id="contact" className="section-panel space-y-6 scroll-mt-16">
+    <section id="contact" className="space-y-6 scroll-mt-16">
       <CommandBlock command="contact --help" delay={0.05}>
         <div className="border-l-2 border-[#333333] pl-4 text-sm space-y-4">
           <p className="text-[#888888]">Usage: contact [OPTIONS]</p>

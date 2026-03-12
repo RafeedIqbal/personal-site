@@ -5,7 +5,7 @@ import { PROFILE } from "../lib/content";
 
 export default function Hero() {
   return (
-    <section id="whoami" className="section-panel space-y-6 scroll-mt-16">
+    <section id="whoami" className="space-y-6 scroll-mt-16">
       <CommandBlock command="whoami">
         <div className="space-y-4">
           <div>

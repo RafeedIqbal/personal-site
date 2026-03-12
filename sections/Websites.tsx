@@ -5,7 +5,7 @@ import { WEBSITES } from "../lib/content";
 
 export default function Websites() {
   return (
-    <section id="websites" className="section-panel space-y-6 scroll-mt-16">
+    <section id="websites" className="space-y-6 scroll-mt-16">
       <CommandBlock command="ls -la websites/" delay={0.05}>
         <div className="space-y-0">
           <div className="hidden md:block overflow-x-auto">
