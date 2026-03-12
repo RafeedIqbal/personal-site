@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rafeed Iqbal CLI Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16169c",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        "display": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden selection:bg-slate-300 dark:selection:bg-slate-700">
+<div class="flex-1 flex flex-col md:flex-row max-w-[1200px] mx-auto w-full border-x border-slate-300 dark:border-[#333333] min-h-screen relative">
+<aside class="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-300 dark:border-[#333333] bg-background-light dark:bg-background-dark hidden md:flex flex-col sticky top-0 h-screen">
+<div class="p-6 border-b border-slate-300 dark:border-[#333333]">
+<h1 class="text-base font-bold leading-normal">Rafeed Iqbal</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal mt-1">Portfolio CLI</p>
+</div>
+<nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2 bg-slate-200 dark:bg-[#333333] rounded" href="#whoami">
+<span class="material-symbols-outlined text-xl">terminal</span>
+<span class="text-sm font-medium">$ whoami</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] rounded transition-colors" href="#about">
+<span class="material-symbols-outlined text-xl">description</span>
+<span class="text-sm font-medium">$ cat about.txt</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] rounded transition-colors" href="#experience">
+<span class="material-symbols-outlined text-xl">timeline</span>
+<span class="text-sm font-medium">$ experience.log</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] rounded transition-colors" href="#projects">
+<span class="material-symbols-outlined text-xl">folder</span>
+<span class="text-sm font-medium">$ ls projects/</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] rounded transition-colors" href="#env">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-medium">$ env</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] rounded transition-colors" href="#contact">
+<span class="material-symbols-outlined text-xl">help</span>
+<span class="text-sm font-medium">$ contact --help</span>
+</a>
+</nav>
+</aside>
+<main class="flex-1 flex flex-col h-full bg-background-light dark:bg-background-dark pb-24">
+<header class="flex items-center justify-between border-b border-slate-300 dark:border-[#333333] px-6 py-4 sticky top-0 bg-background-light dark:bg-background-dark z-10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lg">code</span>
+<h2 class="text-sm font-bold tracking-tight">rafeed@portfolio:~</h2>
+</div>
+<div class="flex items-center gap-2 text-slate-400 dark:text-[#555555] text-xs">
+<span>●</span><span>●</span><span>●</span>
+</div>
+</header>
+<div class="p-6 md:p-10 space-y-16 overflow-y-auto">
+<section class="space-y-6" id="whoami">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-4">
+<span class="text-green-600 dark:text-slate-300 font-bold">rafeed@portfolio</span>:<span class="text-blue-600 dark:text-slate-400">~</span>$ <span class="text-slate-900 dark:text-slate-100">whoami</span>
+</div>
+<div>
+<h1 class="text-4xl md:text-5xl font-black leading-tight tracking-tight uppercase">RAFEED IQBAL</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-medium mt-2">Software Engineer &amp; Product Manager</p>
+</div>
+<div class="flex flex-wrap gap-4 pt-4">
+<a class="flex items-center gap-2 border border-slate-300 dark:border-[#333333] px-4 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">link</span>
+<span class="text-sm font-medium">[linkedin]</span>
+</a>
+<a class="flex items-center gap-2 border border-slate-300 dark:border-[#333333] px-4 py-2 hover:bg-slate-100 dark:hover:bg-[#1a1a1a] transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">code</span>
+<span class="text-sm font-medium">[github]</span>
+</a>
+</div>
+</section>
+<section class="space-y-4" id="about">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-4">
+<span class="text-green-600 dark:text-slate-300 font-bold">rafeed@portfolio</span>:<span class="text-blue-600 dark:text-slate-400">~</span>$ <span class="text-slate-900 dark:text-slate-100">cat about.txt</span>
+</div>
+<div class="border-l-2 border-slate-300 dark:border-[#333333] pl-4 space-y-4">
+<p class="leading-relaxed text-sm md:text-base">
+                            I am a Software Engineer and Product Manager with a passion for building robust, scalable applications and designing intuitive user experiences. I thrive at the intersection of technical execution and product strategy.
+                        </p>
+<div class="mt-4">
+<h3 class="text-sm font-bold uppercase mb-2 text-slate-500 dark:text-slate-400">Education</h3>
+<p class="text-sm">B.Eng. Software Engineering, McMaster University</p>
+</div>
+</div>
+</section>
+<section class="space-y-4" id="experience">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-4">
+<span class="text-green-600 dark:text-slate-300 font-bold">rafeed@portfolio</span>:<span class="text-blue-600 dark:text-slate-400">~</span>$ <span class="text-slate-900 dark:text-slate-100">tail -n 3 experience.log</span>
+</div>
+<div class="space-y-6 font-mono text-sm">
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4">
+<span class="text-slate-500 dark:text-slate-400 min-w-[120px]">[2022-Present]</span>
+<div>
+<strong class="text-base">Software Engineer</strong> @ Icon Train Smarter
+                                <p class="text-slate-600 dark:text-slate-400 mt-1">Full-stack development, API design, performance optimization.</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4">
+<span class="text-slate-500 dark:text-slate-400 min-w-[120px]">[2020-2022]</span>
+<div>
+<strong class="text-base">Product Manager</strong> @ Sanofi Pasteur
+                                <p class="text-slate-600 dark:text-slate-400 mt-1">Cross-functional team leadership, product roadmap, agile methodologies.</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4">
+<span class="text-slate-500 dark:text-slate-400 min-w-[120px]">[2018-2019]</span>
+<div>
+<strong class="text-base">Software Intern</strong> @ Eastern Bank Limited
+                                <p class="text-slate-600 dark:text-slate-400 mt-1">Internal tools development, database management.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="space-y-4" id="projects">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-4">
+<span class="text-green-600 dark:text-slate-300 font-bold">rafeed@portfolio</span>:<span class="text-blue-600 dark:text-slate-400">~</span>$ <span class="text-slate-900 dark:text-slate-100">ls -la projects/</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm font-mono text-left whitespace-nowrap">
+<tbody class="divide-y divide-slate-200 dark:divide-[#222222]">
+<tr class="hover:bg-slate-50 dark:hover:bg-[#111111] transition-colors">
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">drwxr-xr-x</td>
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">rafeed</td>
+<td class="py-2 pr-4">4096</td>
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">Oct 12 10:24</td>
+<td class="py-2 font-bold"><a class="hover:underline" href="#">id8</a></td>
+<td class="py-2 pl-4 text-slate-500 dark:text-slate-400 truncate max-w-[200px]">Idea management platform</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-[#111111] transition-colors">
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">drwxr-xr-x</td>
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">rafeed</td>
+<td class="py-2 pr-4">4096</td>
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">Sep 05 14:10</td>
+<td class="py-2 font-bold"><a class="hover:underline" href="#">e-predict</a></td>
+<td class="py-2 pl-4 text-slate-500 dark:text-slate-400 truncate max-w-[200px]">ML driven forecasting tool</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-[#111111] transition-colors">
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">drwxr-xr-x</td>
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">rafeed</td>
+<td class="py-2 pr-4">4096</td>
+<td class="py-2 pr-4 text-slate-500 dark:text-slate-400">Jul 22 09:00</td>
+<td class="py-2 font-bold"><a class="hover:underline" href="#">syncmaster</a></td>
+<td class="py-2 pl-4 text-slate-500 dark:text-slate-400 truncate max-w-[200px]">Data synchronization CLI</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<div class="fixed bottom-0 left-0 right-0 md:left-auto md:w-[calc(100%-16rem)] max-w-[1200px] border-t border-slate-300 dark:border-[#333333] bg-background-light dark:bg-background-dark p-4 z-20">
+<div class="flex items-center gap-2 font-mono text-sm">
+<span class="text-green-600 dark:text-slate-300 font-bold">visitor@rafeed.dev</span>:<span class="text-blue-600 dark:text-slate-400">~</span>$ 
+                    <input autofocus="" class="bg-transparent border-none outline-none flex-1 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:ring-0 p-0" placeholder="type a command..." type="text"/>
+<span class="animate-pulse">█</span>
+</div>
+</div>
+</main>
+</div>
+</body></html>

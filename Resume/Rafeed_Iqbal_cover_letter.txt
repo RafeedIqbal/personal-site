@@ -1,0 +1,16 @@
+Dear Hiring Manager,
+
+I am writing to express my enthusiasm for the [POSITION] role at [COMPANY]. As a Software Engineering graduate with direct experience leading the 0-to-1 development of consumer-facing applications, I am eager to apply my skills in product lifecycle management, agile leadership, and full-stack development to [ONE SENTENCE ON WHAT EXCITES YOU ABOUT THE COMPANY'S MISSION].
+
+Currently, as a Product Manager at Icon Train Smarter Ltd., I am spearheading the development of a scalable mobile fitness application, managing the product from ideation through to its current pre-launch phase. This role requires me to act as the central hub between business goals and technical execution. My day-to-day involves orchestrating the efforts of frontend and backend development teams, establishing Agile workflows to track deliverables, and ensuring we meet critical release deadlines. Beyond product development, I manage full-cycle operations, including recruitment and payroll for employees and contractors. This operational oversight has given me a holistic understanding of overall business strategy, allowing me to make product decisions that are deeply informed by the revenue and cost components that drive the business.
+
+My ability to bridge the gap between technical and commercial teams is supported by my hands-on development experience. I recently built id8, an AI-powered platform that transforms natural language prompts into production-deployed web applications, using Next.js, FastAPI, and PostgreSQL. Having built frontends and created prototypes in Figma, I possess a strong technical understanding of user interface design. This experience allows me to advocate effectively for the customer experience, ensuring that design goals are technically feasible and flawlessly executed. [TAILOR: Connect this to the role's specific technical requirements.]
+
+Prior to my current role, I gained significant experience in data-driven process improvement. As an Analyst at Sanofi Pasteur, I led an initiative that eliminated a backlog of 255 critical system errors through root cause analysis. Furthermore, my time at Eastern Bank Limited involved optimizing business intelligence reporting using SQL and Oracle BI. This background ensures I can combine creativity with sound data analysis to continuously improve [PRODUCT/SERVICE] for [COMPANY]'s users.
+
+I am particularly drawn to this role at [COMPANY] because [2-3 SENTENCES: Why this company? What about the role excites you? Connect your experience to their specific needs.]
+
+I would welcome the opportunity to discuss how my hands-on product management experience and technical engineering background can drive value for the [TEAM/COMPANY] team. Thank you for your time and consideration.
+
+Sincerely,
+Rafeed Iqbal

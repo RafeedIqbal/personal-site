@@ -1,8 +1,0 @@
-# /id8 Project Rule
-
-When `/id8` is invoked:
-
-1. Follow the installed `/id8` workflow file in `.agent/workflows/id8.md`.
-2. Execute one step at a time.
-3. Require explicit confirmation before repository creation/push and frontend deploy.
-4. Respect `--dry-run` as connectivity checks only, with zero mutating actions.
