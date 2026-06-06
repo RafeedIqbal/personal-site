@@ -124,10 +124,6 @@ function stepState(state: SpaceInvadersState): SpaceInvadersState {
   let bullet = state.bullet;
   let score = state.score;
 
-  if (!bullet) {
-    bullet = { x: state.playerX, y: PLAYER_ROW - 1 };
-  }
-
   const bulletStep = advanceBullet(bullet, invaders);
   bullet = bulletStep.bullet;
   invaders = bulletStep.invaders;
@@ -242,7 +238,12 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
       </div>
 
       <div className="flex gap-4 items-start">
-        <div className="grid gap-px bg-[#111111] p-px" style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, minmax(0, 1fr))` }}>
+        <div
+          role="img"
+          aria-label={`Space Invaders board — score ${state.score}, ${state.invaders.length} invaders remaining`}
+          className="grid gap-px bg-[#111111] p-px"
+          style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, minmax(0, 1fr))` }}
+        >
           {renderedBoard.flatMap((row, rowIndex) =>
             row.map((cell, columnIndex) => (
               <div
@@ -265,12 +266,18 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
 
         <div className="space-y-2 text-[#666666] leading-relaxed max-w-[180px]">
           <p>clear every invader before the wave reaches your row.</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => setState((currentState) => movePlayer(currentState, -1))}
               className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
             >
               left
+            </button>
+            <button
+              onClick={() => setState((currentState) => fireBullet(currentState))}
+              className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
+            >
+              fire
             </button>
             <button
               onClick={() => setState((currentState) => movePlayer(currentState, 1))}

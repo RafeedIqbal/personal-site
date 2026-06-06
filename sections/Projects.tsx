@@ -6,11 +6,21 @@ import { PROJECTS } from "../lib/content";
 export default function Projects() {
   return (
     <section id="projects" className="space-y-6 scroll-mt-16">
-      <CommandBlock command="ls -la projects/" delay={0.05}>
+      <CommandBlock command="ls -la projects/" delay={0.05} as="h2">
         <div className="space-y-0">
           {/* Desktop: file listing table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm text-left">
+              <caption className="sr-only">Projects</caption>
+              <thead className="sr-only">
+                <tr>
+                  <th scope="col">Permissions</th>
+                  <th scope="col">Owner</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Project</th>
+                  <th scope="col">Description</th>
+                </tr>
+              </thead>
               <tbody>
                 {PROJECTS.map((project) => (
                   <tr key={project.slug} className="align-top">

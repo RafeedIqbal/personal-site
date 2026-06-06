@@ -6,7 +6,7 @@ import { EDUCATION } from "../lib/content";
 export default function About() {
   return (
     <section id="about" className="space-y-6 scroll-mt-16">
-      <CommandBlock command="cat about.txt" delay={0.05}>
+      <CommandBlock command="cat about.txt" delay={0.05} as="h2">
         <div className="border-l-2 border-[#333333] pl-4 space-y-5 text-sm">
           <p className="leading-relaxed text-[#cccccc]">
             Software engineer and product manager with hands-on experience building consumer-facing

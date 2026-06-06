@@ -1,11 +1,11 @@
 export const PROFILE = {
   name: "Rafeed Iqbal",
   email: "rafeediqbal@gmail.com",
-  phone: "+1 437-256-8457",
   linkedin: "linkedin.com/in/rafeediqbal",
   linkedinUrl: "https://linkedin.com/in/rafeediqbal",
   github: "github.com/RafeedIqbal",
   githubUrl: "https://github.com/RafeedIqbal",
+  resumeUrl: "/Rafeed_Iqbal_Resume.pdf",
   title: "Software Engineer & Product Manager",
   tagline: "Building products at the intersection of code and strategy.",
 };

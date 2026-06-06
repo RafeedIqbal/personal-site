@@ -9,7 +9,7 @@ This repository is centered on the Next.js app in the repository root. Work from
 - `lib/`: content and command helpers.
 - `public/`: static assets.
 
-Root-level files like `prd.md`, `tech_plan.md`, `screens/`, and `Resume/` are supporting docs and assets, not runtime code.
+The `Resume/` directory holds the source résumé files (the published copy lives in `public/`); it is not runtime code.
 
 ## Build, Test, and Development Commands
 Run commands from the repository root.
@@ -50,7 +50,7 @@ Git history is currently minimal (`Initial commit` plus a placeholder follow-up)
 PRs should include:
 
 - a short summary of the change and why it was made;
-- linked issue, task, or relevant section of `prd.md`;
+- a linked issue or task when one exists;
 - screenshots or screen recordings for visual updates;
 - the commands you ran, such as `npm run lint`.
 

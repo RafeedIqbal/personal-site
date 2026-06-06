@@ -6,10 +6,20 @@ import { WEBSITES } from "../lib/content";
 export default function Websites() {
   return (
     <section id="websites" className="space-y-6 scroll-mt-16">
-      <CommandBlock command="ls -la websites/" delay={0.05}>
+      <CommandBlock command="ls -la websites/" delay={0.05} as="h2">
         <div className="space-y-0">
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm text-left">
+              <caption className="sr-only">Deployed websites</caption>
+              <thead className="sr-only">
+                <tr>
+                  <th scope="col">Permissions</th>
+                  <th scope="col">Owner</th>
+                  <th scope="col">URL length</th>
+                  <th scope="col">Website</th>
+                  <th scope="col">Repository</th>
+                </tr>
+              </thead>
               <tbody>
                 {WEBSITES.map((website) => (
                   <tr key={website.slug} className="align-top">

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 const TREE_ITEMS = [
   { href: "#whoami", label: "whoami" },
   { href: "#about", label: "about.txt" },
@@ -11,6 +13,34 @@ const TREE_ITEMS = [
 ];
 
 export default function Nav() {
+  const [activeId, setActiveId] = useState<string>("whoami");
+
+  useEffect(() => {
+    const sections = TREE_ITEMS.map((item) =>
+      document.getElementById(item.href.replace("#", ""))
+    ).filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+          );
+        if (visible[0]) {
+          setActiveId(visible[0].target.id);
+        }
+      },
+      // Active band sits ~40% down the viewport.
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
   const handleNavClick = (href: string) => {
     const id = href.replace("#", "");
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -27,11 +57,17 @@ export default function Nav() {
           {TREE_ITEMS.map((item, i) => {
             const isLast = i === TREE_ITEMS.length - 1;
             const branch = isLast ? "└── " : "├── ";
+            const isActive = activeId === item.href.replace("#", "");
             return (
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className="block w-full text-left text-[#cccccc] hover:text-white transition-colors leading-6"
+                aria-current={isActive ? "true" : undefined}
+                className={`block w-full text-left transition-colors leading-6 ${
+                  isActive
+                    ? "text-white font-bold"
+                    : "text-[#cccccc] hover:text-white"
+                }`}
               >
                 <span className="text-[#444444]">{branch}</span>
                 {item.label}

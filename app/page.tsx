@@ -16,29 +16,47 @@ import Contact from "../sections/Contact";
 export default function Page() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [booted, setBooted] = useState(false);
-  const [terminalWidth, setTerminalWidth] = useState(1000);
+  const [terminalWidth, setTerminalWidth] = useState(480);
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Skip the boot animation if it already played this session, or if the
+    // visitor prefers reduced motion.
+    const skipBoot =
+      sessionStorage.getItem("rafeed:booted") === "1" || reduceMotion.matches;
 
     const syncLayout = (matches: boolean) => {
       setIsMobile(matches);
-      if (matches) {
+      if (matches || skipBoot) {
         setBooted(true);
       }
     };
 
-    syncLayout(mediaQuery.matches);
+    const applyDefaults = () => {
+      syncLayout(mobileQuery.matches);
+      // Viewport-relative default so the terminal doesn't crowd the content
+      // column on 1280–1440px laptops.
+      setTerminalWidth(Math.min(Math.max(window.innerWidth * 0.38, 360), 720));
+    };
+
+    applyDefaults();
 
     const handleChange = (event: MediaQueryListEvent) => {
       syncLayout(event.matches);
     };
 
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    mobileQuery.addEventListener("change", handleChange);
+    return () => mobileQuery.removeEventListener("change", handleChange);
   }, []);
+
+  const handleBootComplete = () => {
+    setBooted(true);
+    sessionStorage.setItem("rafeed:booted", "1");
+  };
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -75,70 +93,65 @@ export default function Page() {
     };
   }, [isDragging]);
 
-  if (isMobile === null) {
-    return null;
-  }
-
   return (
-    <>
-      {!isMobile && !booted && <BootSequence onComplete={() => setBooted(true)} />}
+    <div className="relative min-h-screen">
+      {/* Desktop-only animated background (client-only, hydrates in) */}
+      {isMobile === false && <BackgroundEffect />}
 
-      {booted && (
-        <div className="relative min-h-screen">
-          {!isMobile && <BackgroundEffect />}
+      {/* Desktop-only boot overlay — sits over already-rendered content, then fades */}
+      {isMobile === false && !booted && (
+        <BootSequence onComplete={handleBootComplete} />
+      )}
 
-          <div className="relative z-10 flex min-h-screen">
-            {!isMobile && <Nav />}
+      <div className="relative z-10 flex min-h-screen">
+        {/* Nav — desktop only */}
+        {isMobile === false && <Nav />}
 
-            {/* Main content */}
-            <main className="flex-1 flex flex-col min-w-0">
-              {/* Header — matched height */}
-              {!isMobile && (
-                <div className="hidden md:flex items-center px-6 h-10 border-b border-[rgba(255,255,255,0.12)] sticky top-0 bg-[rgba(0,0,0,0.16)] backdrop-blur-[3px] z-10">
-                  <span className="text-xs text-[#888888]">rafeed@portfolio:~</span>
-                </div>
-              )}
-
-              {/* Sections */}
-              <div className="flex-1 w-full px-6 md:px-10 py-10 md:py-10 space-y-12 md:space-y-16 pb-16">
-                <Hero />
-                <hr className="hidden md:block border-[#1a1a1a]" />
-                <About />
-                <hr className="hidden md:block border-[#1a1a1a]" />
-                <Experience />
-                <hr className="hidden md:block border-[#1a1a1a]" />
-                <Projects />
-                <hr className="hidden md:block border-[#1a1a1a]" />
-                <Websites />
-                <hr className="hidden md:block border-[#1a1a1a]" />
-                <Skills />
-                <hr className="hidden md:block border-[#1a1a1a]" />
-                <Contact />
-              </div>
-            </main>
-
-            {!isMobile && (
-              <>
-                {/* Drag handle */}
-                <div
-                  className="hidden lg:block w-1 shrink-0 cursor-col-resize bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.22)] active:bg-[rgba(255,255,255,0.32)] transition-colors relative z-20"
-                  style={{ background: isDragging ? "rgba(255,255,255,0.32)" : undefined }}
-                  onMouseDown={handleMouseDown}
-                >
-                  <div className="absolute inset-y-0 -left-1 -right-1" />
-                </div>
-
-                <InteractiveTerminal width={terminalWidth} />
-              </>
-            )}
+        {/* Main content — always rendered so it ships in the server HTML */}
+        <main className="flex-1 flex flex-col min-w-0">
+          {/* Header — matched height; hidden on mobile via CSS */}
+          <div className="hidden md:flex items-center px-6 h-10 border-b border-[rgba(255,255,255,0.12)] sticky top-0 bg-[rgba(0,0,0,0.16)] backdrop-blur-[3px] z-10">
+            <span className="text-xs text-[#888888]">rafeed@portfolio:~</span>
           </div>
 
-          {/* Prevent text selection while dragging */}
-          {!isMobile && isDragging && (
-            <div className="fixed inset-0 z-50 cursor-col-resize" />
-          )}
-        </div>
+          {/* Sections */}
+          <div className="flex-1 w-full px-6 md:px-10 py-10 md:py-10 space-y-12 md:space-y-16 pb-16">
+            <Hero />
+            <hr className="hidden md:block border-[#1a1a1a]" />
+            <About />
+            <hr className="hidden md:block border-[#1a1a1a]" />
+            <Experience />
+            <hr className="hidden md:block border-[#1a1a1a]" />
+            <Projects />
+            <hr className="hidden md:block border-[#1a1a1a]" />
+            <Websites />
+            <hr className="hidden md:block border-[#1a1a1a]" />
+            <Skills />
+            <hr className="hidden md:block border-[#1a1a1a]" />
+            <Contact />
+          </div>
+        </main>
+
+        {/* Drag handle + terminal — desktop only */}
+        {isMobile === false && (
+          <>
+            <div
+              className="hidden lg:block w-1 shrink-0 cursor-col-resize bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.22)] active:bg-[rgba(255,255,255,0.32)] transition-colors relative z-20"
+              style={{ background: isDragging ? "rgba(255,255,255,0.32)" : undefined }}
+              onMouseDown={handleMouseDown}
+            >
+              <div className="absolute inset-y-0 -left-1 -right-1" />
+            </div>
+
+            <InteractiveTerminal width={terminalWidth} />
+          </>
+        )}
+      </div>
+
+      {/* Prevent text selection while dragging */}
+      {isMobile === false && isDragging && (
+        <div className="fixed inset-0 z-50 cursor-col-resize" />
       )}
-    </>
+    </div>
   );
 }

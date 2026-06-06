@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { runCommand, AVAILABLE_COMMANDS } from "../lib/terminal-commands";
+import { runCommand, AVAILABLE_COMMANDS, HELP_COMMANDS } from "../lib/terminal-commands";
 import type { TerminalGameId } from "../lib/terminal-games";
 import TerminalGamesPanel from "./terminal-games/TerminalGamesPanel";
 
@@ -203,21 +203,7 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
                   </button>
                 </div>
                 <div className="px-3 py-2 space-y-0.5">
-                  {[
-                    ["whoami", "display identity"],
-                    ["cat about.txt", "education & background"],
-                    ["cat experience.log", "work history"],
-                    ["ls projects/", "list projects"],
-                    ["ls websites/", "list deployed websites"],
-                    ["cat projects/<name>", "project details"],
-                    ["env", "skills & tools"],
-                    ["contact --help", "contact information"],
-                    ["games", "open terminal arcade"],
-                    ["play tetris", "launch a game"],
-                    ["open linkedin", "open LinkedIn"],
-                    ["open github", "open GitHub"],
-                    ["clear", "clear terminal"],
-                  ].map(([cmd, desc]) => (
+                  {HELP_COMMANDS.map(({ command: cmd, description: desc }) => (
                     <div key={cmd} className="flex justify-between gap-4">
                       <button
                         className="text-white hover:underline text-left"
@@ -279,6 +265,7 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
               onKeyDown={handleKeyDown}
               onFocus={() => setGameHotkeysEnabled(false)}
               className="absolute inset-0 w-full h-full opacity-0 z-10"
+              aria-label="Terminal command input"
               autoComplete="off"
               spellCheck={false}
               autoFocus

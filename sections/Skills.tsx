@@ -6,7 +6,7 @@ import { SKILLS } from "../lib/content";
 export default function Skills() {
   return (
     <section id="env" className="space-y-6 scroll-mt-16">
-      <CommandBlock command="env" delay={0.05}>
+      <CommandBlock command="env" delay={0.05} as="h2">
         <div className="border-l-2 border-[#333333] pl-4 space-y-2 text-sm font-mono">
           {Object.entries(SKILLS).map(([key, value]) => (
             <div key={key} className="flex flex-wrap gap-1">

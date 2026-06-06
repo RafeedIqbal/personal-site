@@ -36,7 +36,7 @@ export const TERMINAL_GAMES: TerminalGameDefinition[] = [
     command: "play spaceinvaders",
     aliases: ["spaceinvaders", "space invaders", "space-invaders"],
     description: "Slide the cannon, fire upward, and clear the fleet before it lands.",
-    controls: "Arrow keys or A/D to move.",
+    controls: "Arrow keys or A/D to move, Space (or the fire button) to shoot.",
   },
   {
     id: "tictactoe",

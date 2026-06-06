@@ -6,7 +6,7 @@ import { PROFILE } from "../lib/content";
 export default function Contact() {
   return (
     <section id="contact" className="space-y-6 scroll-mt-16">
-      <CommandBlock command="contact --help" delay={0.05}>
+      <CommandBlock command="contact --help" delay={0.05} as="h2">
         <div className="border-l-2 border-[#333333] pl-4 text-sm space-y-4">
           <p className="text-[#888888]">Usage: contact [OPTIONS]</p>
           <div className="space-y-2">
@@ -37,8 +37,14 @@ export default function Contact() {
               >
                 {PROFILE.github}
               </a>
-              <span className="text-[#888888]">--phone</span>
-              <span className="text-white">{PROFILE.phone}</span>
+              <span className="text-[#888888]">--resume</span>
+              <a
+                href={PROFILE.resumeUrl}
+                download
+                className="text-white hover:underline"
+              >
+                download résumé (pdf)
+              </a>
             </div>
           </div>
           <p className="text-[#444444] text-xs pt-2">

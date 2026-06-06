@@ -96,6 +96,7 @@ export default function BackgroundEffect() {
     lastFrameAt: 0,
   });
   const rafRef = useRef<number>(0);
+  const runningRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -103,6 +104,11 @@ export default function BackgroundEffect() {
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Respect reduced-motion: leave the canvas blank, run no animation loop.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
 
     const drawFrame = (timestamp: number) => {
       const viewport = viewportRef.current;
@@ -114,6 +120,10 @@ export default function BackgroundEffect() {
       const positionBlend = getBlendFactor(POSITION_EASING, deltaMs);
       const opacityBlend = getBlendFactor(OPACITY_EASING, deltaMs);
       const isPointerActive = timestamp - pointer.lastMoveAt < POINTER_ACTIVE_MS;
+
+      // Track whether anything is still animating this frame so the loop can
+      // idle once everything has settled.
+      let active = isPointerActive;
 
       viewport.lastFrameAt = timestamp;
 
@@ -183,12 +193,33 @@ export default function BackgroundEffect() {
         particle.y += (targetY - particle.y) * positionBlend;
 
         if (particle.opacity > VISIBLE_EPSILON) {
+          active = true;
           ctx.globalAlpha = particle.opacity;
           ctx.fillText(particle.char, particle.x, particle.y);
+        } else if (
+          Math.abs(particle.x - particle.originX) > 0.05 ||
+          Math.abs(particle.y - particle.originY) > 0.05
+        ) {
+          // Still easing back toward its origin — keep animating.
+          active = true;
         }
       }
 
       ctx.globalAlpha = 1;
+
+      // Idle the loop once nothing is visible or moving and the pointer is
+      // inactive; handleMouseMove/resizeCanvas restart it on demand.
+      if (active) {
+        rafRef.current = requestAnimationFrame(drawFrame);
+      } else {
+        runningRef.current = false;
+      }
+    };
+
+    const startLoop = () => {
+      if (runningRef.current) return;
+      runningRef.current = true;
+      viewportRef.current.lastFrameAt = 0;
       rafRef.current = requestAnimationFrame(drawFrame);
     };
 
@@ -214,6 +245,7 @@ export default function BackgroundEffect() {
       ctx.textBaseline = "middle";
 
       particlesRef.current = createParticleGrid(width, height);
+      startLoop();
     };
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -222,6 +254,7 @@ export default function BackgroundEffect() {
         y: event.clientY,
         lastMoveAt: performance.now(),
       };
+      startLoop();
     };
 
     const handleMouseLeave = () => {
@@ -233,7 +266,7 @@ export default function BackgroundEffect() {
     };
 
     resizeCanvas();
-    rafRef.current = requestAnimationFrame(drawFrame);
+    startLoop();
 
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -241,6 +274,7 @@ export default function BackgroundEffect() {
 
     return () => {
       cancelAnimationFrame(rafRef.current);
+      runningRef.current = false;
 
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("mousemove", handleMouseMove);
@@ -248,5 +282,11 @@ export default function BackgroundEffect() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="fixed inset-0 z-0 pointer-events-none"
+    />
+  );
 }

@@ -22,6 +22,6 @@ npm run dev
 - `components/`: reusable UI and terminal game components
 - `sections/`: page-level content blocks
 - `lib/`: typed content and terminal command helpers
-- `public/`: static assets
+- `public/`: static assets (including `Rafeed_Iqbal_Resume.pdf`, the downloadable résumé)
 
-Supporting docs and assets remain at the repo root in `prd.md`, `tech_plan.md`, `screens/`, and `Resume/`.
+The original résumé source files live at the repo root in `Resume/`.

@@ -31,6 +31,8 @@ export const AVAILABLE_COMMANDS = [
   "cat projects/syncmaster",
   "env",
   "contact --help",
+  "resume",
+  "open resume",
   "games",
   "play hanoi",
   "play tetris",
@@ -43,32 +45,28 @@ export const AVAILABLE_COMMANDS = [
   "ls",
 ];
 
-const HELP_TEXT = `Available commands:
-
-  whoami              display identity
-  cat about.txt       education & background
-  cat experience.log  work history
-  ls projects/        list projects
-  ls websites/        list deployed websites
-  cat projects/<name> project details (id8, e-predict, syncmaster)
-  env                 skills & environment
-  contact --help      contact information
-  games               open the terminal arcade
-  play <game>         launch hanoi, tetris, spaceinvaders, or tic-tac-toe
-  open linkedin       open LinkedIn profile
-  open github         open GitHub profile
-  close game          close the active game panel
-  clear               clear terminal
-  help                show this message`;
+// Single source of truth for the help card (rendered in InteractiveTerminal).
+export const HELP_COMMANDS: { command: string; description: string }[] = [
+  { command: "whoami", description: "display identity" },
+  { command: "cat about.txt", description: "education & background" },
+  { command: "cat experience.log", description: "work history" },
+  { command: "ls projects/", description: "list projects" },
+  { command: "ls websites/", description: "list deployed websites" },
+  { command: "cat projects/<name>", description: "project details" },
+  { command: "env", description: "skills & tools" },
+  { command: "contact --help", description: "contact information" },
+  { command: "resume", description: "download résumé" },
+  { command: "games", description: "open terminal arcade" },
+  { command: "play tetris", description: "launch a game" },
+  { command: "open linkedin", description: "open LinkedIn" },
+  { command: "open github", description: "open GitHub" },
+  { command: "clear", description: "clear terminal" },
+];
 
 export function runCommand(input: string): CommandResult | null {
   const cmd = input.trim().toLowerCase();
 
   if (!cmd) return null;
-
-  if (cmd === "help" || cmd === "--help") {
-    return { output: HELP_TEXT };
-  }
 
   if (cmd === "games" || cmd === "games --help") {
     return {
@@ -197,21 +195,28 @@ Options:
   --email      ${PROFILE.email}
   --linkedin   ${PROFILE.linkedin}
   --github     ${PROFILE.github}
-  --phone      ${PROFILE.phone}`,
+  --resume     ${PROFILE.resumeUrl}`,
       scrollTarget: "contact",
     };
   }
 
+  if (cmd === "resume" || cmd === "open resume" || cmd === "cat resume.pdf") {
+    if (typeof window !== "undefined") {
+      window.open(PROFILE.resumeUrl, "_blank", "noopener,noreferrer");
+    }
+    return { output: `Opening ${PROFILE.resumeUrl}...`, scrollTarget: "contact" };
+  }
+
   if (cmd === "open linkedin") {
     if (typeof window !== "undefined") {
-      window.open(PROFILE.linkedinUrl, "_blank");
+      window.open(PROFILE.linkedinUrl, "_blank", "noopener,noreferrer");
     }
     return { output: `Opening ${PROFILE.linkedinUrl}...`, scrollTarget: "contact" };
   }
 
   if (cmd === "open github") {
     if (typeof window !== "undefined") {
-      window.open(PROFILE.githubUrl, "_blank");
+      window.open(PROFILE.githubUrl, "_blank", "noopener,noreferrer");
     }
     return { output: `Opening ${PROFILE.githubUrl}...`, scrollTarget: "contact" };
   }

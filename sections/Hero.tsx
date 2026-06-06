@@ -39,6 +39,13 @@ export default function Hero() {
             >
               [↗] email
             </a>
+            <a
+              href={PROFILE.resumeUrl}
+              download
+              className="border border-[#333333] px-4 py-1.5 text-xs hover:bg-[#111111] hover:border-white transition-colors"
+            >
+              [↓] resume
+            </a>
           </div>
         </div>
       </CommandBlock>
