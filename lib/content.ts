@@ -99,7 +99,8 @@ export interface Website {
   slug: string;
   name: string;
   url: string;
-  githubUrl: string;
+  stack: string;
+  type: string;
 }
 
 export const WEBSITES: Website[] = [
@@ -107,55 +108,36 @@ export const WEBSITES: Website[] = [
     slug: "rafeed-dev",
     name: "rafeed.dev",
     url: "https://rafeed.dev",
-    githubUrl: "https://github.com/RafeedIqbal/personal-site",
+    stack: "Next.js",
+    type: "portfolio",
   },
   {
-    slug: "icontraining",
-    name: "www.icontraining.app",
-    url: "https://www.icontraining.app/",
-    githubUrl: "https://github.com/rafeed-iconfitness/Icon-website-vercel",
+    slug: "alpac-london",
+    name: "alpaclondon.com",
+    url: "https://alpaclondon.com/",
+    stack: "Shopify Hydrogen",
+    type: "e-commerce",
   },
   {
-    slug: "id8-feature-requests",
-    name: "id8-feature-requests.vercel.app",
-    url: "https://id8-feature-requests.vercel.app",
-    githubUrl: "https://github.com/RafeedIqbal/id8-feature-requests",
+    slug: "arizmi-labs",
+    name: "arizmilabs.com",
+    url: "https://www.arizmilabs.com/",
+    stack: "Next.js",
+    type: "consultancy",
   },
   {
-    slug: "kanban-team",
-    name: "kanban-team-id8.vercel.app",
-    url: "https://kanban-team-id8.vercel.app",
-    githubUrl: "https://github.com/RafeedIqbal/kanban-team",
+    slug: "basenote-solutions",
+    name: "basenotesolutions.com",
+    url: "https://www.basenotesolutions.com/",
+    stack: "Next.js",
+    type: "consultancy",
   },
   {
-    slug: "simple-expense",
-    name: "simple-expense-id8.vercel.app",
-    url: "https://simple-expense-id8.vercel.app/",
-    githubUrl: "https://github.com/RafeedIqbal/simple-expense",
-  },
-  {
-    slug: "ramadantrack",
-    name: "ramadantrack.vercel.app",
-    url: "https://ramadantrack.vercel.app",
-    githubUrl: "https://github.com/RafeedIqbal/RamadanTrack",
-  },
-  {
-    slug: "habitflow",
-    name: "habitflow-16.vercel.app",
-    url: "https://habitflow-16.vercel.app/",
-    githubUrl: "https://github.com/RafeedIqbal/habitflow",
-  },
-  {
-    slug: "basenote-site",
-    name: "basenote-site.vercel.app",
-    url: "https://basenote-site.vercel.app/",
-    githubUrl: "https://github.com/RafeedIqbal/basenote-site",
-  },
-  {
-    slug: "arizmi-site",
-    name: "arizmi-site-y16w.vercel.app",
-    url: "https://arizmi-site-y16w.vercel.app/",
-    githubUrl: "https://github.com/RafeedIqbal/arizmi-site",
+    slug: "riveli-mn",
+    name: "rivelimn.com",
+    url: "https://rivelimn.com",
+    stack: "Next.js, Payload CMS",
+    type: "consultancy",
   },
 ];
 

@@ -150,7 +150,7 @@ McMaster B.Eng Software Engineering graduate (${EDUCATION.gpa} GPA).`,
     return {
       output: WEBSITES.map(
         (website) =>
-          `lrwxrwxrwx  rafeed  ${website.url.length}  ${website.name} -> ${website.url}`
+          `lrwxrwxrwx  rafeed  ${website.url.length}  ${website.name} -> ${website.url}  [${website.stack}] [${website.type}]`
       ).join("\n"),
       scrollTarget: "websites",
     };

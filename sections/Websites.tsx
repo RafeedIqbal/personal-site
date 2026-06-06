@@ -17,7 +17,7 @@ export default function Websites() {
                   <th scope="col">Owner</th>
                   <th scope="col">URL length</th>
                   <th scope="col">Website</th>
-                  <th scope="col">Repository</th>
+                  <th scope="col">Stack</th>
                 </tr>
               </thead>
               <tbody>
@@ -38,15 +38,13 @@ export default function Websites() {
                         {website.name}
                       </a>
                     </td>
-                    <td className="py-2.5 text-xs">
-                      <a
-                        href={website.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#888888] hover:text-white hover:underline"
-                      >
-                        [github]
-                      </a>
+                    <td className="py-2.5 text-xs whitespace-nowrap">
+                      {website.stack.split(", ").map((tech) => (
+                        <span key={tech} className="mr-2 text-[#888888]">
+                          [{tech}]
+                        </span>
+                      ))}
+                      <span className="text-[#666666]">[{website.type}]</span>
                     </td>
                   </tr>
                 ))}
@@ -68,14 +66,14 @@ export default function Websites() {
                 >
                   ./{website.name}
                 </a>
-                <a
-                  href={website.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex text-xs text-[#888888] hover:text-white hover:underline"
-                >
-                  [github] view_repo
-                </a>
+                <p className="text-xs">
+                  {website.stack.split(", ").map((tech) => (
+                    <span key={tech} className="mr-1.5 text-[#888888]">
+                      [{tech}]
+                    </span>
+                  ))}
+                  <span className="text-[#666666]">[{website.type}]</span>
+                </p>
               </div>
             ))}
           </div>
