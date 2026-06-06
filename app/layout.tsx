@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -11,14 +11,35 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://rafeed.dev"),
-  title: "Rafeed Iqbal — Portfolio",
+  title: {
+    default: "Rafeed Iqbal — Portfolio",
+    template: "%s — Rafeed Iqbal",
+  },
   description:
     "Software Engineer & Product Manager. Building products at the intersection of code and strategy.",
+  applicationName: "Rafeed Iqbal — Portfolio",
+  keywords: [
+    "Rafeed Iqbal",
+    "Software Engineer",
+    "Product Manager",
+    "Portfolio",
+    "Full-stack Developer",
+    "Next.js",
+    "React",
+    "TypeScript",
+  ],
+  authors: [{ name: "Rafeed Iqbal", url: "https://rafeed.dev" }],
+  creator: "Rafeed Iqbal",
+  publisher: "Rafeed Iqbal",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Rafeed Iqbal — Portfolio",
     description: "Software Engineer & Product Manager.",
     url: "https://rafeed.dev",
     siteName: "rafeed.dev",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
@@ -26,6 +47,16 @@ export const metadata: Metadata = {
     title: "Rafeed Iqbal — Portfolio",
     description: "Software Engineer & Product Manager.",
   },
+  appleWebApp: {
+    capable: true,
+    title: "Rafeed Iqbal",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
