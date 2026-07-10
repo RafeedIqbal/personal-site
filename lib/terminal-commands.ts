@@ -117,13 +117,15 @@ ${PROFILE.tagline}`,
 ---------
 ${EDUCATION.school}
 ${EDUCATION.degree}
-GPA: ${EDUCATION.gpa} | ${EDUCATION.years} | ${EDUCATION.location}
+${EDUCATION.years} | ${EDUCATION.location}
 
 BIO
 ---
-Software engineer and product manager with experience building 0-to-1 consumer applications,
-leading cross-functional teams, and shipping production systems.
-McMaster B.Eng Software Engineering graduate (${EDUCATION.gpa} GPA).`,
+Software engineer and product leader building consumer applications from 0 to 1.
+Running product and engineering for an AI-powered fitness app, and sole engineer
+behind a SaaS ERP platform for perfumers — RAG-based AI assistants, production
+systems, and the storefronts around them.
+McMaster B.Eng Software Engineering graduate.`,
       scrollTarget: "about",
     };
   }

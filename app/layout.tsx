@@ -16,12 +16,12 @@ export const metadata: Metadata = {
     template: "%s — Rafeed Iqbal",
   },
   description:
-    "Software Engineer & Product Manager. Building products at the intersection of code and strategy.",
+    "Software Engineer & Product Leader. Building products at the intersection of code and strategy.",
   applicationName: "Rafeed Iqbal — Portfolio",
   keywords: [
     "Rafeed Iqbal",
     "Software Engineer",
-    "Product Manager",
+    "Product Leader",
     "Portfolio",
     "Full-stack Developer",
     "Next.js",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Rafeed Iqbal — Portfolio",
-    description: "Software Engineer & Product Manager.",
+    description: "Software Engineer & Product Leader.",
     url: "https://rafeed.dev",
     siteName: "rafeed.dev",
     locale: "en_US",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Rafeed Iqbal — Portfolio",
-    description: "Software Engineer & Product Manager.",
+    description: "Software Engineer & Product Leader.",
   },
   appleWebApp: {
     capable: true,

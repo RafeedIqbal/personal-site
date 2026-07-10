@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Rafeed Iqbal — Portfolio",
     short_name: "Rafeed Iqbal",
     description:
-      "Software Engineer & Product Manager. Building products at the intersection of code and strategy.",
+      "Software Engineer & Product Leader. Building products at the intersection of code and strategy.",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",

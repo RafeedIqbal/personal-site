@@ -9,10 +9,10 @@ export default function About() {
       <CommandBlock command="cat about.txt" delay={0.05} as="h2">
         <div className="border-l-2 border-[#333333] pl-4 space-y-5 text-sm">
           <p className="leading-relaxed text-[#cccccc]">
-            Software engineer and product manager with hands-on experience building consumer-facing
-            applications from 0 to 1. I bridge the gap between technical execution and product
-            strategy — having led development teams, shipped production systems, and driven
-            data-informed process improvements.
+            Software engineer and product leader building consumer applications from 0 to 1. I run
+            product and engineering for an AI-powered fitness app, and I&apos;m the sole engineer
+            behind a SaaS ERP platform for perfumers — shipping RAG-based AI assistants, production
+            systems, and the storefronts around them.
           </p>
 
           <div className="space-y-1">
@@ -20,7 +20,7 @@ export default function About() {
             <p className="text-white font-bold">{EDUCATION.school}</p>
             <p className="text-[#aaaaaa]">{EDUCATION.degree}</p>
             <p className="text-[#666666]">
-              GPA: {EDUCATION.gpa} &nbsp;·&nbsp; {EDUCATION.years} &nbsp;·&nbsp; {EDUCATION.location}
+              {EDUCATION.years} &nbsp;·&nbsp; {EDUCATION.location}
             </p>
           </div>
         </div>
