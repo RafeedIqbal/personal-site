@@ -92,7 +92,7 @@ export default function TicTacToeGame() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-4">
-        <p className="text-[#aaaaaa]">{status}</p>
+        <p className="text-[#aaaaaa]" role="status">{status}</p>
         <button
           onClick={() => setBoard(Array<Cell>(9).fill(null))}
           className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
@@ -101,15 +101,20 @@ export default function TicTacToeGame() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 max-w-[240px]">
+      <div
+        className="grid grid-cols-3 gap-2 max-w-[240px]"
+        role="group"
+        aria-label="Tic-tac-toe board. You play X."
+      >
         {board.map((cell, index) => (
           <button
             key={index}
             onClick={() => handleMove(index)}
+            aria-label={`Row ${Math.floor(index / 3) + 1}, column ${(index % 3) + 1}: ${cell ?? "empty"}`}
             className="aspect-square border border-[#333333] text-white text-2xl font-bold hover:border-white transition-colors disabled:opacity-60"
             disabled={Boolean(cell) || Boolean(winner) || isDraw}
           >
-            {cell ?? "·"}
+            <span aria-hidden="true">{cell ?? "·"}</span>
           </button>
         ))}
       </div>

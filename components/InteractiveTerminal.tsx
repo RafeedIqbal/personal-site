@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, KeyboardEvent } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { runCommand, AVAILABLE_COMMANDS, HELP_COMMANDS } from "../lib/terminal-commands";
 import type { TerminalGameId } from "../lib/terminal-games";
-import TerminalGamesPanel from "./terminal-games/TerminalGamesPanel";
+
+// The games only load when the panel first opens, keeping them out of the
+// terminal's initial chunk.
+const TerminalGamesPanel = dynamic(() => import("./terminal-games/TerminalGamesPanel"), {
+  ssr: false,
+  loading: () => <p className="text-xs text-subtle">loading arcade...</p>,
+});
 
 interface HistoryEntry {
   command: string;
@@ -27,6 +34,9 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
   const [gameHotkeysEnabled, setGameHotkeysEnabled] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const gamePanelRef = useRef<HTMLDivElement>(null);
+  const lastFocusedRef = useRef<HTMLElement | null>(null);
 
   // Auto-scroll to keep prompt visible
   useEffect(() => {
@@ -34,13 +44,29 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       top: bodyRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [history, gamePanelOpen, activeGameId, showHelp]);
+  }, [history, showHelp]);
 
-  // Focus the prompt whenever the overlay opens; the input's onFocus handler
-  // disarms game hotkeys, so reopening always starts with the prompt live.
+  // Opening a game grows the panel; align the arcade heading with the top of
+  // the body so the game title and controls stay visible.
+  useEffect(() => {
+    const body = bodyRef.current;
+    const panel = gamePanelRef.current;
+    if (!gamePanelOpen || !body || !panel) return;
+    const delta = panel.getBoundingClientRect().top - body.getBoundingClientRect().top;
+    body.scrollTo({ top: body.scrollTop + delta - 4, behavior: "smooth" });
+  }, [gamePanelOpen, activeGameId]);
+
+  // Focus the prompt whenever the overlay opens (the input's onFocus handler
+  // disarms game hotkeys, so reopening always starts with the prompt live),
+  // and hand focus back to whatever opened the overlay when it closes.
   useEffect(() => {
     if (open) {
+      lastFocusedRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       inputRef.current?.focus();
+    } else {
+      lastFocusedRef.current?.focus();
+      lastFocusedRef.current = null;
     }
   }, [open]);
 
@@ -98,6 +124,36 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  // Keep Tab cycling inside the dialog (it's aria-modal) — including while a
+  // game has the input blurred — without stealing Tab from autocomplete.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== "Tab" || e.defaultPrevented) return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = Array.from(
+        panel.querySelectorAll<HTMLElement>("button, input, a[href]")
+      ).filter((el) => !el.hasAttribute("disabled"));
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (!(active instanceof HTMLElement) || !panel.contains(active)) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   const handleSubmit = () => {
     const trimmed = input.trim();
     if (!trimmed) return;
@@ -149,9 +205,13 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // Tab only completes the ghost suggestion; otherwise it stays a focus key
+    // (Shift+Tab always is) so keyboard users can reach the dialog's buttons.
     if (e.key === "Tab") {
-      e.preventDefault();
-      if (ghostSuggestion) setInput(input + ghostSuggestion);
+      if (!e.shiftKey && ghostSuggestion) {
+        e.preventDefault();
+        setInput(input + ghostSuggestion);
+      }
       return;
     }
     if (e.key === "ArrowRight" && ghostSuggestion && inputRef.current) {
@@ -185,6 +245,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       <div className="absolute inset-0 bg-black/45" onClick={onClose} />
 
       <div
+        ref={panelRef}
         className="absolute bottom-11 left-1/2 flex w-[min(760px,calc(100vw-48px))] -translate-x-1/2 flex-col overflow-hidden rounded-xl border border-white/[0.12] bg-[rgba(9,10,12,0.92)] shadow-[0_24px_80px_rgba(0,0,0,0.6)] backdrop-blur-[16px]"
         style={{ height: gamePanelOpen ? "min(78vh, 700px)" : 440 }}
         onClick={focusPrompt}
@@ -263,18 +324,20 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
           </AnimatePresence>
 
           {gamePanelOpen && (
-            <TerminalGamesPanel
-              activeGameId={activeGameId}
-              hotkeysEnabled={gameHotkeysEnabled}
-              onSelectGame={launchGame}
-              onClose={closeGames}
-              onBackToLibrary={openGameLibrary}
-              onEnableHotkeys={() => {
-                if (!activeGameId) return;
-                setGameHotkeysEnabled(true);
-                inputRef.current?.blur();
-              }}
-            />
+            <div ref={gamePanelRef}>
+              <TerminalGamesPanel
+                activeGameId={activeGameId}
+                hotkeysEnabled={gameHotkeysEnabled}
+                onSelectGame={launchGame}
+                onClose={closeGames}
+                onBackToLibrary={openGameLibrary}
+                onEnableHotkeys={() => {
+                  if (!activeGameId) return;
+                  setGameHotkeysEnabled(true);
+                  inputRef.current?.blur();
+                }}
+              />
+            </div>
           )}
 
           {/* Past commands + output */}
@@ -305,7 +368,6 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
                 aria-label="Terminal command input"
                 autoComplete="off"
                 spellCheck={false}
-                autoFocus
               />
               <div className="pointer-events-none flex min-h-[1rem] items-center">
                 <span className="whitespace-pre text-xs text-fg">{input}</span>

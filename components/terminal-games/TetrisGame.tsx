@@ -313,6 +313,13 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
           score: {state.score} · lines: {state.lines}
           {state.gameOver ? " · game over" : ""}
         </p>
+        {/* Announce only line clears and game over — announcing every score
+            tick would swamp screen readers. */}
+        <p className="sr-only" role="status">
+          {state.gameOver
+            ? `Game over. Final score ${state.score}, ${state.lines} lines cleared.`
+            : `${state.lines} lines cleared.`}
+        </p>
         <button
           onClick={() => setState(createInitialState())}
           className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
@@ -322,11 +329,17 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
       </div>
 
       <div className="flex gap-4 items-start">
-        <div className="grid gap-px bg-[#111111] p-px" style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, minmax(0, 1fr))` }}>
+        <div
+          className="grid gap-px bg-[#111111] p-px"
+          style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, minmax(0, 1fr))` }}
+          role="img"
+          aria-label={`Tetris playfield, ${BOARD_WIDTH} columns by ${BOARD_HEIGHT} rows. Use the buttons or arrow keys to move the falling piece.`}
+        >
           {renderedBoard.flatMap((row, rowIndex) =>
             row.map((cell, columnIndex) => (
               <div
                 key={`${rowIndex}-${columnIndex}`}
+                aria-hidden="true"
                 className={`h-4 w-4 ${
                   cell === 0
                     ? "bg-black"
@@ -339,7 +352,7 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
           )}
         </div>
 
-        <div className="space-y-2 text-[#666666] leading-relaxed max-w-[180px]">
+        <div className="space-y-2 text-subtle leading-relaxed max-w-[180px]">
           <p>rows clear for points; hard drop with space.</p>
           <div className="grid grid-cols-3 gap-2">
             <button

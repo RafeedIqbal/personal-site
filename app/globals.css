@@ -6,7 +6,7 @@
   --color-body: #c9cdd2;
   --color-body-2: #a6abb2;
   --color-muted: #9aa0a6;
-  --color-subtle: #5b6067;
+  --color-subtle: #767b83; /* keep ≥4.5:1 on --color-bg (WCAG AA) */
   --color-faint: #3a3f45;
   --color-accent: #4ade80;
   --font-mono: var(--font-jetbrains-mono);

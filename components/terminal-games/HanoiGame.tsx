@@ -68,7 +68,7 @@ export default function HanoiGame() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-4">
-        <p className="text-[#aaaaaa]">
+        <p className="text-[#aaaaaa]" role="status">
           {solved
             ? `Solved in ${moves} moves. Minimum: ${2 ** DISK_COUNT - 1}.`
             : `Moves: ${moves} · Move the full stack to another tower.`}
@@ -81,21 +81,27 @@ export default function HanoiGame() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3" role="group" aria-label="Towers of Hanoi. Select a tower to pick up its top disk, then a tower to drop it on.">
         {towers.map((tower, towerIndex) => {
           const isSelected = towerIndex === selectedTower;
+          const diskDescription =
+            tower.length > 0
+              ? `disks from top: ${[...tower].reverse().join(", ")}`
+              : "empty";
 
           return (
             <button
               key={towerIndex}
               onClick={() => handleTowerClick(towerIndex)}
+              aria-pressed={isSelected}
+              aria-label={`Tower ${towerIndex + 1}: ${diskDescription}${isSelected ? ". Selected" : ""}`}
               className={`border rounded px-2 py-3 min-h-[180px] flex flex-col justify-end items-center gap-1 transition-colors ${
                 isSelected
                   ? "border-white bg-[rgba(255,255,255,0.05)]"
                   : "border-[#333333] hover:border-[#666666]"
               }`}
             >
-              <div className="relative h-32 w-full flex items-end justify-center">
+              <div className="relative h-32 w-full flex items-end justify-center" aria-hidden="true">
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-28 w-px bg-[#333333]" />
                 <div className="relative z-10 h-full w-full flex flex-col justify-end items-center gap-1">
                   {[...tower].reverse().map((disk) => (
@@ -109,7 +115,7 @@ export default function HanoiGame() {
               </div>
               <div className="w-full h-px bg-[#1a1a1a]" />
               <div className="pt-1">
-                <span className="text-[#666666]">tower {towerIndex + 1}</span>
+                <span className="text-subtle">tower {towerIndex + 1}</span>
               </div>
             </button>
           );

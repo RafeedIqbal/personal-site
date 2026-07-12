@@ -229,6 +229,15 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
           score: {state.score}
           {state.win ? " · fleet cleared" : state.gameOver ? " · invasion successful" : ""}
         </p>
+        {/* Announce only end states — announcing every score change would
+            swamp screen readers. */}
+        <p className="sr-only" role="status">
+          {state.win
+            ? `You win. Final score ${state.score}.`
+            : state.gameOver
+              ? `Game over. Final score ${state.score}.`
+              : ""}
+        </p>
         <button
           onClick={() => setState(createInitialState())}
           className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
@@ -248,6 +257,7 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
             row.map((cell, columnIndex) => (
               <div
                 key={`${rowIndex}-${columnIndex}`}
+                aria-hidden="true"
                 className={`h-4 w-4 flex items-center justify-center text-[10px] ${
                   cell === "."
                     ? "bg-black text-transparent"
@@ -264,7 +274,7 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
           )}
         </div>
 
-        <div className="space-y-2 text-[#666666] leading-relaxed max-w-[180px]">
+        <div className="space-y-2 text-subtle leading-relaxed max-w-[180px]">
           <p>clear every invader before the wave reaches your row.</p>
           <div className="grid grid-cols-3 gap-2">
             <button

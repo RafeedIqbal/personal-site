@@ -1,11 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import BackgroundEffect from "../components/BackgroundEffect";
 import BootSequence from "../components/BootSequence";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
-import InteractiveTerminal from "../components/InteractiveTerminal";
+
+// Keep the terminal (and everything it drags in) out of the first-load
+// bundle; it hydrates in the background on desktop after the page is up.
+const InteractiveTerminal = dynamic(
+  () => import("../components/InteractiveTerminal"),
+  { ssr: false }
+);
 import Hero from "../sections/Hero";
 import About from "../sections/About";
 import Experience from "../sections/Experience";
