@@ -8,6 +8,9 @@ export const PROFILE = {
   resumeUrl: "/Rafeed_Iqbal_Resume.pdf",
   title: "Software Engineer & Product Leader",
   tagline: "Building products at the intersection of code and strategy.",
+  availability: "open to swe & pm roles — remote or hybrid",
+  heroParagraph:
+    "Building products at the intersection of code and strategy — from RAG pipelines and SaaS platforms to roadmaps and teams.",
 };
 
 export const EDUCATION = {

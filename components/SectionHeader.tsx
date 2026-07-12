@@ -3,38 +3,43 @@
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 
-interface CommandBlockProps {
+interface SectionHeaderProps {
+  /** Two-digit section number, e.g. "01". */
+  index: string;
+  /** Terminal command shown after the `$` prompt. */
   command: string;
-  children: React.ReactNode;
+  /** Optional right-aligned annotation after the hairline rule. */
+  right?: React.ReactNode;
   delay?: number;
-  /** Render the command-prompt line as a heading for document outline. */
-  as?: "div" | "h2";
+  children: React.ReactNode;
 }
 
-export default function CommandBlock({
+export default function SectionHeader({
+  index,
   command,
-  children,
+  right,
   delay = 0,
-  as = "div",
-}: CommandBlockProps) {
+  children,
+}: SectionHeaderProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const reduce = useReducedMotion();
 
-  const HeadingTag = as === "h2" ? motion.h2 : motion.div;
-
   return (
-    <div ref={ref} className="space-y-4">
-      <HeadingTag
+    <div ref={ref}>
+      <motion.div
         initial={reduce ? false : { opacity: 0 }}
         animate={reduce ? { opacity: 1 } : inView ? { opacity: 1 } : {}}
         transition={reduce ? { duration: 0 } : { duration: 0.3, delay }}
-        className="js-reveal flex items-center gap-2 text-sm"
+        className="js-reveal mb-11 flex items-center gap-3.5"
       >
-        <span className="text-[#888888] font-bold">rafeed@portfolio</span>
-        <span className="text-[#555555]">:~$</span>
-        <span className="text-white">{command}</span>
-      </HeadingTag>
+        <span className="text-xs text-accent">{index}</span>
+        <h2 className="text-[13px] font-normal text-fg">
+          <span className="text-subtle">$</span> {command}
+        </h2>
+        <div className="flex-1 border-t border-white/[0.07]" />
+        {right}
+      </motion.div>
 
       <motion.div
         className="js-reveal"

@@ -4,7 +4,7 @@
 This repository is centered on the Next.js app in the repository root. Work from the root for app changes.
 
 - `app/`: App Router entry points, layout, and global CSS.
-- `components/`: reusable UI pieces such as the terminal and navigation.
+- `components/`: reusable UI pieces such as the terminal overlay, sidebar navigation, section headers, and footer.
 - `sections/`: page-level content blocks (`Hero.tsx`, `Projects.tsx`, etc.).
 - `lib/`: content and command helpers.
 - `public/`: static assets.

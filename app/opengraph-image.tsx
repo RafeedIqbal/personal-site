@@ -15,23 +15,23 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          backgroundColor: "#000000",
-          color: "#ffffff",
+          backgroundColor: "#060607",
+          color: "#ececec",
           padding: "80px",
           fontFamily: "monospace",
         }}
       >
-        <div style={{ display: "flex", fontSize: 30, color: "#888888" }}>
-          rafeed@portfolio:~$ whoami
+        <div style={{ display: "flex", fontSize: 30, color: "#9aa0a6" }}>
+          <span style={{ color: "#4ade80" }}>$</span>&nbsp;whoami
         </div>
         <div
           style={{
             display: "flex",
             fontSize: 96,
             fontWeight: 800,
-            letterSpacing: "-2px",
+            letterSpacing: "-4px",
             marginTop: 24,
-            textTransform: "uppercase",
+            color: "#ffffff",
           }}
         >
           Rafeed Iqbal
@@ -40,21 +40,21 @@ export default function OpengraphImage() {
           style={{
             display: "flex",
             fontSize: 36,
-            color: "#aaaaaa",
+            color: "#c9cdd2",
             marginTop: 16,
           }}
         >
-          Software Engineer &amp; Product Leader
+          software engineer <span style={{ color: "#4ade80" }}>&nbsp;×&nbsp;</span> product leader
         </div>
         <div
           style={{
             display: "flex",
             fontSize: 26,
-            color: "#555555",
+            color: "#5b6067",
             marginTop: 48,
           }}
         >
-          rafeed.dev
+          <span style={{ color: "#4ade80" }}>~</span>/rafeed.dev
         </div>
       </div>
     ),

@@ -12,10 +12,11 @@ interface HistoryEntry {
 }
 
 interface TerminalProps {
-  width: number;
+  open: boolean;
+  onClose: () => void;
 }
 
-export default function InteractiveTerminal({ width }: TerminalProps) {
+export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
@@ -34,6 +35,14 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
       behavior: "smooth",
     });
   }, [history, gamePanelOpen, activeGameId, showHelp]);
+
+  // Focus the prompt whenever the overlay opens; the input's onFocus handler
+  // disarms game hotkeys, so reopening always starts with the prompt live.
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    }
+  }, [open]);
 
   // Inline ghost suggestion (fish-shell style)
   const ghostSuggestion = useMemo(() => {
@@ -60,6 +69,7 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
 
   const openGameLibrary = () => {
     setGamePanelOpen(true);
+    setActiveGameId(null);
     setGameHotkeysEnabled(false);
   };
 
@@ -69,6 +79,24 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
     setGameHotkeysEnabled(false);
     inputRef.current?.focus();
   };
+
+  // Escape cascade lives on window because the input is blurred while a game
+  // is armed: help card → games panel → overlay.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (showHelp) {
+        setShowHelp(false);
+      } else if (gamePanelOpen) {
+        closeGames();
+      } else {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   const handleSubmit = () => {
     const trimmed = input.trim();
@@ -121,10 +149,6 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape") {
-      setShowHelp(false);
-      return;
-    }
     if (e.key === "Tab") {
       e.preventDefault();
       if (ghostSuggestion) setInput(input + ghostSuggestion);
@@ -152,135 +176,149 @@ export default function InteractiveTerminal({ width }: TerminalProps) {
     }
   };
 
-  const Prompt = ({ children }: { children?: React.ReactNode }) => (
-    <div className="flex items-start gap-2 text-xs">
-      <span className="text-[#555555] shrink-0 select-none">$</span>
-      {children}
-    </div>
-  );
+  if (!open) return null;
 
   return (
-    <div
-      style={{ width }}
-      className="hidden lg:flex flex-col shrink-0 sticky top-0 h-screen bg-transparent"
-      onClick={focusPrompt}
-    >
-      {/* Header — matched height */}
-      <div className="h-10 flex items-center px-4 border-b border-[rgba(255,255,255,0.12)] shrink-0 bg-[rgba(0,0,0,0.16)] backdrop-blur-[3px]">
-        <span className="text-xs text-[#555555]">visitor@rafeed.dev</span>
-      </div>
+    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Terminal">
+      {/* Dim backdrop — click to close. Page keeps scrolling behind it so
+          scrollTarget commands stay visible. */}
+      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
 
-      {/* Terminal body — single scrollable area, input is part of the flow */}
       <div
-        ref={bodyRef}
-        className="flex-1 overflow-y-auto px-4 py-3 space-y-3 flex flex-col bg-transparent"
+        className="absolute bottom-11 left-1/2 flex w-[min(760px,calc(100vw-48px))] -translate-x-1/2 flex-col overflow-hidden rounded-xl border border-white/[0.12] bg-[rgba(9,10,12,0.92)] shadow-[0_24px_80px_rgba(0,0,0,0.6)] backdrop-blur-[16px]"
+        style={{ height: gamePanelOpen ? "min(78vh, 700px)" : 440 }}
+        onClick={focusPrompt}
       >
-        {/* Welcome */}
-        <div className="text-xs text-[#555555] space-y-0.5">
-          <p>Welcome to rafeed.dev</p>
-          <p>Type <span className="text-white">help</span> for commands. Tab to autocomplete.</p>
-          <p>Type <span className="text-white">games</span> if bored.</p>
+        {/* Header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-white/[0.08] px-4 py-2.5">
+          <span className="text-xs text-subtle">
+            <span className="text-accent">●</span> visitor@rafeed.dev
+          </span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="text-xs text-subtle transition-colors hover:text-white"
+          >
+            [esc]
+          </button>
         </div>
 
-        {/* Help card */}
-        <AnimatePresence>
-          {showHelp && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.15 }}
-              className="overflow-hidden"
-            >
-              <div className="border border-[rgba(255,255,255,0.1)] bg-[rgba(10,10,10,0.42)] backdrop-blur-[4px] rounded text-xs my-1">
-                <div className="flex items-center justify-between px-3 py-2 border-b border-[#1a1a1a]">
-                  <span className="font-bold text-white">available commands</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setShowHelp(false); }}
-                    className="text-[#555555] hover:text-white transition-colors"
-                  >
-                    [esc]
-                  </button>
-                </div>
-                <div className="px-3 py-2 space-y-0.5">
-                  {HELP_COMMANDS.map(({ command: cmd, description: desc }) => (
-                    <div key={cmd} className="flex justify-between gap-4">
-                      <button
-                        className="text-white hover:underline text-left"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (cmd && !cmd.includes("<")) {
-                            setInput(cmd);
-                            setShowHelp(false);
-                            inputRef.current?.focus();
-                          }
-                        }}
-                      >
-                        {cmd}
-                      </button>
-                      <span className="text-[#444444] text-right shrink-0">{desc}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {gamePanelOpen && (
-          <TerminalGamesPanel
-            activeGameId={activeGameId}
-            hotkeysEnabled={gameHotkeysEnabled}
-            onSelectGame={launchGame}
-            onClose={closeGames}
-            onEnableHotkeys={() => {
-              if (!activeGameId) return;
-              setGameHotkeysEnabled(true);
-              inputRef.current?.blur();
-            }}
-          />
-        )}
-
-        {/* Past commands + output */}
-        {history.map((entry, i) => (
-          <div key={i} className="space-y-1">
-            <Prompt>
-              <span className="text-white">{entry.command}</span>
-            </Prompt>
-            <pre className="text-[#aaaaaa] whitespace-pre-wrap pl-5 text-xs leading-relaxed">
-              {entry.output}
-            </pre>
+        {/* Terminal body — single scrollable area, input is part of the flow */}
+        <div
+          ref={bodyRef}
+          className="flex flex-1 flex-col space-y-3 overflow-y-auto px-4 py-3"
+        >
+          {/* Welcome */}
+          <div className="space-y-0.5 text-xs text-subtle">
+            <p>Welcome to rafeed.dev — you found the terminal.</p>
+            <p>Type <span className="text-fg">help</span> for commands. Tab to autocomplete.</p>
+            <p>Type <span className="text-fg">games</span> if bored.</p>
           </div>
-        ))}
 
-        {/* Active input prompt — part of the content flow */}
-        <div className="flex items-start gap-2 text-xs">
-          <span className="text-[#555555] shrink-0 select-none pt-px">$</span>
-          <div className="flex-1 relative min-w-0">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => setGameHotkeysEnabled(false)}
-              className="absolute inset-0 w-full h-full opacity-0 z-10"
-              aria-label="Terminal command input"
-              autoComplete="off"
-              spellCheck={false}
-              autoFocus
+          {/* Help card */}
+          <AnimatePresence>
+            {showHelp && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.15 }}
+                className="overflow-hidden"
+              >
+                <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs">
+                  <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
+                    <span className="font-bold text-fg">available commands</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowHelp(false); }}
+                      className="text-subtle transition-colors hover:text-white"
+                    >
+                      [esc]
+                    </button>
+                  </div>
+                  <div className="space-y-0.5 px-3 py-2">
+                    {HELP_COMMANDS.map(({ command: cmd, description: desc }) => (
+                      <div key={cmd} className="flex justify-between gap-4">
+                        <button
+                          className="text-left text-fg hover:underline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (cmd && !cmd.includes("<")) {
+                              setInput(cmd);
+                              setShowHelp(false);
+                              inputRef.current?.focus();
+                            }
+                          }}
+                        >
+                          {cmd}
+                        </button>
+                        <span className="shrink-0 text-right text-subtle">{desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {gamePanelOpen && (
+            <TerminalGamesPanel
+              activeGameId={activeGameId}
+              hotkeysEnabled={gameHotkeysEnabled}
+              onSelectGame={launchGame}
+              onClose={closeGames}
+              onBackToLibrary={openGameLibrary}
+              onEnableHotkeys={() => {
+                if (!activeGameId) return;
+                setGameHotkeysEnabled(true);
+                inputRef.current?.blur();
+              }}
             />
-            <div className="flex items-center min-h-[1rem] pointer-events-none">
-              <span className="text-white text-xs whitespace-pre">{input}</span>
-              {ghostSuggestion && (
-                <span className="text-[#333333] text-xs whitespace-pre">{ghostSuggestion}</span>
-              )}
-              <span className="cursor-blink" />
-              {!input && !ghostSuggestion && (
-                <span className="text-[#333333] text-xs absolute left-0">
-                  type a command...
-                </span>
-              )}
+          )}
+
+          {/* Past commands + output */}
+          {history.map((entry, i) => (
+            <div key={i} className="space-y-1">
+              <div className="flex items-start gap-2 text-xs">
+                <span className="shrink-0 select-none text-accent">$</span>
+                <span className="text-fg">{entry.command}</span>
+              </div>
+              <pre className="whitespace-pre-wrap pl-5 text-xs leading-relaxed text-muted">
+                {entry.output}
+              </pre>
+            </div>
+          ))}
+
+          {/* Active input prompt — part of the content flow */}
+          <div className="flex items-start gap-2 text-xs">
+            <span className="shrink-0 select-none pt-px text-accent">$</span>
+            <div className="relative min-w-0 flex-1">
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setGameHotkeysEnabled(false)}
+                className="terminal-input absolute inset-0 z-10 h-full w-full opacity-0"
+                aria-label="Terminal command input"
+                autoComplete="off"
+                spellCheck={false}
+                autoFocus
+              />
+              <div className="pointer-events-none flex min-h-[1rem] items-center">
+                <span className="whitespace-pre text-xs text-fg">{input}</span>
+                {ghostSuggestion && (
+                  <span className="whitespace-pre text-xs text-faint">{ghostSuggestion}</span>
+                )}
+                <span className="cursor-blink" />
+                {!input && !ghostSuggestion && (
+                  <span className="absolute left-0 text-xs text-faint">
+                    type a command...
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

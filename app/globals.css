@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #000000;
-  --color-fg: #ffffff;
-  --color-muted: #888888;
-  --color-subtle: #555555;
-  --color-border: #333333;
-  --color-hover: #111111;
-  --color-card: #0a0a0a;
+  --color-bg: #060607;
+  --color-fg: #ececec;
+  --color-body: #c9cdd2;
+  --color-body-2: #a6abb2;
+  --color-muted: #9aa0a6;
+  --color-subtle: #5b6067;
+  --color-faint: #3a3f45;
+  --color-accent: #4ade80;
   --font-mono: var(--font-jetbrains-mono);
+  --font-grotesk: var(--font-space-grotesk);
 }
 
 *,
@@ -22,8 +24,8 @@ html {
 }
 
 body {
-  background: #000000;
-  color: #ffffff;
+  background: #060607;
+  color: #ececec;
   font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
   min-height: 100dvh;
   overflow-x: hidden;
@@ -40,10 +42,41 @@ body {
   display: inline-block;
   width: 0.55ch;
   height: 1.1em;
-  background: #ffffff;
+  background: #4ade80;
   animation: blink 1s step-end infinite;
   vertical-align: text-bottom;
   margin-left: 2px;
+}
+
+/* Pulsing status dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* Staggered entry for the hero */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+.fade-up {
+  animation: fade-up 0.6s ease both;
+}
+.fade-up-1 { animation-delay: 0.15s; }
+.fade-up-2 { animation-delay: 0.25s; }
+.fade-up-3 { animation-delay: 0.35s; }
+
+/* Keyboard key chip (footer terminal hint) */
+.kbd {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: #9aa0a6;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -51,20 +84,27 @@ body {
     scroll-behavior: auto;
   }
 
-  .cursor-blink {
+  .cursor-blink,
+  .pulse-dot {
     animation: none;
+  }
+
+  .fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #060607;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333333;
+  background: #2a2d31;
 }
 
 /* Hide native caret in terminal input */
@@ -74,6 +114,6 @@ body {
 
 /* Selection */
 ::selection {
-  background: #ffffff;
+  background: #4ade80;
   color: #000000;
 }

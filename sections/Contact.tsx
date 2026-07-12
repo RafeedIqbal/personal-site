@@ -1,57 +1,51 @@
 "use client";
 
-import CommandBlock from "../components/CommandBlock";
+import SectionHeader from "../components/SectionHeader";
 import { PROFILE } from "../lib/content";
 
 export default function Contact() {
   return (
-    <section id="contact" className="space-y-6 scroll-mt-16">
-      <CommandBlock command="contact --help" delay={0.05} as="h2">
-        <div className="border-l-2 border-[#333333] pl-4 text-sm space-y-4">
-          <p className="text-[#888888]">Usage: contact [OPTIONS]</p>
-          <div className="space-y-2">
-            <p className="text-[#666666] text-xs uppercase tracking-widest">Options</p>
-            <div className="grid grid-cols-[110px_1fr] gap-y-2 gap-x-3">
-              <span className="text-[#888888]">--email</span>
-              <a
-                href={`mailto:${PROFILE.email}`}
-                className="text-white hover:underline"
-              >
-                {PROFILE.email}
-              </a>
-              <span className="text-[#888888]">--linkedin</span>
-              <a
-                href={PROFILE.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:underline"
-              >
-                {PROFILE.linkedin}
-              </a>
-              <span className="text-[#888888]">--github</span>
-              <a
-                href={PROFILE.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:underline"
-              >
-                {PROFILE.github}
-              </a>
-              <span className="text-[#888888]">--resume</span>
-              <a
-                href={PROFILE.resumeUrl}
-                download
-                className="text-white hover:underline"
-              >
-                download résumé (pdf)
-              </a>
-            </div>
-          </div>
-          <p className="text-[#444444] text-xs pt-2">
-            # open to SWE & PM roles — remote or hybrid
-          </p>
+    <section id="contact" className="scroll-mt-[90px] pb-20 md:pb-[110px]">
+      <SectionHeader index="06" command="contact --help" delay={0.05}>
+        <h3 className="font-grotesk text-[clamp(36px,5vw,52px)] font-bold tracking-[-0.03em] text-white">
+          Let&apos;s build something.
+        </h3>
+        <p className="mt-[18px] max-w-[440px] text-[13.5px] leading-[1.8] text-muted">
+          Open to software engineering and product roles — remote or hybrid. The fastest way to
+          reach me is email.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+          <a
+            href={`mailto:${PROFILE.email}`}
+            className="rounded-md border border-accent px-6 py-[11px] text-[13px] text-accent transition-colors hover:bg-accent hover:text-black"
+          >
+            {PROFILE.email}
+          </a>
+          <a
+            href={PROFILE.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[12.5px] text-muted transition-colors hover:text-white"
+          >
+            linkedin ↗
+          </a>
+          <a
+            href={PROFILE.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[12.5px] text-muted transition-colors hover:text-white"
+          >
+            github ↗
+          </a>
+          <a
+            href={PROFILE.resumeUrl}
+            download
+            className="text-[12.5px] text-muted transition-colors hover:text-white"
+          >
+            resume ↓
+          </a>
         </div>
-      </CommandBlock>
+      </SectionHeader>
     </section>
   );
 }

@@ -11,6 +11,7 @@ interface TerminalGamesPanelProps {
   hotkeysEnabled: boolean;
   onSelectGame: (gameId: TerminalGameId) => void;
   onClose: () => void;
+  onBackToLibrary: () => void;
   onEnableHotkeys: () => void;
 }
 
@@ -35,79 +36,81 @@ export default function TerminalGamesPanel({
   hotkeysEnabled,
   onSelectGame,
   onClose,
+  onBackToLibrary,
   onEnableHotkeys,
 }: TerminalGamesPanelProps) {
   const activeGame = TERMINAL_GAMES.find((game) => game.id === activeGameId) ?? null;
 
   return (
     <div
-      className="border border-[rgba(255,255,255,0.1)] bg-[rgba(10,10,10,0.42)] backdrop-blur-[4px] rounded text-xs"
+      className="rounded-md border border-white/10 bg-white/[0.02] text-xs"
       onClick={(event) => {
         event.stopPropagation();
         onEnableHotkeys();
       }}
     >
-      <div className="flex items-center justify-between gap-4 px-3 py-2 border-b border-[#1a1a1a]">
+      <div className="flex items-center justify-between gap-4 border-b border-white/[0.07] px-3 py-2">
         <div>
-          <p className="text-white font-bold">terminal arcade</p>
-          <p className="text-[#555555]">
-            Run <span className="text-white">games</span> to reopen this list or{" "}
-            <span className="text-white">close game</span> to dismiss it.
+          <p className="font-bold text-fg">terminal arcade</p>
+          <p className="text-subtle">
+            Run <span className="text-fg">games</span> to reopen this list or{" "}
+            <span className="text-fg">close game</span> to dismiss it.
           </p>
         </div>
-        <button
-          onClick={(event) => {
-            event.stopPropagation();
-            onClose();
-          }}
-          className="text-[#555555] hover:text-white transition-colors shrink-0"
-        >
-          [close]
-        </button>
+        <div className="flex shrink-0 items-center gap-3">
+          {activeGame && (
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                onBackToLibrary();
+              }}
+              className="text-subtle transition-colors hover:text-white"
+            >
+              [library]
+            </button>
+          )}
+          <button
+            onClick={(event) => {
+              event.stopPropagation();
+              onClose();
+            }}
+            className="text-subtle transition-colors hover:text-white"
+          >
+            [close]
+          </button>
+        </div>
       </div>
 
-      <div className="px-3 py-3 space-y-4">
-        <div className="grid grid-cols-2 gap-2">
-          {TERMINAL_GAMES.map((game) => {
-            const isActive = game.id === activeGameId;
-
-            return (
-              <button
-                key={game.id}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onSelectGame(game.id);
-                }}
-                className={`border px-3 py-2 text-left transition-colors ${
-                  isActive
-                    ? "border-white bg-[rgba(255,255,255,0.08)]"
-                    : "border-[#333333] hover:border-[#666666] hover:bg-[rgba(255,255,255,0.03)]"
-                }`}
-              >
-                <p className="text-white font-bold">{game.title}</p>
-                <p className="text-[#888888] mt-1">{game.command}</p>
-                <p className="text-[#555555] mt-2 leading-relaxed">{game.description}</p>
-              </button>
-            );
-          })}
-        </div>
-
+      <div className="space-y-4 px-3 py-3">
         {activeGame ? (
-          <div className="border border-[#1a1a1a] bg-[rgba(0,0,0,0.28)] rounded">
-            <div className="flex items-center justify-between gap-4 px-3 py-2 border-b border-[#1a1a1a]">
+          <div className="rounded border border-white/[0.07] bg-black/30">
+            <div className="flex items-center justify-between gap-4 border-b border-white/[0.07] px-3 py-2">
               <div>
-                <p className="text-white font-bold">{activeGame.title}</p>
-                <p className="text-[#555555]">{activeGame.controls}</p>
+                <p className="font-bold text-fg">{activeGame.title}</p>
+                <p className="text-subtle">{activeGame.controls}</p>
               </div>
-              <span className="text-[#555555] shrink-0">
+              <span className={`shrink-0 ${hotkeysEnabled ? "text-accent" : "text-subtle"}`}>
                 {hotkeysEnabled ? "[controls armed]" : "[click panel to arm controls]"}
               </span>
             </div>
             <div className="p-3">{renderGame(activeGame.id, hotkeysEnabled)}</div>
           </div>
         ) : (
-          <div className="border border-dashed border-[#333333] px-3 py-4 text-[#555555]">
-            Select a game above or run a command like <span className="text-white">play tetris</span>.
+          <div className="grid grid-cols-2 gap-2">
+            {TERMINAL_GAMES.map((game) => (
+              <button
+                key={game.id}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSelectGame(game.id);
+                }}
+                className="rounded border border-white/10 px-3 py-2 text-left transition-colors hover:border-accent/60 hover:bg-white/[0.03]"
+              >
+                <p className="font-bold text-fg">{game.title}</p>
+                <p className="mt-1 text-accent">{game.command}</p>
+                <p className="mt-2 leading-relaxed text-subtle">{game.description}</p>
+              </button>
+            ))}
           </div>
         )}
       </div>

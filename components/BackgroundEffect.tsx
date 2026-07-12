@@ -18,6 +18,8 @@ const OPACITY_EASING = 0.22;
 const FRAME_MS = 1000 / 60;
 const MAX_DPR = 2;
 const VISIBLE_EPSILON = 0.005;
+const EXCLUSION_PAD = 10;
+const EXCLUSION_VIEWPORT_MARGIN = 40;
 const REVEAL_RADIUS_SQ = REVEAL_RADIUS * REVEAL_RADIUS;
 const MAGNETIC_RADIUS_SQ = MAGNETIC_RADIUS * MAGNETIC_RADIUS;
 const MAGNETIC_STOP_RADIUS_SQ = MAGNETIC_STOP_RADIUS * MAGNETIC_STOP_RADIUS;
@@ -97,6 +99,9 @@ export default function BackgroundEffect() {
   });
   const rafRef = useRef<number>(0);
   const runningRef = useRef(false);
+  // Viewport-space boxes around visible text content; characters are never
+  // drawn inside them so the effect stays out of the copy's way.
+  const exclusionRectsRef = useRef<[number, number, number, number][]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -109,6 +114,44 @@ export default function BackgroundEffect() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
+
+    const collectExclusionRects = () => {
+      const elements = document.querySelectorAll(
+        "main h1, main h2, main h3, main p, main ul, main a, main button, aside a, aside button, footer"
+      );
+      const rects: [number, number, number, number][] = [];
+      const viewportBottom = window.innerHeight + EXCLUSION_VIEWPORT_MARGIN;
+
+      for (const el of elements) {
+        const rect = el.getBoundingClientRect();
+        if (
+          rect.width === 0 ||
+          rect.bottom < -EXCLUSION_VIEWPORT_MARGIN ||
+          rect.top > viewportBottom
+        ) {
+          continue;
+        }
+        rects.push([
+          rect.left - EXCLUSION_PAD,
+          rect.top - EXCLUSION_PAD,
+          rect.right + EXCLUSION_PAD,
+          rect.bottom + EXCLUSION_PAD,
+        ]);
+      }
+
+      exclusionRectsRef.current = rects;
+    };
+
+    const isInsideText = (x: number, y: number) => {
+      const rects = exclusionRectsRef.current;
+      for (let i = 0; i < rects.length; i += 1) {
+        const [left, top, right, bottom] = rects[i];
+        if (x >= left && x <= right && y >= top && y <= bottom) {
+          return true;
+        }
+      }
+      return false;
+    };
 
     const drawFrame = (timestamp: number) => {
       const viewport = viewportRef.current;
@@ -194,8 +237,10 @@ export default function BackgroundEffect() {
 
         if (particle.opacity > VISIBLE_EPSILON) {
           active = true;
-          ctx.globalAlpha = particle.opacity;
-          ctx.fillText(particle.char, particle.x, particle.y);
+          if (!isInsideText(particle.x, particle.y)) {
+            ctx.globalAlpha = particle.opacity;
+            ctx.fillText(particle.char, particle.x, particle.y);
+          }
         } else if (
           Math.abs(particle.x - particle.originX) > 0.05 ||
           Math.abs(particle.y - particle.originY) > 0.05
@@ -245,6 +290,7 @@ export default function BackgroundEffect() {
       ctx.textBaseline = "middle";
 
       particlesRef.current = createParticleGrid(width, height);
+      collectExclusionRects();
       startLoop();
     };
 
@@ -265,18 +311,37 @@ export default function BackgroundEffect() {
       };
     };
 
+    // Keep the exclusion boxes in sync while the page scrolls under the
+    // fixed canvas (rAF-throttled).
+    let scrollRefreshPending = false;
+    const handleScroll = () => {
+      if (scrollRefreshPending) return;
+      scrollRefreshPending = true;
+      requestAnimationFrame(() => {
+        scrollRefreshPending = false;
+        collectExclusionRects();
+      });
+    };
+
     resizeCanvas();
     startLoop();
 
+    // Re-measure once fonts and the initial reveal animations have settled.
+    document.fonts?.ready.then(collectExclusionRects).catch(() => {});
+    const settleTimer = window.setTimeout(collectExclusionRects, 600);
+
     window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       runningRef.current = false;
+      window.clearTimeout(settleTimer);
 
       window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
@@ -286,7 +351,7 @@ export default function BackgroundEffect() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="fixed inset-0 z-0 pointer-events-none"
+      className="fixed inset-0 z-0 pointer-events-none opacity-50"
     />
   );
 }

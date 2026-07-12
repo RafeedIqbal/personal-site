@@ -42,7 +42,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
         <motion.div
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+          className="fixed inset-0 z-50 bg-bg flex items-center justify-center"
         >
           <div className="text-sm space-y-2 min-w-[260px]">
             {LINES.slice(0, visibleLines).map((line, i) => (
@@ -52,8 +52,8 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
                 animate={{ opacity: 1 }}
                 className="flex items-center gap-2"
               >
-                <span className="text-[#555555]">$</span>
-                <span className={i === visibleLines - 1 && !done ? "text-white" : "text-[#888888]"}>
+                <span className="text-accent">$</span>
+                <span className={i === visibleLines - 1 && !done ? "text-white" : "text-muted"}>
                   {line}
                 </span>
                 {i === visibleLines - 1 && !done && (
