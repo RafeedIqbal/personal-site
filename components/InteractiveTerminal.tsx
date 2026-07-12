@@ -124,6 +124,20 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  // Disarm game hotkeys whenever focus lands outside the games panel (e.g.
+  // tabbing to the [esc] button) so Space/arrows activate the focused control
+  // instead of being captured by the game. Clicking the panel re-arms.
+  useEffect(() => {
+    if (!open || !gameHotkeysEnabled) return;
+    const onFocusIn = (e: FocusEvent) => {
+      const panel = gamePanelRef.current;
+      if (panel && e.target instanceof Node && panel.contains(e.target)) return;
+      setGameHotkeysEnabled(false);
+    };
+    window.addEventListener("focusin", onFocusIn);
+    return () => window.removeEventListener("focusin", onFocusIn);
+  }, [open, gameHotkeysEnabled]);
+
   // Keep Tab cycling inside the dialog (it's aria-modal) — including while a
   // game has the input blurred — without stealing Tab from autocomplete.
   useEffect(() => {
@@ -372,11 +386,11 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
               <div className="pointer-events-none flex min-h-[1rem] items-center">
                 <span className="whitespace-pre text-xs text-fg">{input}</span>
                 {ghostSuggestion && (
-                  <span className="whitespace-pre text-xs text-faint">{ghostSuggestion}</span>
+                  <span className="whitespace-pre text-xs text-subtle">{ghostSuggestion}</span>
                 )}
                 <span className="cursor-blink" />
                 {!input && !ghostSuggestion && (
-                  <span className="absolute left-0 text-xs text-faint">
+                  <span className="absolute left-0 text-xs text-subtle">
                     type a command...
                   </span>
                 )}

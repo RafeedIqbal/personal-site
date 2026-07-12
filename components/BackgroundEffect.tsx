@@ -116,8 +116,10 @@ export default function BackgroundEffect() {
     }
 
     const collectExclusionRects = () => {
+      // main span matters: several sections (skills rows, education block,
+      // hero status line, header annotations) hold text in bare spans.
       const elements = document.querySelectorAll(
-        "main h1, main h2, main h3, main p, main ul, main a, main button, aside a, aside button, footer"
+        "main h1, main h2, main h3, main p, main ul, main a, main button, main span, aside a, aside button, footer"
       );
       const rects: [number, number, number, number][] = [];
       const viewportBottom = window.innerHeight + EXCLUSION_VIEWPORT_MARGIN;
@@ -312,9 +314,14 @@ export default function BackgroundEffect() {
     };
 
     // Keep the exclusion boxes in sync while the page scrolls under the
-    // fixed canvas (rAF-throttled).
+    // fixed canvas (rAF-throttled). The trailing re-measure catches sections
+    // whose scroll-reveal animation finishes after the last scroll event —
+    // otherwise their rects stay where the text was mid-animation.
     let scrollRefreshPending = false;
+    let scrollSettleTimer = 0;
     const handleScroll = () => {
+      window.clearTimeout(scrollSettleTimer);
+      scrollSettleTimer = window.setTimeout(collectExclusionRects, 700);
       if (scrollRefreshPending) return;
       scrollRefreshPending = true;
       requestAnimationFrame(() => {
@@ -339,6 +346,7 @@ export default function BackgroundEffect() {
       cancelAnimationFrame(rafRef.current);
       runningRef.current = false;
       window.clearTimeout(settleTimer);
+      window.clearTimeout(scrollSettleTimer);
 
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("scroll", handleScroll);

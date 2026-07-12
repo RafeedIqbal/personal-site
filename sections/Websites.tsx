@@ -12,7 +12,10 @@ export default function Websites() {
         delay={0.05}
         right={
           <span className="text-[11.5px] text-subtle">
-            {WEBSITES.length} sites shipped &amp; live
+            {/* Single expression on purpose: SWC drops the space between an
+                interpolation and a following text chunk that contains an
+                HTML entity ("6sites"). */}
+            {`${WEBSITES.length} sites shipped & live`}
           </span>
         }
       >

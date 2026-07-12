@@ -8,7 +8,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
 // Keep the terminal (and everything it drags in) out of the first-load
-// bundle; it hydrates in the background on desktop after the page is up.
+// bundle; the chunk is only fetched on the first open (see terminalReady).
 const InteractiveTerminal = dynamic(
   () => import("../components/InteractiveTerminal"),
   { ssr: false }
@@ -25,6 +25,14 @@ export default function Page() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [booted, setBooted] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
+  // Latches on the first open so the terminal chunk isn't fetched until it's
+  // actually wanted, then stays mounted so command history survives toggles.
+  const [terminalReady, setTerminalReady] = useState(false);
+
+  const openTerminal = () => {
+    setTerminalReady(true);
+    setTerminalOpen(true);
+  };
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 767px)");
@@ -67,6 +75,7 @@ export default function Page() {
           target.isContentEditable);
       if (typing) return;
       e.preventDefault();
+      setTerminalReady(true);
       setTerminalOpen((prev) => !prev);
     };
 
@@ -92,7 +101,7 @@ export default function Page() {
       <div className="relative z-10 flex min-h-screen">
         {/* Nav — desktop only */}
         {isMobile === false && (
-          <Nav onOpenTerminal={() => setTerminalOpen(true)} />
+          <Nav onOpenTerminal={openTerminal} />
         )}
 
         {/* Main content — always rendered so it ships in the server HTML */}
@@ -110,8 +119,9 @@ export default function Page() {
         </main>
       </div>
 
-      {/* Terminal overlay — desktop only; stays mounted so history survives toggles */}
-      {isMobile === false && (
+      {/* Terminal overlay — desktop only; mounts on first open, then stays
+          mounted so history survives toggles */}
+      {isMobile === false && terminalReady && (
         <InteractiveTerminal
           open={terminalOpen}
           onClose={() => setTerminalOpen(false)}
