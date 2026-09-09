@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PROFILE } from "@/lib/content";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://rafeed.dev/sitemap.xml",
-    host: "https://rafeed.dev",
+    sitemap: `${PROFILE.siteUrl}/sitemap.xml`,
+    host: PROFILE.siteUrl,
   };
 }

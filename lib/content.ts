@@ -1,5 +1,6 @@
 export const PROFILE = {
   name: "Rafeed Iqbal",
+  siteUrl: "https://www.rafeed.dev",
   email: "rafeediqbal@gmail.com",
   linkedin: "linkedin.com/in/rafeediqbal",
   linkedinUrl: "https://linkedin.com/in/rafeediqbal",
@@ -123,7 +124,7 @@ export const WEBSITES: Website[] = [
   {
     slug: "rafeed-dev",
     name: "rafeed.dev",
-    url: "https://rafeed.dev",
+    url: PROFILE.siteUrl,
     stack: "Next.js",
     type: "portfolio",
   },

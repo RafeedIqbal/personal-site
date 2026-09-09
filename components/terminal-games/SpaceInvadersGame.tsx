@@ -83,12 +83,9 @@ function advanceBullet(bullet: Point | null, invaders: Point[]) {
 
   let nextBullet = { ...bullet };
 
-  for (let step = 0; step < BULLET_SPEED; step += 1) {
-    nextBullet = {
-      ...nextBullet,
-      y: nextBullet.y - 1,
-    };
-
+  // Include the current cell: a shot can spawn on an invader, or an invader
+  // can move into it between ticks.
+  for (let step = 0; step <= BULLET_SPEED; step += 1) {
     if (nextBullet.y < 0) {
       return {
         bullet: null,
@@ -108,6 +105,8 @@ function advanceBullet(bullet: Point | null, invaders: Point[]) {
         scoreDelta: 100,
       };
     }
+
+    if (step < BULLET_SPEED) nextBullet = { ...nextBullet, y: nextBullet.y - 1 };
   }
 
   return {
@@ -153,6 +152,16 @@ function stepState(state: SpaceInvadersState): SpaceInvadersState {
     }
   }
 
+  if (bullet) {
+    const { x: bulletX, y: bulletY } = bullet;
+    const hitIndex = invaders.findIndex((invader) => invader.x === bulletX && invader.y === bulletY);
+    if (hitIndex !== -1) {
+      invaders = invaders.filter((_, index) => index !== hitIndex);
+      bullet = null;
+      score += 100;
+    }
+  }
+
   const gameOver = invaders.some((invader) => invader.y >= PLAYER_ROW);
   const win = invaders.length === 0;
 
@@ -186,21 +195,25 @@ function getRenderedBoard(state: SpaceInvadersState) {
 
 export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameProps) {
   const [state, setState] = useState<SpaceInvadersState>(createInitialState);
+  const [paused, setPaused] = useState(false);
+  const running = hotkeysEnabled && !paused;
 
   useEffect(() => {
-    if (state.gameOver || state.win) return;
+    if (state.gameOver || state.win || !running) return;
 
     const interval = window.setInterval(() => {
       setState((currentState) => stepState(currentState));
     }, TICK_MS);
 
     return () => window.clearInterval(interval);
-  }, [state.gameOver, state.win]);
+  }, [state.gameOver, state.win, running]);
 
   useEffect(() => {
-    if (!hotkeysEnabled) return;
+    if (!running) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.target instanceof Element && event.target.closest("button, input, textarea, select, a[href], [contenteditable='true']")) return;
       const key = event.key.toLowerCase();
 
       if (["arrowleft", "arrowright", "a", "d", " "].includes(key)) {
@@ -218,7 +231,7 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [hotkeysEnabled]);
+  }, [running]);
 
   const renderedBoard = useMemo(() => getRenderedBoard(state), [state]);
 
@@ -227,7 +240,7 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
       <div className="flex items-center justify-between gap-4">
         <p className="text-[#aaaaaa]">
           score: {state.score}
-          {state.win ? " · fleet cleared" : state.gameOver ? " · invasion successful" : ""}
+          {state.win ? " · fleet cleared" : state.gameOver ? " · invasion successful" : !running ? " · paused" : ""}
         </p>
         {/* Announce only end states — announcing every score change would
             swamp screen readers. */}
@@ -236,21 +249,30 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
             ? `You win. Final score ${state.score}.`
             : state.gameOver
               ? `Game over. Final score ${state.score}.`
-              : ""}
+              : !running ? "Game paused." : ""}
         </p>
-        <button
-          onClick={() => setState(createInitialState())}
-          className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
-        >
-          reset
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPaused(running)}
+            disabled={state.gameOver || state.win}
+            className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors disabled:opacity-50"
+          >
+            {running ? "pause" : "resume"}
+          </button>
+          <button
+            onClick={() => { setState(createInitialState()); setPaused(false); }}
+            className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
+          >
+            reset
+          </button>
+        </div>
       </div>
 
-      <div className="flex gap-4 items-start">
+      <div className="flex flex-wrap gap-4 items-start">
         <div
           role="img"
           aria-label={`Space Invaders board — score ${state.score}, ${state.invaders.length} invaders remaining`}
-          className="grid gap-px bg-[#111111] p-px"
+          className="grid shrink-0 gap-px bg-[#111111] p-px"
           style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, minmax(0, 1fr))` }}
         >
           {renderedBoard.flatMap((row, rowIndex) =>
@@ -276,7 +298,7 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
 
         <div className="space-y-2 text-subtle leading-relaxed max-w-[180px]">
           <p>clear every invader before the wave reaches your row.</p>
-          <div className="grid grid-cols-3 gap-2">
+          <fieldset disabled={paused || state.gameOver || state.win} aria-label="Space Invaders controls" className="grid grid-cols-3 gap-2 disabled:opacity-50">
             <button
               onClick={() => setState((currentState) => movePlayer(currentState, -1))}
               className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
@@ -295,7 +317,7 @@ export default function SpaceInvadersGame({ hotkeysEnabled }: SpaceInvadersGameP
             >
               right
             </button>
-          </div>
+          </fieldset>
         </div>
       </div>
     </div>

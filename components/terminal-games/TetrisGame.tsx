@@ -251,21 +251,25 @@ function getRenderedBoard(board: Board, piece: ActivePiece) {
 
 export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
   const [state, setState] = useState<TetrisState>(createInitialState);
+  const [paused, setPaused] = useState(false);
+  const running = hotkeysEnabled && !paused;
 
   useEffect(() => {
-    if (state.gameOver) return;
+    if (state.gameOver || !running) return;
 
     const interval = window.setInterval(() => {
       setState((currentState) => translateState(currentState, 0, 1));
     }, DROP_INTERVAL_MS);
 
     return () => window.clearInterval(interval);
-  }, [state.gameOver]);
+  }, [state.gameOver, running]);
 
   useEffect(() => {
-    if (!hotkeysEnabled) return;
+    if (!running) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.target instanceof Element && event.target.closest("button, input, textarea, select, a[href], [contenteditable='true']")) return;
       const key = event.key.toLowerCase();
 
       if (
@@ -292,14 +296,14 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
         setState((currentState) => translateState(currentState, 0, 1));
       } else if (key === "arrowup" || key === "w") {
         setState((currentState) => rotateState(currentState));
-      } else if (event.key === " ") {
+      } else if (event.key === " " && !event.repeat) {
         setState((currentState) => hardDropState(currentState));
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [hotkeysEnabled]);
+  }, [running]);
 
   const renderedBoard = useMemo(
     () => getRenderedBoard(state.board, state.activePiece),
@@ -311,26 +315,35 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
       <div className="flex items-center justify-between gap-4">
         <p className="text-[#aaaaaa]">
           score: {state.score} · lines: {state.lines}
-          {state.gameOver ? " · game over" : ""}
+          {state.gameOver ? " · game over" : !running ? " · paused" : ""}
         </p>
         {/* Announce only line clears and game over — announcing every score
             tick would swamp screen readers. */}
         <p className="sr-only" role="status">
           {state.gameOver
             ? `Game over. Final score ${state.score}, ${state.lines} lines cleared.`
-            : `${state.lines} lines cleared.`}
+            : !running ? "Game paused." : `${state.lines} lines cleared.`}
         </p>
-        <button
-          onClick={() => setState(createInitialState())}
-          className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
-        >
-          reset
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPaused(running)}
+            disabled={state.gameOver}
+            className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors disabled:opacity-50"
+          >
+            {running ? "pause" : "resume"}
+          </button>
+          <button
+            onClick={() => { setState(createInitialState()); setPaused(false); }}
+            className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors"
+          >
+            reset
+          </button>
+        </div>
       </div>
 
-      <div className="flex gap-4 items-start">
+      <div className="flex flex-wrap gap-4 items-start">
         <div
-          className="grid gap-px bg-[#111111] p-px"
+          className="grid shrink-0 gap-px bg-[#111111] p-px"
           style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, minmax(0, 1fr))` }}
           role="img"
           aria-label={`Tetris playfield, ${BOARD_WIDTH} columns by ${BOARD_HEIGHT} rows. Use the buttons or arrow keys to move the falling piece.`}
@@ -354,7 +367,7 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
 
         <div className="space-y-2 text-subtle leading-relaxed max-w-[180px]">
           <p>rows clear for points; hard drop with space.</p>
-          <div className="grid grid-cols-3 gap-2">
+          <fieldset disabled={paused || state.gameOver} aria-label="Tetris controls" className="grid grid-cols-3 gap-2 disabled:opacity-50">
             <button
               onClick={() => setState((currentState) => rotateState(currentState))}
               className="border border-[#333333] px-2 py-1 text-white hover:border-white transition-colors col-span-3"
@@ -385,7 +398,7 @@ export default function TetrisGame({ hotkeysEnabled }: TetrisGameProps) {
             >
               hard drop
             </button>
-          </div>
+          </fieldset>
         </div>
       </div>
     </div>

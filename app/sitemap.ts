@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
+import { PROFILE } from "@/lib/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: "https://rafeed.dev",
-      lastModified: new Date(),
+      url: `${PROFILE.siteUrl}/`,
       changeFrequency: "monthly",
       priority: 1,
     },

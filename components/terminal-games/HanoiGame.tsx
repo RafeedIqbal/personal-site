@@ -81,7 +81,7 @@ export default function HanoiGame() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3" role="group" aria-label="Towers of Hanoi. Select a tower to pick up its top disk, then a tower to drop it on.">
+      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Towers of Hanoi. Select a tower to pick up its top disk, then a tower to drop it on.">
         {towers.map((tower, towerIndex) => {
           const isSelected = towerIndex === selectedTower;
           const diskDescription =
@@ -108,7 +108,7 @@ export default function HanoiGame() {
                     <div
                       key={disk}
                       className="h-4 border border-white/50 bg-[rgba(255,255,255,0.08)]"
-                      style={{ width: `${30 + disk * 24}px` }}
+                      style={{ width: `${25 + disk * 18}%`, maxWidth: `${30 + disk * 24}px` }}
                     />
                   ))}
                 </div>

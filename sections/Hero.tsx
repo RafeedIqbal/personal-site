@@ -15,14 +15,15 @@ export default function Hero() {
   return (
     <section
       id="whoami"
-      className="flex min-h-[60vh] scroll-mt-[90px] flex-col justify-center pt-24 pb-24 md:pt-40 md:pb-[150px]"
+      aria-labelledby="hero-title"
+      className="flex min-h-[60vh] scroll-mt-[110px] flex-col justify-center pt-16 pb-24 md:pt-40 md:pb-[150px]"
     >
       <div className="fade-up flex items-center gap-2.5">
-        <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-accent" />
+        <span aria-hidden="true" className="pulse-dot h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
         <span className="text-xs text-muted">{PROFILE.availability}</span>
       </div>
 
-      <h1 className="mt-6 font-grotesk text-[clamp(52px,9vw,104px)] font-bold leading-[0.95] tracking-[-0.04em] text-white">
+      <h1 id="hero-title" className="mt-6 font-grotesk text-[clamp(48px,9vw,104px)] font-bold leading-[0.95] tracking-[-0.04em] text-white">
         {PROFILE.name}
         <span
           aria-hidden="true"
@@ -43,13 +44,14 @@ export default function Hero() {
           <a
             key={link.label}
             href={link.href}
+            aria-label={`${link.label}${link.external ? " (opens in a new tab)" : link.download ? " (PDF download)" : ""}`}
             {...(link.external
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
             {...(link.download ? { download: true } : {})}
-            className="text-[12.5px] text-muted transition-colors hover:text-white"
+            className="py-1 text-[12.5px] text-muted transition-colors hover:text-white"
           >
-            <span className="text-accent">{link.glyph}</span> {link.label}
+            <span aria-hidden="true" className="text-accent">{link.glyph}</span> {link.label}
           </a>
         ))}
       </div>

@@ -110,12 +110,11 @@ export default function BackgroundEffect() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Respect reduced-motion: leave the canvas blank, run no animation loop.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let disposed = false;
 
     const collectExclusionRects = () => {
+      if (disposed || motionQuery.matches || document.hidden) return;
       // main span matters: several sections (skills rows, education block,
       // hero status line, header annotations) hold text in bare spans.
       const elements = document.querySelectorAll(
@@ -264,13 +263,14 @@ export default function BackgroundEffect() {
     };
 
     const startLoop = () => {
-      if (runningRef.current) return;
+      if (runningRef.current || motionQuery.matches || document.hidden) return;
       runningRef.current = true;
       viewportRef.current.lastFrameAt = 0;
       rafRef.current = requestAnimationFrame(drawFrame);
     };
 
     const resizeCanvas = () => {
+      if (motionQuery.matches || document.hidden) return;
       const width = window.innerWidth;
       const height = window.innerHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
@@ -287,7 +287,7 @@ export default function BackgroundEffect() {
       canvas.style.height = `${height}px`;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.font = `${FONT_SIZE}px "JetBrains Mono", monospace`;
+      ctx.font = `${FONT_SIZE}px ${getComputedStyle(document.body).fontFamily}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -297,6 +297,7 @@ export default function BackgroundEffect() {
     };
 
     const handleMouseMove = (event: MouseEvent) => {
+      if (motionQuery.matches || document.hidden) return;
       pointerRef.current = {
         x: event.clientX,
         y: event.clientY,
@@ -317,17 +318,25 @@ export default function BackgroundEffect() {
     // fixed canvas (rAF-throttled). The trailing re-measure catches sections
     // whose scroll-reveal animation finishes after the last scroll event —
     // otherwise their rects stay where the text was mid-animation.
-    let scrollRefreshPending = false;
+    let scrollRefreshFrame = 0;
     let scrollSettleTimer = 0;
     const handleScroll = () => {
+      if (motionQuery.matches || document.hidden) return;
       window.clearTimeout(scrollSettleTimer);
       scrollSettleTimer = window.setTimeout(collectExclusionRects, 700);
-      if (scrollRefreshPending) return;
-      scrollRefreshPending = true;
-      requestAnimationFrame(() => {
-        scrollRefreshPending = false;
+      if (scrollRefreshFrame) return;
+      scrollRefreshFrame = requestAnimationFrame(() => {
+        scrollRefreshFrame = 0;
         collectExclusionRects();
       });
+    };
+
+    const resetAnimation = () => {
+      cancelAnimationFrame(rafRef.current);
+      runningRef.current = false;
+      pointerRef.current.lastMoveAt = -Infinity;
+      ctx.clearRect(0, 0, viewportRef.current.width, viewportRef.current.height);
+      if (!motionQuery.matches && !document.hidden) resizeCanvas();
     };
 
     resizeCanvas();
@@ -341,9 +350,13 @@ export default function BackgroundEffect() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("visibilitychange", resetAnimation);
+    motionQuery.addEventListener("change", resetAnimation);
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(scrollRefreshFrame);
       runningRef.current = false;
       window.clearTimeout(settleTimer);
       window.clearTimeout(scrollSettleTimer);
@@ -352,6 +365,8 @@ export default function BackgroundEffect() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("visibilitychange", resetAnimation);
+      motionQuery.removeEventListener("change", resetAnimation);
     };
   }, []);
 

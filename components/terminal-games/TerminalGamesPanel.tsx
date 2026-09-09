@@ -12,7 +12,7 @@ interface TerminalGamesPanelProps {
   onSelectGame: (gameId: TerminalGameId) => void;
   onClose: () => void;
   onBackToLibrary: () => void;
-  onEnableHotkeys: () => void;
+  onEnableHotkeys: (focusControls?: boolean) => void;
 }
 
 function renderGame(gameId: TerminalGameId, hotkeysEnabled: boolean) {
@@ -40,6 +40,7 @@ export default function TerminalGamesPanel({
   onEnableHotkeys,
 }: TerminalGamesPanelProps) {
   const activeGame = TERMINAL_GAMES.find((game) => game.id === activeGameId) ?? null;
+  const hasKeyboardControls = activeGameId === "tetris" || activeGameId === "spaceinvaders";
 
   return (
     <div
@@ -49,7 +50,7 @@ export default function TerminalGamesPanel({
         onEnableHotkeys();
       }}
     >
-      <div className="flex items-center justify-between gap-4 border-b border-white/[0.07] px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] px-3 py-2">
         <div>
           <p className="font-bold text-fg">terminal arcade</p>
           <p className="text-subtle">
@@ -84,19 +85,28 @@ export default function TerminalGamesPanel({
       <div className="space-y-4 px-3 py-3">
         {activeGame ? (
           <div className="rounded border border-white/[0.07] bg-black/30">
-            <div className="flex items-center justify-between gap-4 border-b border-white/[0.07] px-3 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] px-3 py-2">
               <div>
                 <p className="font-bold text-fg">{activeGame.title}</p>
                 <p className="text-subtle">{activeGame.controls}</p>
               </div>
-              <span className={`shrink-0 ${hotkeysEnabled ? "text-accent" : "text-subtle"}`}>
-                {hotkeysEnabled ? "[controls armed]" : "[click panel to arm controls]"}
-              </span>
+              {hasKeyboardControls && (
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onEnableHotkeys(true);
+                  }}
+                  className={hotkeysEnabled ? "text-accent" : "text-subtle hover:text-white"}
+                  aria-label="Focus game keyboard controls"
+                >
+                  {hotkeysEnabled ? "[focus keyboard controls]" : "[resume keyboard controls]"}
+                </button>
+              )}
             </div>
             <div className="p-3">{renderGame(activeGame.id, hotkeysEnabled)}</div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 min-[480px]:grid-cols-2">
             {TERMINAL_GAMES.map((game) => (
               <button
                 key={game.id}

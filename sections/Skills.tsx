@@ -5,8 +5,8 @@ import { SKILLS } from "../lib/content";
 
 export default function Skills() {
   return (
-    <section id="env" className="scroll-mt-[90px] pb-24 md:pb-[130px]">
-      <SectionHeader index="05" command="env" delay={0.05}>
+    <section id="env" aria-labelledby="section-05-title" className="scroll-mt-[110px] pb-24 md:pb-[130px]">
+      <SectionHeader index="05" command="env" title="Skills" delay={0.05}>
         <div className="flex flex-col gap-[13px]">
           {Object.entries(SKILLS).map(([key, value]) => (
             <div key={key} className="flex flex-wrap gap-0.5 text-[13px]">

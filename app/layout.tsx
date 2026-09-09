@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { PROFILE } from "@/lib/content";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -16,15 +17,17 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["500", "600", "700"],
 });
 
+const title = `${PROFILE.name} — Portfolio`;
+const description = `${PROFILE.title}. ${PROFILE.tagline}`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rafeed.dev"),
+  metadataBase: new URL(PROFILE.siteUrl),
   title: {
-    default: "Rafeed Iqbal — Portfolio",
-    template: "%s — Rafeed Iqbal",
+    default: title,
+    template: `%s — ${PROFILE.name}`,
   },
-  description:
-    "Software Engineer & Product Leader. Building products at the intersection of code and strategy.",
-  applicationName: "Rafeed Iqbal — Portfolio",
+  description,
+  applicationName: title,
   keywords: [
     "Rafeed Iqbal",
     "Software Engineer",
@@ -35,28 +38,28 @@ export const metadata: Metadata = {
     "React",
     "TypeScript",
   ],
-  authors: [{ name: "Rafeed Iqbal", url: "https://rafeed.dev" }],
-  creator: "Rafeed Iqbal",
-  publisher: "Rafeed Iqbal",
+  authors: [{ name: PROFILE.name, url: PROFILE.siteUrl }],
+  creator: PROFILE.name,
+  publisher: PROFILE.name,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Rafeed Iqbal — Portfolio",
-    description: "Software Engineer & Product Leader.",
-    url: "https://rafeed.dev",
+    title,
+    description,
+    url: PROFILE.siteUrl,
     siteName: "rafeed.dev",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rafeed Iqbal — Portfolio",
-    description: "Software Engineer & Product Leader.",
+    title,
+    description,
   },
   appleWebApp: {
     capable: true,
-    title: "Rafeed Iqbal",
+    title: PROFILE.name,
     statusBarStyle: "black-translucent",
   },
 };
@@ -74,6 +77,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: PROFILE.name,
+              url: PROFILE.siteUrl,
+              jobTitle: PROFILE.title,
+              sameAs: [PROFILE.githubUrl, PROFILE.linkedinUrl],
+            }).replace(/</g, "\\u003c"),
+          }}
+        />
         {/* Without JS the scroll-reveal animations never fire, so force the
             animated content visible for no-JS visitors and crawlers. The raw
             HTML keeps React 19 from hoisting the rule out of <noscript>. */}

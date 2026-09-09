@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
+import { PROFILE } from "@/lib/content";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Rafeed Iqbal — Portfolio",
-    short_name: "Rafeed Iqbal",
-    description:
-      "Software Engineer & Product Leader. Building products at the intersection of code and strategy.",
+    name: `${PROFILE.name} — Portfolio`,
+    short_name: PROFILE.name,
+    description: `${PROFILE.title}. ${PROFILE.tagline}`,
     start_url: "/",
     display: "standalone",
     background_color: "#060607",
