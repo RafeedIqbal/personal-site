@@ -1,42 +1,48 @@
-"use client";
-
-import SectionHeader from "../components/SectionHeader";
-import { EXPERIENCE } from "../lib/content";
+import SectionHeader from "@/components/SectionHeader";
+import { EXPERIENCE } from "@/lib/content";
 
 export default function Experience() {
   return (
-    <section id="experience" aria-labelledby="section-02-title" className="scroll-mt-[110px] pb-24 md:pb-[130px]">
-      <SectionHeader index="02" command="cat experience.log" title="Experience" delay={0.05}>
-        <div className="flex flex-col">
-          {EXPERIENCE.map((exp, i) => (
-            <article
-              key={i}
-              className="grid gap-3 border-b border-white/5 py-8 first:pt-0 last:border-b-0 lg:grid-cols-[180px_1fr] lg:gap-10 md:py-[38px]"
-            >
-              <div className="flex flex-col gap-1.5 md:pt-1">
-                <span className="text-xs text-muted">{exp.date}</span>
-                <span className="text-[11.5px] text-subtle">{exp.location}</span>
-              </div>
-              <div className="flex flex-col gap-3.5">
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <h3 className="font-grotesk text-[21px] font-semibold tracking-[-0.01em] text-white">
-                    {exp.role}
-                  </h3>
-                  <span className="text-[13px] text-accent">@ {exp.company}</span>
-                </div>
-                <ul className="flex flex-col gap-2.5">
-                  {exp.bullets.map((b, j) => (
-                    <li key={j} className="flex gap-3 text-[13.5px] leading-[1.75] text-body-2">
-                      <span aria-hidden="true" className="shrink-0 text-faint">–</span>
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </article>
-          ))}
-        </div>
-      </SectionHeader>
+    <section
+      id="experience"
+      aria-labelledby="experience-title"
+      className="portfolio-section"
+    >
+      <SectionHeader
+        id="experience-title"
+        command="cat experience.log"
+        title="Experience"
+        description="Hands-on engineering, product direction, and the operational work that connects them."
+      />
+      <div>
+        {EXPERIENCE.map((experience) => (
+          <article key={experience.company} className="experience-row">
+            <div className="font-mono text-[11px] leading-relaxed text-muted">
+              <p>{experience.date}</p>
+              <p className="mt-2">{experience.location}</p>
+            </div>
+            <div>
+              <p className="mb-2 text-sm text-muted">{experience.company}</p>
+              <h3 className="max-w-[32ch] text-[23px] font-medium leading-snug tracking-[-0.025em]">
+                {experience.role}
+              </h3>
+              <p className="my-5 border-l-2 border-accent/60 pl-3 font-mono text-xs leading-relaxed">
+                {experience.impact}
+              </p>
+              <ul className="max-w-[75ch] space-y-3 text-base leading-[1.75] text-muted">
+                {experience.bullets.map((bullet) => (
+                  <li key={bullet} className="flex gap-3">
+                    <span aria-hidden="true" className="text-muted">
+                      –
+                    </span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }

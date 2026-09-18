@@ -1,54 +1,59 @@
-"use client";
-
-import SectionHeader from "../components/SectionHeader";
-import { PROFILE } from "../lib/content";
+import SectionHeader from "@/components/SectionHeader";
+import CopyEmail from "@/components/CopyEmail";
+import { PROFILE } from "@/lib/content";
 
 export default function Contact() {
   return (
-    <section id="contact" aria-labelledby="section-06-title" className="scroll-mt-[110px] pb-20 md:pb-[110px]">
-      <SectionHeader index="06" command="contact --help" title="Contact" delay={0.05}>
-        <h3 className="font-grotesk text-[clamp(36px,5vw,52px)] font-bold tracking-[-0.03em] text-white">
-          Let&apos;s build something.
-        </h3>
-        <p className="mt-[18px] max-w-[440px] text-[13.5px] leading-[1.8] text-muted">
-          Open to software engineering and product roles — remote or hybrid. The fastest way to
-          reach me is email.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <a
-            href={`mailto:${PROFILE.email}`}
-            className="max-w-full break-all rounded-md border border-accent px-4 py-[11px] text-[13px] text-accent transition-colors hover:bg-accent hover:text-black sm:px-6"
-          >
-            {PROFILE.email}
-          </a>
-          <a
-            href={PROFILE.linkedinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn (opens in a new tab)"
-            className="text-[12.5px] text-muted transition-colors hover:text-white"
-          >
-            linkedin ↗
-          </a>
-          <a
-            href={PROFILE.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub (opens in a new tab)"
-            className="text-[12.5px] text-muted transition-colors hover:text-white"
-          >
-            github ↗
-          </a>
-          <a
-            href={PROFILE.resumeUrl}
-            download
-            aria-label="Resume (PDF download)"
-            className="text-[12.5px] text-muted transition-colors hover:text-white"
-          >
-            resume ↓
-          </a>
-        </div>
-      </SectionHeader>
+    <section
+      id="contact"
+      aria-labelledby="contact-title"
+      className="portfolio-section contact-section"
+    >
+      <SectionHeader
+        id="contact-title"
+        command="contact --help"
+        title="Let’s talk about what’s next."
+      />
+      <p className="max-w-[52ch] text-base leading-relaxed text-muted">
+        I’m open to software engineering and product roles, remote or hybrid. If
+        my work fits what your team needs, email is the best place to start.
+      </p>
+      <a
+        href={`mailto:${PROFILE.email}`}
+        className="mt-6 inline-block max-w-full break-all text-[clamp(18px,2.8vw,30px)] font-medium tracking-[-0.035em] underline decoration-line underline-offset-8 hover:decoration-muted"
+      >
+        {PROFILE.email}
+      </a>
+      <div className="mt-8 flex flex-wrap items-start gap-3">
+        <a href={`mailto:${PROFILE.email}`} className="button-primary">
+          Send an email <span aria-hidden="true">↗</span>
+        </a>
+        <CopyEmail />
+      </div>
+      <div className="mt-6 flex flex-wrap gap-6 font-mono text-xs text-muted">
+        <a
+          href={PROFILE.linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="small-link"
+        >
+          LinkedIn <span aria-hidden="true">↗</span>
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+        <a
+          href={PROFILE.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="small-link"
+        >
+          GitHub <span aria-hidden="true">↗</span>
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+        <a href={PROFILE.resumeUrl} download className="small-link">
+          Download résumé <span aria-hidden="true">↓</span>
+          <span className="sr-only"> (PDF)</span>
+        </a>
+      </div>
     </section>
   );
 }

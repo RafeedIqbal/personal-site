@@ -1,17 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PROFILE } from "../lib/content";
-
-const TREE_ITEMS = [
-  { href: "#whoami", label: "whoami" },
-  { href: "#about", label: "about.txt" },
-  { href: "#experience", label: "experience.log" },
-  { href: "#projects", label: "projects/" },
-  { href: "#websites", label: "websites/" },
-  { href: "#env", label: "skills.env" },
-  { href: "#contact", label: "contact.sh" },
-];
+import { useEffect, useRef, useState } from "react";
+import { NAV_ITEMS, PROFILE } from "@/lib/content";
 
 interface NavProps {
   onOpenTerminal: () => void;
@@ -19,141 +9,167 @@ interface NavProps {
 }
 
 export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
-  const [activeId, setActiveId] = useState<string>("whoami");
+  const [activeId, setActiveId] = useState("whoami");
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
-    const sections = TREE_ITEMS.map((item) =>
-      document.getElementById(item.href.replace("#", ""))
+    const sections = NAV_ITEMS.map(({ id }) =>
+      document.getElementById(id),
     ).filter((el): el is HTMLElement => el !== null);
-
-    if (sections.length === 0) return;
-
-    // Scanline scroll-spy: the active section is the last one whose top has
-    // crossed ~40% down the viewport. An IntersectionObserver band breaks on
-    // short final sections that never reach it, so at the bottom of the page
-    // the last section is forced active.
     let frame = 0;
     const update = () => {
       frame = 0;
-      const doc = document.documentElement;
-      if (window.innerHeight + window.scrollY >= doc.scrollHeight - 100) {
-        setActiveId(sections[sections.length - 1].id);
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 40
+      ) {
+        setActiveId("contact");
         return;
       }
-      const scanline = window.innerHeight * 0.4;
-      let current = sections[0].id;
+      let current = "whoami";
       for (const section of sections) {
-        if (section.getBoundingClientRect().top <= scanline) {
+        if (section.getBoundingClientRect().top <= window.innerHeight * 0.3)
           current = section.id;
-        }
       }
       setActiveId(current);
     };
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(update);
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
     };
-
     update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    document.addEventListener("toggle", schedule, true);
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("toggle", schedule, true);
     };
   }, []);
 
+  const closeMenu = () => {
+    if (mobileMenuRef.current) mobileMenuRef.current.open = false;
+  };
+
   return (
     <>
-    <header className="sticky top-0 z-20 border-b border-white/[0.07] bg-bg/95 px-6 pt-4 backdrop-blur-sm md:hidden">
-      <div className="flex items-center justify-between gap-4">
-        <a href="#whoami" className="py-1 text-xs text-fg">
-          <span aria-hidden="true" className="text-accent">~</span>/rafeed.dev
-        </a>
-        <a href={PROFILE.resumeUrl} download className="py-1 text-xs text-accent">
-          resume <span aria-hidden="true">↓</span>
-          <span className="sr-only"> (PDF download)</span>
-        </a>
-      </div>
-      <nav aria-label="Page sections" className="-mx-2 mt-2 overflow-x-auto">
-        <ul className="flex w-max gap-1 text-xs">
-          {TREE_ITEMS.map((item) => {
-            const isActive = activeId === item.href.slice(1);
-            return (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  aria-current={isActive ? "location" : undefined}
-                  className={`block border-b-2 px-2 py-3 transition-colors ${
-                    isActive
-                      ? "border-accent text-white"
-                      : "border-transparent text-muted hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </header>
-    <aside className="sticky top-0 hidden h-dvh w-52 shrink-0 flex-col border-r border-white/[0.07] md:flex">
-      {/* Brand */}
-      <div className="shrink-0 px-5 pt-6 pb-4">
+      <header className="mobile-header lg:hidden">
+        <div className="flex min-h-16 items-center justify-between gap-3 px-5 sm:px-8">
+          <a href="#whoami" onClick={closeMenu} className="font-mono text-xs">
+            <span className="text-accent">~</span>/rafeed.dev
+          </a>
+          <a
+            href={PROFILE.resumeUrl}
+            download
+            className="small-link font-mono text-xs"
+          >
+            Résumé <span aria-hidden="true">↓</span>
+            <span className="sr-only"> (PDF download)</span>
+          </a>
+        </div>
+        <details
+          ref={mobileMenuRef}
+          className="mobile-menu"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              closeMenu();
+              mobileMenuRef.current?.querySelector("summary")?.focus();
+            }
+          }}
+        >
+          <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-4 px-5 font-mono text-xs sm:px-8">
+            <span>
+              Explore{" "}
+              <span className="ml-2 text-muted">
+                / {NAV_ITEMS.find(({ id }) => id === activeId)?.label}
+              </span>
+            </span>
+            <span className="menu-indicator" aria-hidden="true">
+              +
+            </span>
+          </summary>
+          <nav
+            aria-label="Page sections"
+            className="border-t border-line px-3 py-2 sm:px-6"
+          >
+            {NAV_ITEMS.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                aria-current={activeId === item.id ? "location" : undefined}
+                className="mobile-nav-link"
+                onClick={closeMenu}
+              >
+                <span>{item.label}</span>
+                <span className="font-mono text-xs text-muted">
+                  {item.file}
+                </span>
+              </a>
+            ))}
+          </nav>
+        </details>
+      </header>
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface/25 lg:flex">
         <a
           href="#whoami"
-          className="text-[12.5px] text-muted transition-colors hover:text-white"
+          className="flex h-14 shrink-0 items-center border-b border-line px-6 font-mono text-xs"
         >
           <span className="text-accent">~</span>/rafeed.dev
         </a>
-      </div>
-
-      <nav aria-label="Page sections" className="flex-1 overflow-y-auto px-5 py-2">
-        <div className="space-y-0 text-xs">
-          {TREE_ITEMS.map((item, i) => {
-            const isLast = i === TREE_ITEMS.length - 1;
-            const branch = isLast ? "└── " : "├── ";
-            const isActive = activeId === item.href.replace("#", "");
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                aria-current={isActive ? "location" : undefined}
-                className={`block w-full py-1 text-left leading-6 transition-colors ${
-                  isActive ? "text-white" : "text-muted hover:text-white"
-                }`}
-              >
-                <span aria-hidden="true" className={isActive ? "text-accent" : "text-faint"}>{branch}</span>
-                {item.label}
-              </a>
-            );
-          })}
+        <div className="px-6 pt-9 pb-5">
+          <span className="font-mono text-[11px] text-muted">explorer</span>
+          <p className="mt-2 text-sm font-medium">Rafeed Iqbal</p>
         </div>
-      </nav>
-
-      {/* Terminal + resume */}
-      <div className="flex shrink-0 flex-col gap-3 px-5 pt-4 pb-6">
-        {terminalAvailable && <button
-          type="button"
-          onClick={onOpenTerminal}
-          title="open terminal ( ` )"
-          aria-haspopup="dialog"
-          className="w-full rounded-md bg-accent py-2 text-xs font-bold text-black transition-opacity hover:opacity-80"
+        <nav
+          aria-label="Page sections"
+          className="min-h-0 flex-1 overflow-y-auto px-3"
         >
-          &gt;_ terminal
-        </button>}
-        <a
-          href={PROFILE.resumeUrl}
-          download
-          className="text-xs text-muted transition-colors hover:text-white"
-        >
-          <span aria-hidden="true" className="text-accent">[↓]</span> resume
-          <span className="sr-only"> (PDF download)</span>
-        </a>
-      </div>
-    </aside>
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              aria-current={activeId === item.id ? "location" : undefined}
+              className="desktop-nav-link"
+            >
+              <span aria-hidden="true" className="tree-branch" />
+              <span>
+                <span className="block text-[13px]">{item.label}</span>
+                <span className="mt-0.5 block font-mono text-[10px] text-muted">
+                  {item.file}
+                </span>
+              </span>
+            </a>
+          ))}
+        </nav>
+        <div className="space-y-4 border-t border-line p-5">
+          {terminalAvailable && (
+            <button
+              type="button"
+              onClick={onOpenTerminal}
+              aria-haspopup="dialog"
+              className="terminal-launcher"
+              title="Open terminal (backtick)"
+            >
+              <span>
+                <span className="mr-2 text-accent" aria-hidden="true">
+                  &gt;_
+                </span>
+                Open terminal
+              </span>
+              <kbd className="kbd">`</kbd>
+            </button>
+          )}
+          <a
+            href={PROFILE.resumeUrl}
+            download
+            className="flex min-h-8 items-center justify-between font-mono text-[11px] text-muted hover:text-fg"
+          >
+            Download résumé <span aria-hidden="true">↓</span>
+            <span className="sr-only"> (PDF)</span>
+          </a>
+        </div>
+      </aside>
     </>
   );
 }

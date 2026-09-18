@@ -1,59 +1,73 @@
-"use client";
-
-import { PROFILE } from "../lib/content";
-
-const LINKS = [
-  { label: "linkedin", glyph: "[↗]", href: PROFILE.linkedinUrl, external: true },
-  { label: "github", glyph: "[↗]", href: PROFILE.githubUrl, external: true },
-  { label: "email", glyph: "[↗]", href: `mailto:${PROFILE.email}`, external: false },
-  { label: "resume", glyph: "[↓]", href: PROFILE.resumeUrl, external: false, download: true },
-];
+import { PROFILE } from "@/lib/content";
 
 export default function Hero() {
-  const [firstRole, secondRole] = PROFILE.title.toLowerCase().split(" & ");
-
   return (
-    <section
-      id="whoami"
-      aria-labelledby="hero-title"
-      className="flex min-h-[60vh] scroll-mt-[110px] flex-col justify-center pt-16 pb-24 md:pt-40 md:pb-[150px]"
-    >
-      <div className="fade-up flex items-center gap-2.5">
-        <span aria-hidden="true" className="pulse-dot h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-        <span className="text-xs text-muted">{PROFILE.availability}</span>
+    <section id="whoami" aria-labelledby="hero-title" className="hero-section">
+      <div className="mb-7 flex items-center gap-2.5 font-mono text-xs text-muted">
+        <span aria-hidden="true" className="text-accent">
+          $
+        </span>
+        whoami
+        <span aria-hidden="true" className="h-3.5 w-1.5 bg-muted/60" />
       </div>
-
-      <h1 id="hero-title" className="mt-6 font-grotesk text-[clamp(48px,9vw,104px)] font-bold leading-[0.95] tracking-[-0.04em] text-white">
-        {PROFILE.name}
-        <span
-          aria-hidden="true"
-          className="ml-[0.1em] inline-block h-[0.72em] w-[0.42em] bg-accent animate-[blink_1.1s_step-end_infinite] motion-reduce:animate-none"
-        />
-      </h1>
-
-      <p className="fade-up fade-up-1 mt-7 text-[15px] text-fg">
-        {firstRole} <span className="text-accent">×</span> {secondRole}
-      </p>
-
-      <p className="fade-up fade-up-2 mt-3.5 max-w-[520px] text-[13.5px] leading-[1.8] text-muted">
-        {PROFILE.heroParagraph}
-      </p>
-
-      <div className="fade-up fade-up-3 mt-11 flex flex-wrap gap-6">
-        {LINKS.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            aria-label={`${link.label}${link.external ? " (opens in a new tab)" : link.download ? " (PDF download)" : ""}`}
-            {...(link.external
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-            {...(link.download ? { download: true } : {})}
-            className="py-1 text-[12.5px] text-muted transition-colors hover:text-white"
+      <div className="grid items-end gap-10 xl:grid-cols-[minmax(0,1fr)_230px] xl:gap-12">
+        <div>
+          <h1
+            id="hero-title"
+            className="text-[clamp(46px,6.5vw,82px)] font-semibold leading-[0.98] tracking-[-0.055em]"
           >
-            <span aria-hidden="true" className="text-accent">{link.glyph}</span> {link.label}
+            {PROFILE.name}
+            <span className="text-muted">.</span>
+          </h1>
+          <p className="mt-5 text-[clamp(18px,2vw,23px)] font-medium tracking-[-0.025em]">
+            Software engineer <span className="text-muted">&</span> product
+            leader
+          </p>
+          <p className="mt-5 max-w-[50ch] text-base leading-[1.8] text-muted sm:text-[17px]">
+            {PROFILE.heroParagraph}
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a href="#projects" className="button-primary">
+              View selected work <span aria-hidden="true">↓</span>
+            </a>
+            <a href={PROFILE.resumeUrl} download className="button-secondary">
+              Download résumé<span className="sr-only"> (PDF)</span>
+            </a>
+          </div>
+          <a
+            href={`mailto:${PROFILE.email}`}
+            className="mt-6 inline-block max-w-full break-all font-mono text-xs text-muted underline decoration-line underline-offset-4 hover:text-fg"
+          >
+            {PROFILE.email}
           </a>
-        ))}
+        </div>
+        <div className="current-work">
+          <p className="mb-5 font-mono text-[11px] text-muted">
+            Currently building
+          </p>
+          <a href="#work-basenote" className="current-work-link">
+            <span>BaseNote</span>
+            <span className="mt-1 block text-xs text-muted">
+              Founding Engineer
+            </span>
+          </a>
+          <a href="#work-icon" className="current-work-link">
+            <span>Icon Training</span>
+            <span className="mt-1 block text-xs leading-relaxed text-muted">
+              Head of Product and Engineering
+            </span>
+          </a>
+          <div className="work-availability mt-5 border-t border-line pt-4 text-xs leading-relaxed text-muted">
+            <span className="mb-1 flex items-center gap-2 text-fg">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-accent"
+              />
+              Open to opportunities
+            </span>
+            {PROFILE.workPreference}
+          </div>
+        </div>
       </div>
     </section>
   );

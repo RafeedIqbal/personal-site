@@ -1,6 +1,8 @@
 # personal-site
 
-Terminal-style personal portfolio built with Next.js 16, React 19, Tailwind CSS v4, and Framer Motion. Near-black with a green accent; single content column with a file-tree sidebar, and an interactive terminal overlay (press `` ` ``) that mirrors the page content — games included.
+Terminal-style personal portfolio built with Next.js 16, React 19, and Tailwind CSS v4. A graphite workspace pairs readable case summaries and real project previews with file-tree navigation. The optional desktop terminal (press `` ` ``) and arcade load on demand; Framer Motion is confined to the terminal's help panel.
+
+The reading view, mobile section menu, and case disclosures work without JavaScript. Screenshot previews open in a full-color dialog with JavaScript or link directly to the image without it. Capture provenance and redesign verification are recorded in [docs/portfolio-redesign.md](docs/portfolio-redesign.md).
 
 ## Development
 
