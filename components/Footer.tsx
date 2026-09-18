@@ -1,13 +1,13 @@
-"use client";
-
 export default function Footer() {
   return (
-    <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.06] pt-6 pb-9 text-[11px] text-subtle">
-      <span>© {new Date().getFullYear()} rafeed iqbal</span>
-      <span className="hidden md:inline">
-        press <kbd className="kbd">`</kbd> to open the terminal
+    <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-line py-7 font-mono text-[10px] text-muted">
+      <span>© {new Date().getFullYear()} Rafeed Iqbal</span>
+      <span className="hidden lg:inline">
+        Curious? Open the terminal with <kbd className="kbd">`</kbd>
       </span>
-      <span>built with next.js</span>
+      <a href="#whoami" className="small-link">
+        Back to top <span aria-hidden="true">↑</span>
+      </a>
     </footer>
   );
 }

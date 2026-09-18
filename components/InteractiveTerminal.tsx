@@ -3,15 +3,26 @@
 import { useState, useRef, useEffect, useMemo, KeyboardEvent } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { runCommand, AVAILABLE_COMMANDS, HELP_COMMANDS } from "../lib/terminal-commands";
+import {
+  runCommand,
+  AVAILABLE_COMMANDS,
+  HELP_COMMANDS,
+} from "../lib/terminal-commands";
 import type { TerminalGameId } from "../lib/terminal-games";
 
 // The games only load when the panel first opens, keeping them out of the
 // terminal's initial chunk.
-const TerminalGamesPanel = dynamic(() => import("./terminal-games/TerminalGamesPanel"), {
-  ssr: false,
-  loading: () => <p className="text-xs text-subtle" role="status">loading arcade...</p>,
-});
+const TerminalGamesPanel = dynamic(
+  () => import("./terminal-games/TerminalGamesPanel"),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-xs text-subtle" role="status">
+        loading arcade...
+      </p>
+    ),
+  },
+);
 
 interface HistoryEntry {
   command: string;
@@ -54,8 +65,12 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     const body = bodyRef.current;
     const panel = gamePanelRef.current;
     if (!gamePanelOpen || !body || !panel) return;
-    const delta = panel.getBoundingClientRect().top - body.getBoundingClientRect().top;
-    body.scrollTo({ top: body.scrollTop + delta - 4, behavior: reduceMotion ? "instant" : "smooth" });
+    const delta =
+      panel.getBoundingClientRect().top - body.getBoundingClientRect().top;
+    body.scrollTo({
+      top: body.scrollTop + delta - 4,
+      behavior: reduceMotion ? "instant" : "smooth",
+    });
     panel.focus({ preventScroll: true });
   }, [gamePanelOpen, activeGameId, reduceMotion]);
 
@@ -70,7 +85,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     const trimmed = input.toLowerCase();
     if (!trimmed) return "";
     const match = AVAILABLE_COMMANDS.find(
-      (cmd) => cmd.startsWith(trimmed) && cmd !== trimmed
+      (cmd) => cmd.startsWith(trimmed) && cmd !== trimmed,
     );
     return match ? match.slice(trimmed.length) : "";
   }, [input]);
@@ -149,8 +164,12 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       const panel = panelRef.current;
       if (!panel) return;
       const focusables = Array.from(
-        panel.querySelectorAll<HTMLElement>("button, input, a[href], [tabindex='0']")
-      ).filter((el) => !el.hasAttribute("disabled") && el.getClientRects().length > 0);
+        panel.querySelectorAll<HTMLElement>(
+          "button, input, a[href], [tabindex='0']",
+        ),
+      ).filter(
+        (el) => !el.hasAttribute("disabled") && el.getClientRects().length > 0,
+      );
       if (focusables.length === 0) return;
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
@@ -176,9 +195,16 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     draftInputRef.current = "";
     setAnnouncement("");
 
-    if (trimmed.toLowerCase() === "help" || trimmed.toLowerCase() === "--help") {
+    if (
+      trimmed.toLowerCase() === "help" ||
+      trimmed.toLowerCase() === "--help"
+    ) {
       setShowHelp((prev) => !prev);
-      setAnnouncement(showHelp ? "Command help closed." : "Command help opened above the prompt.");
+      setAnnouncement(
+        showHelp
+          ? "Command help closed."
+          : "Command help opened above the prompt.",
+      );
       setCmdHistory((prev) => [trimmed, ...prev]);
       setHistoryIndex(-1);
       setInput("");
@@ -202,7 +228,10 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
 
     if (result?.gameAction?.type === "open-library") {
       openGameLibrary();
-    } else if (result?.gameAction?.type === "launch" && result.gameAction.gameId) {
+    } else if (
+      result?.gameAction?.type === "launch" &&
+      result.gameAction.gameId
+    ) {
       launchGame(result.gameAction.gameId);
     } else if (result?.gameAction?.type === "close") {
       closeGames();
@@ -217,7 +246,10 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
 
     setHistory((prev) => [
       ...prev,
-      { command: trimmed, output: result?.output ?? `zsh: command not found: ${trimmed}` },
+      {
+        command: trimmed,
+        output: result?.output ?? `zsh: command not found: ${trimmed}`,
+      },
     ]);
     setCmdHistory((prev) => [trimmed, ...prev]);
     setHistoryIndex(-1);
@@ -235,8 +267,16 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       }
       return;
     }
-    if (e.key === "ArrowRight" && !e.shiftKey && ghostSuggestion && inputRef.current) {
-      if (inputRef.current.selectionStart === input.length && inputRef.current.selectionEnd === input.length) {
+    if (
+      e.key === "ArrowRight" &&
+      !e.shiftKey &&
+      ghostSuggestion &&
+      inputRef.current
+    ) {
+      if (
+        inputRef.current.selectionStart === input.length &&
+        inputRef.current.selectionEnd === input.length
+      ) {
         e.preventDefault();
         setInput(input + ghostSuggestion);
       }
@@ -257,21 +297,26 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       e.preventDefault();
       const next = Math.max(historyIndex - 1, -1);
       setHistoryIndex(next);
-      setInput(next === -1 ? draftInputRef.current : cmdHistory[next] ?? "");
+      setInput(next === -1 ? draftInputRef.current : (cmdHistory[next] ?? ""));
     }
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Terminal">
+    <div
+      className="fixed inset-0 z-[60] font-mono"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Terminal"
+    >
       {/* Dim backdrop — click to close. Page keeps scrolling behind it so
           scrollTarget commands stay visible. */}
       <div className="absolute inset-0 bg-black/45" onClick={onClose} />
 
       <div
         ref={panelRef}
-        className="absolute bottom-4 left-1/2 flex max-h-[calc(100dvh-32px)] w-[min(760px,calc(100vw-32px))] -translate-x-1/2 flex-col overflow-hidden rounded-xl border border-white/[0.12] bg-[rgba(9,10,12,0.92)] shadow-[0_24px_80px_rgba(0,0,0,0.6)] backdrop-blur-[16px] sm:bottom-11 sm:max-h-[calc(100dvh-60px)]"
+        className="absolute bottom-4 left-1/2 flex max-h-[calc(100dvh-32px)] w-[min(880px,calc(100vw-32px))] -translate-x-1/2 flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.4)] sm:bottom-11 sm:max-h-[calc(100dvh-60px)]"
         style={{ height: gamePanelOpen ? "min(78dvh, 700px)" : 440 }}
         onClick={focusPrompt}
       >
@@ -300,8 +345,13 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
           {/* Welcome */}
           <div className="space-y-0.5 text-xs text-subtle">
             <p>Welcome to rafeed.dev — you found the terminal.</p>
-            <p id="terminal-instructions">Type <span className="text-fg">help</span> for commands. Tab to autocomplete; Shift+Tab to move focus.</p>
-            <p>Type <span className="text-fg">games</span> if bored.</p>
+            <p id="terminal-instructions">
+              Type <span className="text-fg">help</span> for commands. Tab to
+              autocomplete; Shift+Tab to move focus.
+            </p>
+            <p>
+              Type <span className="text-fg">games</span> if bored.
+            </p>
           </div>
 
           {/* Help card */}
@@ -316,35 +366,46 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
               >
                 <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs">
                   <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
-                    <span className="font-bold text-fg">available commands</span>
+                    <span className="font-bold text-fg">
+                      available commands
+                    </span>
                     <button
                       aria-label="Close command help"
-                      onClick={(e) => { e.stopPropagation(); setShowHelp(false); focusPrompt(); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowHelp(false);
+                        focusPrompt();
+                      }}
                       className="text-subtle transition-colors hover:text-white"
                     >
                       [esc]
                     </button>
                   </div>
                   <div className="space-y-0.5 px-3 py-2">
-                    {HELP_COMMANDS.map(({ command: cmd, description: desc }) => (
-                      <div key={cmd} className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
-                        <button
-                          className="text-left text-fg hover:underline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (cmd) {
-                              setInput(cmd.replace(/<[^>]+>/g, ""));
-                              setHistoryIndex(-1);
-                              setShowHelp(false);
-                              inputRef.current?.focus();
-                            }
-                          }}
+                    {HELP_COMMANDS.map(
+                      ({ command: cmd, description: desc }) => (
+                        <div
+                          key={cmd}
+                          className="flex flex-wrap justify-between gap-x-4 gap-y-0.5"
                         >
-                          {cmd}
-                        </button>
-                        <span className="text-subtle">{desc}</span>
-                      </div>
-                    ))}
+                          <button
+                            className="text-left text-fg hover:underline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (cmd) {
+                                setInput(cmd.replace(/<[^>]+>/g, ""));
+                                setHistoryIndex(-1);
+                                setShowHelp(false);
+                                inputRef.current?.focus();
+                              }
+                            }}
+                          >
+                            {cmd}
+                          </button>
+                          <span className="text-subtle">{desc}</span>
+                        </div>
+                      ),
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -352,7 +413,12 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
           </AnimatePresence>
 
           {gamePanelOpen && (
-            <div ref={gamePanelRef} tabIndex={-1} role="group" aria-label="Terminal arcade">
+            <div
+              ref={gamePanelRef}
+              tabIndex={-1}
+              role="group"
+              aria-label="Terminal arcade"
+            >
               <TerminalGamesPanel
                 activeGameId={activeGameId}
                 hotkeysEnabled={gameHotkeysEnabled}
@@ -362,7 +428,8 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
                 onEnableHotkeys={(focusControls = false) => {
                   if (!activeGameId) return;
                   setGameHotkeysEnabled(true);
-                  if (focusControls) gamePanelRef.current?.focus({ preventScroll: true });
+                  if (focusControls)
+                    gamePanelRef.current?.focus({ preventScroll: true });
                   else inputRef.current?.blur();
                 }}
               />
@@ -370,12 +437,20 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
           )}
 
           {/* Past commands + output */}
-          <div role="log" aria-label="Terminal history" aria-live="polite" aria-relevant="additions" className="space-y-3">
+          <div
+            role="log"
+            aria-label="Terminal history"
+            aria-live="polite"
+            aria-relevant="additions"
+            className="space-y-3"
+          >
             {history.map((entry, i) => (
               <div key={i} className="space-y-1">
                 <div className="flex items-start gap-2 text-xs">
                   <span className="shrink-0 select-none text-accent">$</span>
-                  <span className="min-w-0 break-words text-fg">{entry.command}</span>
+                  <span className="min-w-0 break-words text-fg">
+                    {entry.command}
+                  </span>
                 </div>
                 <pre className="whitespace-pre-wrap break-words pl-5 text-xs leading-relaxed text-muted">
                   {entry.output}
@@ -383,7 +458,9 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
               </div>
             ))}
           </div>
-          <p role="status" className="sr-only">{announcement}</p>
+          <p role="status" className="sr-only">
+            {announcement}
+          </p>
 
           {/* Active input prompt — part of the content flow */}
           <div className="flex items-start gap-2 text-xs">
@@ -393,7 +470,10 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
                 ref={inputRef}
                 type="text"
                 value={input}
-                onChange={(e) => { setInput(e.target.value); setHistoryIndex(-1); }}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  setHistoryIndex(-1);
+                }}
                 onKeyDown={handleKeyDown}
                 onFocus={() => setGameHotkeysEnabled(false)}
                 className="relative z-10 block min-h-5 w-full bg-transparent text-xs text-fg caret-accent outline-none placeholder:text-subtle"
@@ -406,7 +486,10 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
                 placeholder="type a command..."
                 spellCheck={false}
               />
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex min-h-5 items-center whitespace-pre text-xs">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 flex min-h-5 items-center whitespace-pre text-xs"
+              >
                 <span className="invisible">{input}</span>
                 {ghostSuggestion && (
                   <span className="text-subtle">{ghostSuggestion}</span>

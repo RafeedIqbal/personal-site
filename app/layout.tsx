@@ -14,7 +14,7 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-space-grotesk",
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const title = `${PROFILE.name} — Portfolio`;
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#060607",
+  themeColor: "#111315",
   colorScheme: "dark",
 };
 
@@ -75,7 +75,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang="en"
+      className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}
+    >
       <body>
         <script
           type="application/ld+json"
@@ -88,15 +91,6 @@ export default function RootLayout({
               jobTitle: PROFILE.title,
               sameAs: [PROFILE.githubUrl, PROFILE.linkedinUrl],
             }).replace(/</g, "\\u003c"),
-          }}
-        />
-        {/* Without JS the scroll-reveal animations never fire, so force the
-            animated content visible for no-JS visitors and crawlers. The raw
-            HTML keeps React 19 from hoisting the rule out of <noscript>. */}
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html:
-              "<style>.js-reveal{opacity:1 !important;transform:none !important;}</style>",
           }}
         />
         {children}

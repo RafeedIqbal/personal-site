@@ -1,4 +1,12 @@
-import { PROFILE, EDUCATION, EXPERIENCE, PROJECTS, SKILLS, WEBSITES } from "./content";
+import {
+  PROFILE,
+  EDUCATION,
+  EXPERIENCE,
+  SELECTED_WORK,
+  SKILLS,
+  WEBSITES,
+  CAPABILITIES,
+} from "./content";
 import {
   getTerminalGameDefinition,
   getTerminalGamesListText,
@@ -29,6 +37,8 @@ export const AVAILABLE_COMMANDS = [
   "cat projects/id8",
   "cat projects/e-predict",
   "cat projects/syncmaster",
+  "cat projects/basenote",
+  "cat projects/icon",
   "env",
   "contact --help",
   "resume",
@@ -121,11 +131,7 @@ ${EDUCATION.years} | ${EDUCATION.location}
 
 BIO
 ---
-Software engineer and product leader building consumer applications from 0 to 1.
-Running product and engineering for an AI-powered fitness app, and sole engineer
-behind a SaaS ERP platform for perfumers — RAG-based AI assistants, production
-systems, and the storefronts around them.
-McMaster B.Eng Software Engineering graduate.`,
+${PROFILE.bio}`,
       scrollTarget: "about",
     };
   }
@@ -134,31 +140,39 @@ McMaster B.Eng Software Engineering graduate.`,
     const lines = EXPERIENCE.map(
       (e) =>
         `[${e.date}] ${e.role} @ ${e.company} — ${e.location}\n` +
-        e.bullets.map((b) => `  • ${b}`).join("\n")
+        e.bullets.map((b) => `  • ${b}`).join("\n"),
     ).join("\n\n");
     return { output: lines, scrollTarget: "experience" };
   }
 
-  if (cmd === "ls projects/" || cmd === "ls projects" || cmd === "ls -la projects/") {
+  if (
+    cmd === "ls projects/" ||
+    cmd === "ls projects" ||
+    cmd === "ls -la projects/"
+  ) {
     return {
-      output: PROJECTS.map(
-        (p) => `drwxr-xr-x  rafeed  4096  ${p.name}/   [${p.stack.join(", ")}]`
+      output: SELECTED_WORK.map(
+        (p) => `drwxr-xr-x  rafeed  4096  ${p.slug}/   [${p.stack.join(", ")}]`,
       ).join("\n"),
       scrollTarget: "projects",
     };
   }
 
-  if (cmd === "ls websites/" || cmd === "ls websites" || cmd === "ls -la websites/") {
+  if (
+    cmd === "ls websites/" ||
+    cmd === "ls websites" ||
+    cmd === "ls -la websites/"
+  ) {
     return {
       output: WEBSITES.map(
         (website) =>
-          `lrwxrwxrwx  rafeed  ${website.url.length}  ${website.name} -> ${website.url}  [${website.stack}] [${website.type}]`
+          `lrwxrwxrwx  rafeed  ${website.url.length}  ${website.name} -> ${website.url}  [${website.stack}] [${website.type}]`,
       ).join("\n"),
       scrollTarget: "websites",
     };
   }
 
-  for (const project of PROJECTS) {
+  for (const project of SELECTED_WORK) {
     if (
       cmd === `cat projects/${project.slug}` ||
       cmd === `cat projects/${project.slug}.md` ||
@@ -167,6 +181,8 @@ McMaster B.Eng Software Engineering graduate.`,
       const metadata = [
         `Stack:       ${project.stack.join(", ")}`,
         project.githubUrl ? `GitHub:      ${project.githubUrl}` : null,
+        project.websiteUrl ? `Website:     ${project.websiteUrl}` : null,
+        `Contribution: ${project.contribution}`,
       ]
         .filter(Boolean)
         .join("\n");
@@ -176,7 +192,16 @@ McMaster B.Eng Software Engineering graduate.`,
 ${"=".repeat(project.name.length)}
 ${metadata}
 
-${project.description}`,
+${project.description}
+
+PROBLEM
+${project.problem}
+
+APPROACH
+${project.approach}
+
+RESULT
+${project.result}`,
         scrollTarget: "projects",
       };
     }
@@ -186,7 +211,10 @@ ${project.description}`,
     const lines = Object.entries(SKILLS)
       .map(([k, v]) => `${k}="${v}"`)
       .join("\n");
-    return { output: lines, scrollTarget: "env" };
+    return {
+      output: `${lines}\n\n${CAPABILITIES.map((item) => `${item.title}\n${item.description}\n${item.evidence}`).join("\n\n")}`,
+      scrollTarget: "env",
+    };
   }
 
   if (cmd === "contact --help" || cmd === "contact") {
@@ -206,21 +234,30 @@ Options:
     if (typeof window !== "undefined") {
       window.open(PROFILE.resumeUrl, "_blank", "noopener,noreferrer");
     }
-    return { output: `Opening ${PROFILE.resumeUrl}...`, scrollTarget: "contact" };
+    return {
+      output: `Opening ${PROFILE.resumeUrl}...`,
+      scrollTarget: "contact",
+    };
   }
 
   if (cmd === "open linkedin") {
     if (typeof window !== "undefined") {
       window.open(PROFILE.linkedinUrl, "_blank", "noopener,noreferrer");
     }
-    return { output: `Opening ${PROFILE.linkedinUrl}...`, scrollTarget: "contact" };
+    return {
+      output: `Opening ${PROFILE.linkedinUrl}...`,
+      scrollTarget: "contact",
+    };
   }
 
   if (cmd === "open github") {
     if (typeof window !== "undefined") {
       window.open(PROFILE.githubUrl, "_blank", "noopener,noreferrer");
     }
-    return { output: `Opening ${PROFILE.githubUrl}...`, scrollTarget: "contact" };
+    return {
+      output: `Opening ${PROFILE.githubUrl}...`,
+      scrollTarget: "contact",
+    };
   }
 
   if (cmd === "clear") {

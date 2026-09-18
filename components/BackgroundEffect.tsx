@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
-const ASCII_CHARS = "!@#$%^&*()_+-=[]{}|;:',.<>?/~`abcdefghijklmnopqrstuvwxyz0123456789";
+const ASCII_CHARS =
+  "!@#$%^&*()_+-=[]{}|;:',.<>?/~`abcdefghijklmnopqrstuvwxyz0123456789";
 const GRID_SPACING = 28;
 const FONT_SIZE = 12;
 const REVEAL_RADIUS = 80;
@@ -115,10 +116,9 @@ export default function BackgroundEffect() {
 
     const collectExclusionRects = () => {
       if (disposed || motionQuery.matches || document.hidden) return;
-      // main span matters: several sections (skills rows, education block,
-      // hero status line, header annotations) hold text in bare spans.
+      // Keep the effect in the empty space around content and workspace chrome.
       const elements = document.querySelectorAll(
-        "main h1, main h2, main h3, main p, main ul, main a, main button, main span, aside a, aside button, footer"
+        "main h1, main h2, main h3, main h4, main p, main ul, main a, main button, main span, main summary, .hero-section > div:first-child, .work-availability, aside, header, footer",
       );
       const rects: [number, number, number, number][] = [];
       const viewportBottom = window.innerHeight + EXCLUSION_VIEWPORT_MARGIN;
@@ -163,7 +163,8 @@ export default function BackgroundEffect() {
         : FRAME_MS;
       const positionBlend = getBlendFactor(POSITION_EASING, deltaMs);
       const opacityBlend = getBlendFactor(OPACITY_EASING, deltaMs);
-      const isPointerActive = timestamp - pointer.lastMoveAt < POINTER_ACTIVE_MS;
+      const isPointerActive =
+        timestamp - pointer.lastMoveAt < POINTER_ACTIVE_MS;
 
       // Track whether anything is still animating this frame so the loop can
       // idle once everything has settled.
@@ -172,7 +173,7 @@ export default function BackgroundEffect() {
       viewport.lastFrameAt = timestamp;
 
       ctx.clearRect(0, 0, viewport.width, viewport.height);
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#E7E9E8";
       ctx.globalAlpha = 1;
 
       for (let i = 0; i < particles.length; i += 1) {
@@ -190,12 +191,13 @@ export default function BackgroundEffect() {
 
           particle.trailOpacity = Math.max(
             particle.trailOpacity,
-            intensity * TRAIL_MAX_OPACITY
+            intensity * TRAIL_MAX_OPACITY,
           );
           particle.fadeUntil = timestamp + HIGHLIGHT_LINGER_MS;
           desiredOpacity = intensity * ACTIVE_MAX_OPACITY;
         } else if (timestamp < particle.fadeUntil) {
-          const remaining = (particle.fadeUntil - timestamp) / HIGHLIGHT_LINGER_MS;
+          const remaining =
+            (particle.fadeUntil - timestamp) / HIGHLIGHT_LINGER_MS;
           desiredOpacity = particle.trailOpacity * remaining;
         } else {
           particle.trailOpacity = 0;
@@ -203,7 +205,10 @@ export default function BackgroundEffect() {
         }
 
         particle.opacity += (desiredOpacity - particle.opacity) * opacityBlend;
-        if (particle.opacity < VISIBLE_EPSILON && desiredOpacity < VISIBLE_EPSILON) {
+        if (
+          particle.opacity < VISIBLE_EPSILON &&
+          desiredOpacity < VISIBLE_EPSILON
+        ) {
           particle.opacity = 0;
         }
 
@@ -215,7 +220,11 @@ export default function BackgroundEffect() {
         let targetX = particle.originX;
         let targetY = particle.originY;
 
-        if (shouldHoldMagnet && distSq < MAGNETIC_RADIUS_SQ && distSq > MAGNETIC_STOP_RADIUS_SQ) {
+        if (
+          shouldHoldMagnet &&
+          distSq < MAGNETIC_RADIUS_SQ &&
+          distSq > MAGNETIC_STOP_RADIUS_SQ
+        ) {
           if (distance === 0) {
             distance = Math.sqrt(distSq);
           }
@@ -225,7 +234,7 @@ export default function BackgroundEffect() {
             (MAGNETIC_RADIUS - MAGNETIC_STOP_RADIUS);
           const strength = Math.min(
             Math.pow(1 - falloff, 1.35) * MAX_DISPLACEMENT,
-            distance - MAGNETIC_STOP_RADIUS
+            distance - MAGNETIC_STOP_RADIUS,
           );
           const scale = strength / distance;
 
@@ -287,7 +296,10 @@ export default function BackgroundEffect() {
       canvas.style.height = `${height}px`;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.font = `${FONT_SIZE}px ${getComputedStyle(document.body).fontFamily}`;
+      const monoFont = getComputedStyle(document.body)
+        .getPropertyValue("--font-jetbrains-mono")
+        .trim();
+      ctx.font = `${FONT_SIZE}px ${monoFont || "monospace"}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -314,10 +326,7 @@ export default function BackgroundEffect() {
       };
     };
 
-    // Keep the exclusion boxes in sync while the page scrolls under the
-    // fixed canvas (rAF-throttled). The trailing re-measure catches sections
-    // whose scroll-reveal animation finishes after the last scroll event —
-    // otherwise their rects stay where the text was mid-animation.
+    // Keep exclusions aligned with scrolling and expanded case summaries.
     let scrollRefreshFrame = 0;
     let scrollSettleTimer = 0;
     const handleScroll = () => {
@@ -335,22 +344,31 @@ export default function BackgroundEffect() {
       cancelAnimationFrame(rafRef.current);
       runningRef.current = false;
       pointerRef.current.lastMoveAt = -Infinity;
-      ctx.clearRect(0, 0, viewportRef.current.width, viewportRef.current.height);
+      ctx.clearRect(
+        0,
+        0,
+        viewportRef.current.width,
+        viewportRef.current.height,
+      );
       if (!motionQuery.matches && !document.hidden) resizeCanvas();
     };
 
     resizeCanvas();
     startLoop();
 
-    // Re-measure once fonts and the initial reveal animations have settled.
+    // Font loading and native disclosures can change the reading layout.
     document.fonts?.ready.then(collectExclusionRects).catch(() => {});
     const settleTimer = window.setTimeout(collectExclusionRects, 600);
+    const resizeObserver = new ResizeObserver(collectExclusionRects);
+    const main = document.querySelector("main");
+    if (main) resizeObserver.observe(main);
 
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
     document.addEventListener("visibilitychange", resetAnimation);
+    document.addEventListener("toggle", handleScroll, true);
     motionQuery.addEventListener("change", resetAnimation);
 
     return () => {
@@ -360,12 +378,14 @@ export default function BackgroundEffect() {
       runningRef.current = false;
       window.clearTimeout(settleTimer);
       window.clearTimeout(scrollSettleTimer);
+      resizeObserver.disconnect();
 
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.removeEventListener("visibilitychange", resetAnimation);
+      document.removeEventListener("toggle", handleScroll, true);
       motionQuery.removeEventListener("change", resetAnimation);
     };
   }, []);
