@@ -42,21 +42,28 @@ export default function Hero() {
           </a>
         </div>
         <div className="current-work">
-          <p className="mb-5 font-mono text-[11px] text-muted">
-            Currently building
-          </p>
-          <a href="#work-basenote" className="current-work-link">
-            <span>BaseNote</span>
-            <span className="mt-1 block text-xs text-muted">
-              Founding Engineer
-            </span>
-          </a>
-          <a href="#work-icon" className="current-work-link">
-            <span>Icon Training</span>
-            <span className="mt-1 block text-xs leading-relaxed text-muted">
-              Head of Product and Engineering
-            </span>
-          </a>
+          <div>
+            <p className="mb-3 font-mono text-[11px] text-muted">
+              Currently building
+            </p>
+            <a href="#work-basenote" className="current-work-link">
+              <span>BaseNote</span>
+              <span className="mt-1 block text-xs text-muted">
+                Founding Engineer
+              </span>
+            </a>
+          </div>
+          <div className="xl:mt-6">
+            <p className="mb-3 font-mono text-[11px] text-muted">
+              Previously
+            </p>
+            <a href="#work-icon" className="current-work-link">
+              <span>Icon Training</span>
+              <span className="mt-1 block text-xs leading-relaxed text-muted">
+                Head of Product and Engineering
+              </span>
+            </a>
+          </div>
           <div className="work-availability mt-5 border-t border-line pt-4 text-xs leading-relaxed text-muted">
             <span className="mb-1 flex items-center gap-2 text-fg">
               <span

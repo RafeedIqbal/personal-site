@@ -399,10 +399,6 @@ main:focus {
     padding-left: 0;
     border-left: 0;
   }
-  .current-work > p {
-    grid-column: 1 / -1;
-    margin-bottom: 0;
-  }
   .current-work-link {
     padding-bottom: 0;
   }

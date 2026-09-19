@@ -13,7 +13,7 @@ export const PROFILE = {
   workPreference: "Remote or hybrid",
   heroParagraph:
     "I build software and lead the product work around it. From AI assistants and operational platforms to the teams that bring them to life.",
-  bio: "I’m a software engineer and product leader who enjoys working across the whole product: understanding the problem, designing the system, and getting it into people’s hands. Today, that means building fragrance technology at BaseNote and leading product and engineering at Icon Training.",
+  bio: "I’m a software engineer and product leader who enjoys working across the whole product: understanding the problem, designing the system, and getting it into people’s hands. Today, I’m building fragrance technology at BaseNote. Previously, I led product and engineering at Icon Training.",
 };
 
 export const EDUCATION = {
@@ -34,19 +34,19 @@ export interface Experience {
 
 export const EXPERIENCE: Experience[] = [
   {
-    date: "Jan 2026 – Present",
+    date: "Jul 2026 – Present",
     impact: "From architecture to rollout",
     role: "Founding Engineer",
     company: "BaseNote Solutions LTD",
     location: "United Kingdom (Remote)",
     bullets: [
       "Sole engineer building a multi-tenant ERP for perfumers, connecting inventory, production, and client storefronts.",
-      "Built Blend Engine and Alchemy Engine: RAG assistants grounded in the in-house chemists’ experimental data.",
+      "Building Blend Engine and Alchemy Engine: RAG assistants grounded in the in-house chemists’ experimental data.",
       "Own architecture, implementation, and pilot rollout for the first licensed client; launched a Shopify Hydrogen storefront connected to production and fulfilment.",
     ],
   },
   {
-    date: "Jun 2025 – Present",
+    date: "Jul 2025 – Jun 2026",
     impact: "Grew the team from 2 to 8",
     role: "Head of Product and Engineering",
     company: "Icon Train Smarter LTD",
@@ -54,7 +54,7 @@ export const EXPERIENCE: Experience[] = [
     bullets: [
       "Led an AI fitness coaching product from MVP to production-ready launch, connecting product direction with frontend and backend delivery.",
       "Grew the team from 2 to 8, owning recruitment, sprint planning, and day-to-day operations.",
-      "Contribute directly to AI features and the company website, alongside architecture and implementation decisions.",
+      "Contributed directly to AI features and the company website, alongside architecture and implementation decisions.",
     ],
   },
   {
@@ -218,12 +218,12 @@ export const PROFESSIONAL_WORK: Project[] = [
     featured: true,
     stack: ["AI features", "Product strategy", "Next.js"],
     description:
-      "Helping trainers and athletes scale their coaching through AI avatars, while building the team and product behind the experience.",
+      "Helped trainers and athletes scale their coaching through AI avatars, while building the team and product behind the experience.",
     contribution: "Head of Product and Engineering",
     problem:
       "Taking an AI coaching app beyond its MVP required product direction, coordinated engineering, and a team that could deliver it.",
     approach:
-      "Connect business goals to sprint planning and architecture decisions. Recruit across product and engineering, and contribute directly to AI features and the website.",
+      "Connected business goals to sprint planning and architecture decisions. Recruited across product and engineering, and contributed directly to AI features and the website.",
     result:
       "Led the product to a production-ready launch and grew the team from 2 to 8 employees.",
     websiteUrl: "https://icontraining.app",
