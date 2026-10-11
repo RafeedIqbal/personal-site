@@ -121,6 +121,30 @@ const screenshot = (
 
 export const PROJECTS: Project[] = [
   {
+    slug: "bajan",
+    name: "Bajan",
+    summary:
+      "A Bangla-first voice companion for older adults living alone, pairing real-time conversation with profile-based answers and simple, accessible controls.",
+    stack: ["Next.js", "TypeScript", "Gemini Live", "Supabase"],
+    description:
+      "A bilingual voice assistant proof of concept for older adults living alone. Supports live conversations, typed messages, and recorded voice notes, with spoken replies grounded in a structured personal profile. Prescription extraction requires user review, and caregiver calls are simulated.",
+    websiteUrl: "https://bajan.arizmilabs.com/login",
+    category: "Conversational AI · Proof of concept",
+    contribution: "Product design & full-stack development",
+    problem:
+      "Older adults living alone need an easy way to talk in Bangla, hear back everyday information, and ask for family support.",
+    approach:
+      "Connected Gemini Live to a Next.js interface and Supabase profiles. Added Bangla and English controls, prescription extraction with user review, and server-side tools with duplicate-call protection.",
+    result:
+      "A working bilingual proof of concept with live, typed, and recorded voice conversations, profile-based answers, and a demo using sample data. Caregiver calls are simulated.",
+    image: screenshot(
+      "work/bajan",
+      "Bajan's Bangla interface with its companion avatar, voice controls, and conversation panel",
+      "Bangla voice companion",
+    ),
+    featured: true,
+  },
+  {
     slug: "id8",
     name: "id8",
     summary:
