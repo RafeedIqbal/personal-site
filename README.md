@@ -19,6 +19,7 @@ npm run dev
 - `npm run build`: create the production build
 - `npm run start`: serve the production build locally
 - `npm run lint`: run ESLint
+- `npm run test:dependencies`: check the Next.js ESLint dependency replacement
 - `npm run typecheck`: generate route types and check TypeScript without emitting files
 
 ## Verification
@@ -27,6 +28,7 @@ Pull requests and pushes run a locked dependency install, ESLint, TypeScript, a 
 
 ```bash
 npm run lint
+npm run test:dependencies
 npm run typecheck
 npm audit --audit-level=moderate
 npm run build
@@ -34,6 +36,8 @@ npm run start
 ```
 
 Smoke-test the production server on desktop and mobile, including keyboard navigation, the terminal and games, résumé downloads, and external links. Check reduced-motion and JavaScript-disabled rendering after changing animations. The build downloads the Google Fonts used by `next/font` and requires network access; fonts are then served by the app.
+
+Dependency security updates and the scoped ESLint override are documented in [docs/dependency-security.md](docs/dependency-security.md).
 
 ## Project Structure
 
