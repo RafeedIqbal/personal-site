@@ -61,3 +61,11 @@ Passed against the local production build:
 - All eleven unique external destinations returned HTTP 200 after redirects, including the requested BaseNote private-label page, six website destinations, project repositories, and profile links.
 
 The temporary project capture servers and disposable source checkouts were cleaned up. A local portfolio preview may remain on port 3001 for review; no hosted deployment was performed.
+
+## Palette Knife addition — 26 October 2026
+
+Added Palette Knife as a featured project, with repository-backed copy and terminal commands derived from the shared project list. `public/images/work/palette-knife.webp` is a 1440 × 900 capture of the actual local dashboard at source revision `f00e49461e66daf7ff85f01d30b3902db563e05f` of [palette-knife](https://github.com/RafeedIqbal/palette-knife).
+
+The capture uses the bundled synthetic demo: two local pages completed and three records saved. The preview is labeled as a local demo; it contains no third-party crawl data.
+
+Local validation passed: lint, typecheck, production build, server-rendered content, layouts at 320–1920px, image enlargement and focus restoration, case disclosures, terminal listing/details/autocomplete, and content, keyboard disclosure, and direct image access without JavaScript. No browser console errors were reported. Review captures are in ignored `output/playwright/palette-knife-desktop.png` and `output/playwright/palette-knife-mobile.png`. These checks cover the local production build.

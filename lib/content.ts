@@ -121,6 +121,30 @@ const screenshot = (
 
 export const PROJECTS: Project[] = [
   {
+    slug: "palette-knife",
+    name: "Palette Knife",
+    summary:
+      "An open-source Python toolkit for repeatable web scraping, with resumable workflows, a local dashboard, and exports that retain source provenance.",
+    stack: ["Python", "SQLite", "TOML", "CSS / XPath"],
+    description:
+      "A configurable web scraping toolkit built around TOML workflows, CSS/XPath selectors, and custom Python adapters. A durable SQLite queue preserves progress across interruptions, while a local dashboard tracks each crawl. Includes JSON, JSONL, and CSV exports with source metadata, machine-readable CLI output, and a portable agent skill.",
+    githubUrl: "https://github.com/RafeedIqbal/palette-knife",
+    category: "Open source · Developer tools",
+    contribution: "Architecture, development & open-source release",
+    problem:
+      "One-off scraping scripts are hard to reuse, can lose progress when interrupted, and often separate collected records from their original sources.",
+    approach:
+      "Built configurable extraction on a persistent SQLite queue, with explicit host limits, per-origin backoff, and Python adapters for custom workflows. Added a local dashboard, consistent exports, and a CLI designed for people and agents.",
+    result:
+      "An MIT-licensed CLI and local dashboard that preserve crawl progress and export structured JSON, JSONL, and CSV with source provenance.",
+    image: screenshot(
+      "work/palette-knife",
+      "Palette Knife's local demo dashboard showing saved records, completed pages, queue status, and worker controls",
+      "Scraping workflow dashboard · Local demo",
+    ),
+    featured: true,
+  },
+  {
     slug: "bajan",
     name: "Bajan",
     summary:
