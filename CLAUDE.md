@@ -44,6 +44,14 @@ There is no test runner. `npm run lint` is the only automated check; smoke-test 
 
 **Mobile vs. desktop split** lives in `app/page.tsx`. The content sections always render (so they ship in the server HTML for SEO); only client-only chrome is gated. A `matchMedia("(max-width: 767px)")` check sets `isMobile`, and chrome is gated on `isMobile === false` (not `!isMobile`, so it stays absent while the value is `null` during SSR/first paint — avoiding hydration mismatch): the boot sequence, side nav, animated background, and terminal overlay (plus its backtick listener). Mobile renders only the stacked sections + footer; this is a **deliberate** choice — the terminal and keyboard-driven games are desktop-only. The boot overlay plays once per session (guarded by `sessionStorage`) and is skipped entirely under `prefers-reduced-motion`.
 
+## /belong proposal page
+
+`app/belong/` is a separate, unlisted page (noindex via metadata and an `X-Robots-Tag` header in `next.config.ts`; not in the sitemap, robots.txt or homepage) with its own paper-and-ink design system in `app/belong/belong.css` (classes prefixed `bl-`, tokens scoped to `.belong`, light and dark). Its layout loads Newsreader, IBM Plex Sans and IBM Plex Mono only for that route.
+
+- **Data is JSON, logic is pure.** The fictional E-2 files live in `lib/belong/case.json`, the six injectable errors (as path patches) in `lib/belong/scenarios.json`. `lib/belong/checks.ts` holds every check, the router, `settle()` and the tile math; it has no runtime imports so `npm run test:belong` (`scripts/belong-checks.test.mjs`, Node type stripping) can load it directly. Tile values and "caught by" labels must always come from these functions, never from stored results.
+- **Instrument state** is a reducer in `components/belong/demo.tsx` (`DemoProvider`), shared with § 8 and § 9 so the reader's ruling from error 6 shows up there. `Visualizer.tsx` drives the phases with timers; reduced motion jumps to the same end state.
+- Sections live in `sections/belong/`, page primitives (`Section`, `Row`, `Inf`) in `components/belong/Doc.tsx`, and every external claim cites an entry in `lib/belong/sources.ts`.
+
 ## Conventions
 
 - All UI components are client components (`"use client"`). No server components hold logic here.

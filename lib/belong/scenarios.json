@@ -1,0 +1,511 @@
+{
+  "scenarios": [
+    {
+      "id": 1,
+      "chip": "Misread amount",
+      "title": "Apartment proceeds read as EUR 69,000",
+      "failureType": "Reading",
+      "injection": "The parser reads the apartment sale on the savings statement as EUR 69,000. The page says EUR 96,000.",
+      "affected": [
+        "d09"
+      ],
+      "patch": [
+        {
+          "op": "set",
+          "path": "accounts.savings.credits.#c-apartment.amount",
+          "value": 69000
+        }
+      ],
+      "router": {
+        "scores": {
+          "frontier": 0.86,
+          "client": 0.08,
+          "attorney": 0.06
+        },
+        "correctionRate": "4% of statement amounts corrected last month"
+      },
+      "model": {
+        "kind": "frontier",
+        "name": "Frontier model",
+        "output": "Re-read of the cropped line on page 6: +96.000,00 EUR. The first read swapped the first two digits.",
+        "patch": [
+          {
+            "op": "set",
+            "path": "accounts.savings.credits.#c-apartment.amount",
+            "value": 96000
+          }
+        ]
+      },
+      "packet": {
+        "question": "Which amount is printed on the 30.09.2025 credit line?",
+        "candidates": [
+          "EUR 69,000",
+          "EUR 96,000"
+        ]
+      },
+      "outcome": "The frontier model re-read the line, and the balance check accepted the new value. No attorney time was used.",
+      "capture": "The crop and its corrected value join the parser bake-off set, so the next parser is tested on this exact line.",
+      "singlePass": {
+        "result": "The wrong figure flows into the file.",
+        "draft": "Ms Beispiel's savings include {eur:accounts.savings.credits.#c-apartment.amount} from the apartment sale."
+      }
+    },
+    {
+      "id": 2,
+      "chip": "Wrong label",
+      "title": "A balance letter labeled as a statement",
+      "failureType": "Confident mistake",
+      "injection": "The donor's bank sent a balance confirmation, not a statement. The sorter still labels it a statement, at 0.97 confidence.",
+      "affected": [
+        "d08"
+      ],
+      "patch": [
+        {
+          "op": "set",
+          "path": "documents.#d08.kind",
+          "value": "balance-letter"
+        },
+        {
+          "op": "set",
+          "path": "documents.#d08.original",
+          "value": "Saldenbestätigung, Ruth Beispiel"
+        },
+        {
+          "op": "set",
+          "path": "documents.#d08.lines",
+          "value": [
+            {
+              "id": "letter",
+              "text": "Wir bestätigen Ihnen folgenden Kontostand:",
+              "gloss": "We confirm the following balance:"
+            },
+            {
+              "id": "transfer",
+              "text": "Kontostand am 31.03.2026: 211.300,00 EUR",
+              "gloss": "Balance on 31 Mar 2026: EUR 211,300"
+            }
+          ]
+        }
+      ],
+      "router": {
+        "scores": {
+          "client": 0.81,
+          "frontier": 0.11,
+          "attorney": 0.08
+        },
+        "correctionRate": "9% of donor statements replaced last month"
+      },
+      "packet": {
+        "question": "Can you upload Ruth Beispiel's March 2026 statement that shows the {eur:accounts.savings.credits.#c-gift.amount} transfer?",
+        "candidates": [
+          "Upload the statement",
+          "Explain why it is unavailable"
+        ]
+      },
+      "client": {
+        "language": "German",
+        "message": "Bitte laden Sie den Kontoauszug von Ruth Beispiel für März 2026 hoch, auf dem die Überweisung von 40.000 EUR zu sehen ist.",
+        "gloss": "Please upload Ruth Beispiel's March 2026 statement that shows the EUR 40,000 transfer."
+      },
+      "outcome": "A request went to the client in German. The gift stays unproven until the real statement arrives.",
+      "capture": "The page becomes a Sorting test case: a balance letter must never pass as a statement again.",
+      "singlePass": {
+        "result": "A green check with nothing behind it.",
+        "draft": "The {eur:accounts.savings.credits.#c-gift.amount} gift is traced through the donor's bank statement."
+      }
+    },
+    {
+      "id": 3,
+      "chip": "Hidden repayment terms",
+      "title": "The gift letter contains repayment terms",
+      "failureType": "Meaning",
+      "injection": "The German gift letter says the money must be repaid by the end of 2030. The sorter is unsure what kind of document it is.",
+      "affected": [
+        "d07"
+      ],
+      "patch": [
+        {
+          "op": "set",
+          "path": "documents.#d07.sort.confidence",
+          "value": 0.62
+        },
+        {
+          "op": "set",
+          "path": "documents.#d07.lines.#terms",
+          "value": {
+            "id": "terms",
+            "text": "Der Betrag ist bis zum 31.12.2030 zurückzuzahlen.",
+            "gloss": "The amount is to be repaid by 31 December 2030."
+          }
+        }
+      ],
+      "router": {
+        "scores": {
+          "domain": 0.74,
+          "frontier": 0.15,
+          "attorney": 0.11
+        },
+        "correctionRate": "17% of family letters relabeled last month"
+      },
+      "model": {
+        "kind": "domain",
+        "name": "Family-transfer model",
+        "output": "Line 3 sets a repayment date of 31.12.2030. The letter describes a loan, not a gift.",
+        "raises": "loan-or-gift",
+        "src": {
+          "doc": "d07",
+          "line": "terms"
+        }
+      },
+      "packet": {
+        "question": "Is the {eur:accounts.savings.credits.#c-gift.amount} from Ruth Beispiel a gift or a loan, and does it count toward the investment?",
+        "candidates": [
+          "A gift",
+          "A loan that counts",
+          "A loan that does not count"
+        ]
+      },
+      "outcome": "Reserved for the attorney. The FAM lets some loans count, so the system never decides this itself.",
+      "capture": "The letter joins the family-transfer evaluation set with the attorney's label, so the domain model is tested on it.",
+      "singlePass": {
+        "result": "Counted as a gift.",
+        "draft": "Ruth Beispiel gave Mara Beispiel {eur:accounts.savings.credits.#c-gift.amount} as a gift, with no repayment."
+      }
+    },
+    {
+      "id": 4,
+      "chip": "Unexplained money",
+      "title": "The US account shows USD 198,650 received",
+      "failureType": "Trail gap",
+      "injection": "The US statement shows USD 198,650 arriving, which is USD 12,000 more than was wired. The extra money is later spent on a second espresso line.",
+      "affected": [
+        "d12",
+        "d17",
+        "d15"
+      ],
+      "patch": [
+        {
+          "op": "set",
+          "path": "accounts.us.credits.#wire-in.amount",
+          "value": 198650
+        },
+        {
+          "op": "set",
+          "path": "accounts.us.debits.#to-llc.amount",
+          "value": 48650
+        },
+        {
+          "op": "set",
+          "path": "accounts.llc.credits.#from-investor.amount",
+          "value": 48650
+        },
+        {
+          "op": "insert",
+          "path": "accounts.llc.debits",
+          "index": 2,
+          "value": {
+            "id": "second-line",
+            "label": "Second espresso line",
+            "amount": 12000,
+            "counterparty": "Demo Kitchen Supply",
+            "date": "2026-07-22",
+            "src": {
+              "doc": "d17",
+              "line": "second"
+            },
+            "evidence": [
+              "d15"
+            ],
+            "origin": "vendor"
+          }
+        },
+        {
+          "op": "set",
+          "path": "documents.#d12.lines.#wire",
+          "value": {
+            "id": "wire",
+            "text": "07/02 Incoming wire, Nordhafen Bank +198,650.00",
+            "tx": true
+          }
+        },
+        {
+          "op": "set",
+          "path": "documents.#d12.lines.#llc",
+          "value": {
+            "id": "llc",
+            "text": "07/08 To Demo Street Coffee LLC −48,650.00",
+            "tx": true
+          }
+        },
+        {
+          "op": "set",
+          "path": "documents.#d17.lines.#in",
+          "value": {
+            "id": "in",
+            "text": "07/08 From Mara Beispiel +48,650.00",
+            "tx": true
+          }
+        },
+        {
+          "op": "insert",
+          "path": "documents.#d17.lines",
+          "index": 5,
+          "value": {
+            "id": "second",
+            "text": "07/22 Demo Kitchen Supply −12,000.00",
+            "tx": true
+          }
+        },
+        {
+          "op": "insert",
+          "path": "documents.#d15.lines",
+          "index": 2,
+          "value": {
+            "id": "second",
+            "text": "Second espresso line: USD 12,000",
+            "page": 5
+          }
+        }
+      ],
+      "router": {
+        "scores": {
+          "client": 0.77,
+          "attorney": 0.17,
+          "frontier": 0.06
+        },
+        "correctionRate": "6% of transfers needed a client answer last month"
+      },
+      "packet": {
+        "question": "Where did the extra USD 12,000 in your US account come from?",
+        "candidates": [
+          "A second transfer from my own funds",
+          "A loan",
+          "Something else"
+        ]
+      },
+      "client": {
+        "language": "German",
+        "message": "Auf Ihrem US-Konto sind 12.000 USD mehr eingegangen als überwiesen. Woher stammt dieser Betrag?",
+        "gloss": "Your US account received USD 12,000 more than was wired. Where did this amount come from?"
+      },
+      "outcome": "A request went to the client. If the answer does not trace to a source, the item moves to the attorney.",
+      "capture": "The transfer pair becomes a regression test for the transfer-match check.",
+      "singlePass": {
+        "result": "Added to the investment.",
+        "draft": "Ms Beispiel moved {usd:accounts.us.credits.#wire-in.amount} from German savings into the business."
+      }
+    },
+    {
+      "id": 5,
+      "chip": "Secured seller note",
+      "title": "A USD 30,000 seller note secured by the business",
+      "failureType": "Legal rule",
+      "injection": "The purchase agreement adds a USD 30,000 promissory note to the seller, secured by the business's own assets.",
+      "affected": [
+        "d13"
+      ],
+      "patch": [
+        {
+          "op": "set",
+          "path": "purchase.price",
+          "value": 180000
+        },
+        {
+          "op": "set",
+          "path": "purchase.sellerNote",
+          "value": {
+            "amount": 30000,
+            "securedBy": "enterprise-assets",
+            "lender": "Corner Roast Inc.",
+            "src": {
+              "doc": "d13",
+              "line": "security"
+            }
+          }
+        },
+        {
+          "op": "set",
+          "path": "documents.#d13.lines.#price",
+          "value": {
+            "id": "price",
+            "text": "Purchase price: USD 180,000",
+            "page": 3
+          }
+        },
+        {
+          "op": "set",
+          "path": "documents.#d13.lines.#paid",
+          "value": {
+            "id": "paid",
+            "text": "USD 150,000 from escrow; USD 30,000 by promissory note to Seller",
+            "page": 3
+          }
+        },
+        {
+          "op": "insert",
+          "path": "documents.#d13.lines",
+          "index": 3,
+          "value": {
+            "id": "security",
+            "text": "The note is secured by all assets of the business",
+            "page": 7
+          }
+        }
+      ],
+      "packet": {
+        "question": "Confirm that the {usd:purchase.sellerNote.amount} seller note is excluded from the investment.",
+        "candidates": [
+          "Confirm the exclusion",
+          "Ask the client to restructure the note"
+        ]
+      },
+      "outcome": "The debt question is reserved to the attorney by a hard rule. Qualifying funds never included the note.",
+      "capture": "The clause becomes a test: any note secured by enterprise assets must stay out of qualifying funds.",
+      "singlePass": {
+        "result": "Counted as investment.",
+        "draft": "The {usd:purchase.price} purchase price counts in full as Ms Beispiel's investment."
+      }
+    },
+    {
+      "id": 6,
+      "chip": "Spouse's savings",
+      "title": "EUR 15,000 of the savings came from a spouse",
+      "failureType": "Judgment",
+      "injection": "EUR 15,000 of what looks like salary savings was transferred in from the investor's spouse.",
+      "affected": [
+        "d09"
+      ],
+      "patch": [
+        {
+          "op": "set",
+          "path": "accounts.savings.credits.#c-salary.amount",
+          "value": 19000
+        },
+        {
+          "op": "insert",
+          "path": "accounts.savings.credits",
+          "index": 1,
+          "value": {
+            "id": "c-spouse",
+            "label": "Transfer from Jonas Beispiel",
+            "amount": 15000,
+            "counterparty": "Jonas Beispiel",
+            "date": "2026-01-14",
+            "src": {
+              "doc": "d09",
+              "line": "spouse"
+            },
+            "evidence": [],
+            "origin": "transfer",
+            "singlePassLabel": "Salary savings"
+          }
+        },
+        {
+          "op": "set",
+          "path": "documents.#d09.lines.#salary",
+          "value": {
+            "id": "salary",
+            "text": "Gehaltsüberträge, Summe: +19.000,00 EUR",
+            "gloss": "Salary transfers, total: +EUR 19,000",
+            "tx": true,
+            "page": 3
+          }
+        },
+        {
+          "op": "insert",
+          "path": "documents.#d09.lines",
+          "index": 3,
+          "value": {
+            "id": "spouse",
+            "text": "14.01.2026 Überweisung Jonas Beispiel: +15.000,00 EUR",
+            "gloss": "Transfer from Jonas Beispiel: +EUR 15,000",
+            "tx": true,
+            "page": 7
+          }
+        }
+      ],
+      "packet": {
+        "question": "How should {eur:accounts.savings.credits.#c-spouse.amount} transferred in from the investor's spouse be treated?",
+        "candidates": [
+          "Trace it to the spouse's own funds",
+          "Leave it out of the investment"
+        ]
+      },
+      "ruling": {
+        "options": [
+          {
+            "id": "trace",
+            "label": "Trace it to the spouse's funds",
+            "text": "A transfer from a spouse into the investor's sole account counts once the spouse's own statement and a signed gift letter are on file.",
+            "effect": "The client portal asks for the spouse's statement and a gift letter. The amount stays out of qualifying funds until they arrive."
+          },
+          {
+            "id": "exclude",
+            "label": "Leave it out",
+            "text": "A transfer from a spouse into the investor's sole account is left out of qualifying funds unless the spouse is a co-investor.",
+            "effect": "The amount is left out of qualifying funds and the item closes."
+          }
+        ]
+      },
+      "outcome": "Reserved for the attorney until a written policy exists.",
+      "capture": "Your choice becomes ruling R-1, a regression test, and a training example that waits for sign-off.",
+      "singlePass": {
+        "result": "Treated as salary.",
+        "draft": "Ms Beispiel saved {eurLabel:Salary savings} from salary."
+      },
+      "replay": {
+        "file": "demo-2",
+        "affected": [
+          "p09"
+        ],
+        "patch": [
+          {
+            "op": "set",
+            "path": "accounts.savings.credits.#c-salary.amount",
+            "value": 64000
+          },
+          {
+            "op": "insert",
+            "path": "accounts.savings.credits",
+            "index": 1,
+            "value": {
+              "id": "c-spouse",
+              "label": "Transfer from Lea Probe",
+              "amount": 8000,
+              "counterparty": "Lea Probe",
+              "date": "2026-01-20",
+              "src": {
+                "doc": "p09",
+                "line": "spouse"
+              },
+              "evidence": [],
+              "origin": "transfer",
+              "singlePassLabel": "Salary savings"
+            }
+          },
+          {
+            "op": "set",
+            "path": "documents.#p09.lines.#salary",
+            "value": {
+              "id": "salary",
+              "text": "Gehaltsüberträge, Summe: +64.000,00 EUR",
+              "gloss": "Salary transfers, total: +EUR 64,000",
+              "tx": true
+            }
+          },
+          {
+            "op": "insert",
+            "path": "documents.#p09.lines",
+            "index": 3,
+            "value": {
+              "id": "spouse",
+              "text": "20.01.2026 Überweisung Lea Probe: +8.000,00 EUR",
+              "gloss": "Transfer from Lea Probe: +EUR 8,000",
+              "tx": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

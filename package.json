@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:dependencies": "node --test scripts/dependencies.test.mjs",
+    "test:belong": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test scripts/belong-checks.test.mjs",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {

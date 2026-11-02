@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Unlisted proposal page: shared by link only, never indexed.
+        source: "/belong",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+      },
     ];
   },
 };

@@ -1,0 +1,1491 @@
+{
+  "files": [
+    {
+      "id": "demo-1",
+      "label": "Mara Beispiel, Demo Street Coffee LLC",
+      "investor": {
+        "name": "Mara Beispiel",
+        "nationality": "Germany",
+        "route": "consular",
+        "family": [
+          {
+            "name": "Jonas Beispiel",
+            "relation": "spouse"
+          },
+          {
+            "name": "Ruth Beispiel",
+            "relation": "parent"
+          }
+        ]
+      },
+      "enterprise": {
+        "name": "Demo Street Coffee LLC",
+        "owners": [
+          {
+            "name": "Mara Beispiel",
+            "pct": 100
+          }
+        ],
+        "src": {
+          "doc": "d16",
+          "line": "member"
+        }
+      },
+      "fx": {
+        "rate": 1.1,
+        "note": "Fictional rate, 1 EUR = 1.10 USD"
+      },
+      "documents": [
+        {
+          "id": "d01",
+          "title": "Passport",
+          "original": "Reisepass",
+          "lang": "de",
+          "gate": "nationality",
+          "kind": "passport",
+          "issuer": "Federal Republic of Germany (specimen)",
+          "date": "2022-05-03",
+          "pages": 1,
+          "sort": {
+            "label": "passport",
+            "confidence": 0.99
+          },
+          "key": "nationality",
+          "lines": [
+            {
+              "id": "name",
+              "text": "Name: BEISPIEL, MARA"
+            },
+            {
+              "id": "nationality",
+              "text": "Staatsangehörigkeit: DEUTSCH",
+              "gloss": "Nationality: German"
+            },
+            {
+              "id": "number",
+              "text": "Pass-Nr.: C0DEMO001 (fiktiv)",
+              "gloss": "Passport no. (fictional)"
+            }
+          ]
+        },
+        {
+          "id": "d02",
+          "title": "Tax assessment 2024",
+          "original": "Einkommensteuerbescheid 2024",
+          "lang": "de",
+          "gate": "source",
+          "kind": "tax-assessment",
+          "issuer": "Finanzamt Beispielstadt",
+          "date": "2025-05-14",
+          "pages": 4,
+          "sort": {
+            "label": "tax-assessment",
+            "confidence": 0.96
+          },
+          "key": "income",
+          "lines": [
+            {
+              "id": "payer",
+              "text": "Steuerpflichtige: Mara Beispiel",
+              "gloss": "Taxpayer: Mara Beispiel"
+            },
+            {
+              "id": "income",
+              "text": "Zu versteuerndes Einkommen: 58.400,00 EUR",
+              "gloss": "Taxable income: EUR 58,400",
+              "page": 2
+            }
+          ]
+        },
+        {
+          "id": "d03",
+          "title": "Tax assessment 2025",
+          "original": "Einkommensteuerbescheid 2025",
+          "lang": "de",
+          "gate": "source",
+          "kind": "tax-assessment",
+          "issuer": "Finanzamt Beispielstadt",
+          "date": "2026-04-22",
+          "pages": 4,
+          "sort": {
+            "label": "tax-assessment",
+            "confidence": 0.95
+          },
+          "key": "income",
+          "lines": [
+            {
+              "id": "payer",
+              "text": "Steuerpflichtige: Mara Beispiel",
+              "gloss": "Taxpayer: Mara Beispiel"
+            },
+            {
+              "id": "income",
+              "text": "Zu versteuerndes Einkommen: 61.200,00 EUR",
+              "gloss": "Taxable income: EUR 61,200",
+              "page": 2
+            }
+          ]
+        },
+        {
+          "id": "d04",
+          "title": "Payslips",
+          "original": "Gehaltsabrechnungen 01/2024 bis 06/2026",
+          "lang": "de",
+          "gate": "source",
+          "kind": "payslips",
+          "issuer": "Hafenlogistik GmbH",
+          "date": "2026-06-30",
+          "pages": 30,
+          "sort": {
+            "label": "payslips",
+            "confidence": 0.93
+          },
+          "key": "net",
+          "lines": [
+            {
+              "id": "employee",
+              "text": "Mitarbeiterin: Mara Beispiel",
+              "gloss": "Employee: Mara Beispiel"
+            },
+            {
+              "id": "net",
+              "text": "Netto monatlich: 3.150,00 EUR",
+              "gloss": "Net monthly pay: EUR 3,150"
+            },
+            {
+              "id": "account",
+              "text": "Auszahlung auf Sparkonto, Nordhafen Bank",
+              "gloss": "Paid into savings account, Nordhafen Bank"
+            }
+          ]
+        },
+        {
+          "id": "d05",
+          "title": "Apartment sale contract",
+          "original": "Kaufvertrag, notariell beurkundet",
+          "lang": "de",
+          "gate": "source",
+          "kind": "sale-contract",
+          "issuer": "Notariat Dr. Ilse Muster, Beispielstadt",
+          "date": "2025-08-19",
+          "pages": 14,
+          "sort": {
+            "label": "sale-contract",
+            "confidence": 0.91
+          },
+          "key": "price",
+          "lines": [
+            {
+              "id": "seller",
+              "text": "Verkäuferin: Mara Beispiel",
+              "gloss": "Seller: Mara Beispiel"
+            },
+            {
+              "id": "object",
+              "text": "Eigentumswohnung, Hafenstraße 12, Beispielstadt",
+              "gloss": "Apartment, 12 Harbour Street"
+            },
+            {
+              "id": "price",
+              "text": "Kaufpreis: 96.000,00 EUR",
+              "gloss": "Purchase price: EUR 96,000",
+              "page": 3
+            }
+          ]
+        },
+        {
+          "id": "d06",
+          "title": "Sale closing statement",
+          "original": "Abrechnung Notaranderkonto",
+          "lang": "de",
+          "gate": "source",
+          "kind": "closing-statement",
+          "issuer": "Notariat Dr. Ilse Muster, Beispielstadt",
+          "date": "2025-09-30",
+          "pages": 2,
+          "sort": {
+            "label": "closing-statement",
+            "confidence": 0.88
+          },
+          "key": "payout",
+          "lines": [
+            {
+              "id": "payout",
+              "text": "Auszahlung an Verkäuferin: 96.000,00 EUR",
+              "gloss": "Paid out to the seller: EUR 96,000"
+            },
+            {
+              "id": "date",
+              "text": "Wertstellung: 30.09.2025",
+              "gloss": "Value date: 30 Sep 2025"
+            }
+          ]
+        },
+        {
+          "id": "d07",
+          "title": "Gift letter",
+          "original": "Schenkungsbestätigung",
+          "lang": "de",
+          "gate": "source",
+          "kind": "gift-letter",
+          "issuer": "Ruth Beispiel, private letter",
+          "date": "2026-03-10",
+          "pages": 1,
+          "sort": {
+            "label": "gift-letter",
+            "confidence": 0.94
+          },
+          "key": "gift",
+          "lines": [
+            {
+              "id": "gift",
+              "text": "Ich schenke meiner Tochter Mara Beispiel 40.000,00 EUR.",
+              "gloss": "I give my daughter Mara Beispiel EUR 40,000."
+            },
+            {
+              "id": "purpose",
+              "text": "Zweck: Gründung eines Unternehmens in den USA.",
+              "gloss": "Purpose: starting a business in the US."
+            },
+            {
+              "id": "terms",
+              "text": "Eine Rückzahlung ist nicht vereinbart.",
+              "gloss": "No repayment is agreed."
+            }
+          ]
+        },
+        {
+          "id": "d08",
+          "title": "Donor's bank statement",
+          "original": "Kontoauszug Girokonto, Ruth Beispiel",
+          "lang": "de",
+          "gate": "source",
+          "kind": "statement",
+          "issuer": "Nordhafen Bank (fictional)",
+          "date": "2026-03-31",
+          "pages": 2,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.97
+          },
+          "key": "transfer",
+          "lines": [
+            {
+              "id": "opening",
+              "text": "Anfangssaldo 01.03.2026: 251.300,00 EUR",
+              "gloss": "Opening balance: EUR 251,300"
+            },
+            {
+              "id": "transfer",
+              "text": "12.03.2026 Überweisung an Mara Beispiel: −40.000,00 EUR",
+              "gloss": "Transfer to Mara Beispiel: −EUR 40,000",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Endsaldo 31.03.2026: 211.300,00 EUR",
+              "gloss": "Closing balance: EUR 211,300"
+            }
+          ]
+        },
+        {
+          "id": "d09",
+          "title": "Savings statements",
+          "original": "Sparkonto, Kontoauszüge 2024 bis 2026",
+          "lang": "de",
+          "gate": "source",
+          "kind": "statement",
+          "issuer": "Nordhafen Bank (fictional)",
+          "date": "2026-06-30",
+          "pages": 9,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.98
+          },
+          "key": "closing",
+          "lines": [
+            {
+              "id": "holder",
+              "text": "Kontoinhaberin: Mara Beispiel",
+              "gloss": "Account holder: Mara Beispiel"
+            },
+            {
+              "id": "opening",
+              "text": "Anfangssaldo 01.01.2024: 0,00 EUR",
+              "gloss": "Opening balance: EUR 0"
+            },
+            {
+              "id": "salary",
+              "text": "Gehaltsüberträge, Summe: +34.000,00 EUR",
+              "gloss": "Salary transfers, total: +EUR 34,000",
+              "tx": true,
+              "page": 3
+            },
+            {
+              "id": "apartment",
+              "text": "30.09.2025 Notaranderkonto Dr. Muster: +96.000,00 EUR",
+              "gloss": "Notary escrow, Dr Muster: +EUR 96,000",
+              "tx": true,
+              "page": 6
+            },
+            {
+              "id": "gift",
+              "text": "12.03.2026 Überweisung Ruth Beispiel: +40.000,00 EUR",
+              "gloss": "Transfer from Ruth Beispiel: +EUR 40,000",
+              "tx": true,
+              "page": 8
+            },
+            {
+              "id": "closing",
+              "text": "Endsaldo 30.06.2026: 170.000,00 EUR",
+              "gloss": "Closing balance: EUR 170,000",
+              "page": 9
+            }
+          ]
+        },
+        {
+          "id": "d10",
+          "title": "Currency conversion",
+          "original": "Devisenabrechnung",
+          "lang": "de",
+          "gate": "committed",
+          "kind": "fx-confirmation",
+          "issuer": "Nordhafen Bank (fictional)",
+          "date": "2026-07-01",
+          "pages": 1,
+          "sort": {
+            "label": "fx-confirmation",
+            "confidence": 0.92
+          },
+          "key": "net",
+          "lines": [
+            {
+              "id": "sold",
+              "text": "Verkauf: 170.000,00 EUR",
+              "gloss": "Sold: EUR 170,000"
+            },
+            {
+              "id": "rate",
+              "text": "Kurs: 1,10 (fiktiv)",
+              "gloss": "Rate: 1.10 (fictional)"
+            },
+            {
+              "id": "fee",
+              "text": "Entgelt: 350,00 USD",
+              "gloss": "Fee: USD 350"
+            },
+            {
+              "id": "net",
+              "text": "Auszahlung: 186.650,00 USD",
+              "gloss": "Paid out: USD 186,650"
+            }
+          ]
+        },
+        {
+          "id": "d11",
+          "title": "Wire confirmation",
+          "lang": "en",
+          "gate": "committed",
+          "kind": "wire-confirmation",
+          "issuer": "Nordhafen Bank (fictional)",
+          "date": "2026-07-02",
+          "pages": 1,
+          "sort": {
+            "label": "wire-confirmation",
+            "confidence": 0.95
+          },
+          "key": "amount",
+          "lines": [
+            {
+              "id": "amount",
+              "text": "Amount: USD 186,650.00"
+            },
+            {
+              "id": "beneficiary",
+              "text": "Beneficiary: Mara Beispiel, Demo Federal Bank"
+            },
+            {
+              "id": "date",
+              "text": "Value date: 2026-07-02"
+            }
+          ]
+        },
+        {
+          "id": "d12",
+          "title": "US account statement",
+          "lang": "en",
+          "gate": "committed",
+          "kind": "statement",
+          "issuer": "Demo Federal Bank (fictional)",
+          "date": "2026-07-31",
+          "pages": 2,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.97
+          },
+          "key": "wire",
+          "lines": [
+            {
+              "id": "holder",
+              "text": "Account holder: Mara Beispiel"
+            },
+            {
+              "id": "opening",
+              "text": "Beginning balance 0.00"
+            },
+            {
+              "id": "wire",
+              "text": "07/02 Incoming wire, Nordhafen Bank +186,650.00",
+              "tx": true
+            },
+            {
+              "id": "escrow",
+              "text": "07/06 To Demo Title & Escrow −150,000.00",
+              "tx": true
+            },
+            {
+              "id": "llc",
+              "text": "07/08 To Demo Street Coffee LLC −36,650.00",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Ending balance 0.00"
+            }
+          ]
+        },
+        {
+          "id": "d13",
+          "title": "Purchase agreement",
+          "lang": "en",
+          "gate": "substantial",
+          "kind": "purchase-agreement",
+          "issuer": "Demo Street Coffee LLC and Corner Roast Inc. (fictional)",
+          "date": "2026-07-05",
+          "pages": 22,
+          "sort": {
+            "label": "purchase-agreement",
+            "confidence": 0.9
+          },
+          "key": "price",
+          "lines": [
+            {
+              "id": "parties",
+              "text": "Buyer: Demo Street Coffee LLC. Seller: Corner Roast Inc."
+            },
+            {
+              "id": "price",
+              "text": "Purchase price: USD 150,000",
+              "page": 3
+            },
+            {
+              "id": "paid",
+              "text": "Paid in full from escrow at closing",
+              "page": 3
+            }
+          ]
+        },
+        {
+          "id": "d14",
+          "title": "Escrow agreement",
+          "lang": "en",
+          "gate": "committed",
+          "kind": "escrow-agreement",
+          "issuer": "Demo Title & Escrow Co. (fictional)",
+          "date": "2026-07-06",
+          "pages": 6,
+          "sort": {
+            "label": "escrow-agreement",
+            "confidence": 0.93
+          },
+          "key": "release",
+          "lines": [
+            {
+              "id": "deposit",
+              "text": "Deposit: USD 150,000"
+            },
+            {
+              "id": "release",
+              "text": "Released to Seller on approval of Buyer's E-2 visa",
+              "page": 2
+            },
+            {
+              "id": "refund",
+              "text": "Refunded to Buyer if the visa is denied",
+              "page": 2
+            }
+          ]
+        },
+        {
+          "id": "d15",
+          "title": "Equipment invoices and lease",
+          "lang": "en",
+          "gate": "operating",
+          "kind": "invoices",
+          "issuer": "Demo Kitchen Supply; 14 Demo Street LLC (fictional)",
+          "date": "2026-07-20",
+          "pages": 5,
+          "sort": {
+            "label": "invoices",
+            "confidence": 0.89
+          },
+          "key": "equipment",
+          "lines": [
+            {
+              "id": "equipment",
+              "text": "Espresso machine and grinder: USD 12,600"
+            },
+            {
+              "id": "lease",
+              "text": "Lease deposit, 14 Demo Street: USD 7,800",
+              "page": 4
+            }
+          ]
+        },
+        {
+          "id": "d16",
+          "title": "LLC operating agreement",
+          "lang": "en",
+          "gate": "direct",
+          "kind": "operating-agreement",
+          "issuer": "Demo Street Coffee LLC",
+          "date": "2026-06-18",
+          "pages": 11,
+          "sort": {
+            "label": "operating-agreement",
+            "confidence": 0.94
+          },
+          "key": "member",
+          "lines": [
+            {
+              "id": "member",
+              "text": "Sole member: Mara Beispiel, 100%",
+              "page": 2
+            },
+            {
+              "id": "manager",
+              "text": "Manager: Mara Beispiel",
+              "page": 2
+            }
+          ]
+        },
+        {
+          "id": "d17",
+          "title": "LLC account statement",
+          "lang": "en",
+          "gate": "operating",
+          "kind": "statement",
+          "issuer": "Demo Federal Bank (fictional)",
+          "date": "2026-07-31",
+          "pages": 2,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.96
+          },
+          "key": "closing",
+          "lines": [
+            {
+              "id": "holder",
+              "text": "Account holder: Demo Street Coffee LLC"
+            },
+            {
+              "id": "opening",
+              "text": "Beginning balance 0.00"
+            },
+            {
+              "id": "in",
+              "text": "07/08 From Mara Beispiel +36,650.00",
+              "tx": true
+            },
+            {
+              "id": "equipment",
+              "text": "07/15 Demo Kitchen Supply −12,600.00",
+              "tx": true
+            },
+            {
+              "id": "lease",
+              "text": "07/20 14 Demo Street LLC, lease deposit −7,800.00",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Ending balance 16,250.00"
+            }
+          ]
+        }
+      ],
+      "accounts": {
+        "savings": {
+          "id": "savings",
+          "label": "Savings account, Germany",
+          "holder": "Mara Beispiel",
+          "ccy": "EUR",
+          "periods": [
+            {
+              "from": "2024-01-01",
+              "to": "2024-12-31"
+            },
+            {
+              "from": "2025-01-01",
+              "to": "2025-12-31"
+            },
+            {
+              "from": "2026-01-01",
+              "to": "2026-06-30"
+            }
+          ],
+          "opening": 0,
+          "closing": 170000,
+          "srcClosing": {
+            "doc": "d09",
+            "line": "closing"
+          },
+          "srcHolder": {
+            "doc": "d09",
+            "line": "holder"
+          },
+          "credits": [
+            {
+              "id": "c-salary",
+              "label": "Salary savings",
+              "amount": 34000,
+              "counterparty": "Hafenlogistik GmbH payroll",
+              "date": "2024-01 to 2026-06",
+              "src": {
+                "doc": "d09",
+                "line": "salary"
+              },
+              "evidence": [
+                "d02",
+                "d03",
+                "d04"
+              ],
+              "origin": "salary",
+              "singlePassLabel": "Salary savings"
+            },
+            {
+              "id": "c-apartment",
+              "label": "Apartment sale",
+              "amount": 96000,
+              "counterparty": "Notariat Dr. Ilse Muster",
+              "date": "2025-09-30",
+              "src": {
+                "doc": "d09",
+                "line": "apartment"
+              },
+              "evidence": [
+                "d05",
+                "d06"
+              ],
+              "origin": "sale",
+              "singlePassLabel": "Apartment sale"
+            },
+            {
+              "id": "c-gift",
+              "label": "Gift from parent",
+              "amount": 40000,
+              "counterparty": "Ruth Beispiel",
+              "date": "2026-03-12",
+              "src": {
+                "doc": "d09",
+                "line": "gift"
+              },
+              "evidence": [
+                "d07",
+                "d08"
+              ],
+              "origin": "gift",
+              "singlePassLabel": "Gift from parent"
+            }
+          ],
+          "debits": []
+        },
+        "us": {
+          "id": "us",
+          "label": "Investor's US account",
+          "holder": "Mara Beispiel",
+          "ccy": "USD",
+          "periods": [
+            {
+              "from": "2026-07-01",
+              "to": "2026-07-31"
+            }
+          ],
+          "opening": 0,
+          "closing": 0,
+          "srcClosing": {
+            "doc": "d12",
+            "line": "closing"
+          },
+          "srcHolder": {
+            "doc": "d12",
+            "line": "holder"
+          },
+          "credits": [
+            {
+              "id": "wire-in",
+              "label": "Incoming wire",
+              "amount": 186650,
+              "counterparty": "Nordhafen Bank",
+              "date": "2026-07-02",
+              "src": {
+                "doc": "d12",
+                "line": "wire"
+              },
+              "origin": "wire"
+            }
+          ],
+          "debits": [
+            {
+              "id": "to-escrow",
+              "label": "Purchase escrow",
+              "amount": 150000,
+              "counterparty": "Demo Title & Escrow Co.",
+              "date": "2026-07-06",
+              "src": {
+                "doc": "d12",
+                "line": "escrow"
+              },
+              "origin": "internal"
+            },
+            {
+              "id": "to-llc",
+              "label": "Transfer to the LLC",
+              "amount": 36650,
+              "counterparty": "Demo Street Coffee LLC",
+              "date": "2026-07-08",
+              "src": {
+                "doc": "d12",
+                "line": "llc"
+              },
+              "origin": "internal"
+            }
+          ]
+        },
+        "llc": {
+          "id": "llc",
+          "label": "LLC operating account",
+          "holder": "Demo Street Coffee LLC",
+          "ccy": "USD",
+          "periods": [
+            {
+              "from": "2026-07-01",
+              "to": "2026-07-31"
+            }
+          ],
+          "opening": 0,
+          "closing": 16250,
+          "srcClosing": {
+            "doc": "d17",
+            "line": "closing"
+          },
+          "srcHolder": {
+            "doc": "d17",
+            "line": "holder"
+          },
+          "credits": [
+            {
+              "id": "from-investor",
+              "label": "From the investor",
+              "amount": 36650,
+              "counterparty": "Mara Beispiel",
+              "date": "2026-07-08",
+              "src": {
+                "doc": "d17",
+                "line": "in"
+              },
+              "origin": "internal"
+            }
+          ],
+          "debits": [
+            {
+              "id": "equipment",
+              "label": "Espresso machine and grinder",
+              "amount": 12600,
+              "counterparty": "Demo Kitchen Supply",
+              "date": "2026-07-15",
+              "src": {
+                "doc": "d17",
+                "line": "equipment"
+              },
+              "evidence": [
+                "d15"
+              ],
+              "origin": "vendor"
+            },
+            {
+              "id": "lease",
+              "label": "Lease deposit",
+              "amount": 7800,
+              "counterparty": "14 Demo Street LLC",
+              "date": "2026-07-20",
+              "src": {
+                "doc": "d17",
+                "line": "lease"
+              },
+              "evidence": [
+                "d15"
+              ],
+              "origin": "vendor"
+            }
+          ]
+        }
+      },
+      "wire": {
+        "sentEur": 170000,
+        "feeUsd": 350,
+        "sentUsd": 186650,
+        "src": {
+          "doc": "d10",
+          "line": "net"
+        }
+      },
+      "escrow": {
+        "amount": 150000,
+        "releaseOn": "visa-approval",
+        "refundOn": "visa-denial",
+        "holder": "Demo Title & Escrow Co.",
+        "src": {
+          "doc": "d14",
+          "line": "release"
+        }
+      },
+      "purchase": {
+        "price": 150000,
+        "src": {
+          "doc": "d13",
+          "line": "price"
+        },
+        "sellerNote": null
+      }
+    },
+    {
+      "id": "demo-2",
+      "label": "Tobias Probe, Demo Bike Works LLC",
+      "investor": {
+        "name": "Tobias Probe",
+        "nationality": "Germany",
+        "route": "consular",
+        "family": [
+          {
+            "name": "Lea Probe",
+            "relation": "spouse"
+          },
+          {
+            "name": "Helga Probe",
+            "relation": "parent"
+          }
+        ]
+      },
+      "enterprise": {
+        "name": "Demo Bike Works LLC",
+        "owners": [
+          {
+            "name": "Tobias Probe",
+            "pct": 100
+          }
+        ],
+        "src": {
+          "doc": "p16",
+          "line": "member"
+        }
+      },
+      "fx": {
+        "rate": 1.1,
+        "note": "Fictional rate, 1 EUR = 1.10 USD"
+      },
+      "documents": [
+        {
+          "id": "p01",
+          "title": "Passport",
+          "original": "Reisepass",
+          "lang": "de",
+          "gate": "nationality",
+          "kind": "passport",
+          "issuer": "Federal Republic of Germany (specimen)",
+          "date": "2023-02-11",
+          "pages": 1,
+          "sort": {
+            "label": "passport",
+            "confidence": 0.99
+          },
+          "key": "nationality",
+          "lines": [
+            {
+              "id": "name",
+              "text": "Name: PROBE, TOBIAS"
+            },
+            {
+              "id": "nationality",
+              "text": "Staatsangehörigkeit: DEUTSCH",
+              "gloss": "Nationality: German"
+            }
+          ]
+        },
+        {
+          "id": "p04",
+          "title": "Payslips",
+          "original": "Gehaltsabrechnungen 01/2023 bis 06/2026",
+          "lang": "de",
+          "gate": "source",
+          "kind": "payslips",
+          "issuer": "Werkstatt Nord GmbH",
+          "date": "2026-06-30",
+          "pages": 42,
+          "sort": {
+            "label": "payslips",
+            "confidence": 0.94
+          },
+          "key": "net",
+          "lines": [
+            {
+              "id": "employee",
+              "text": "Mitarbeiter: Tobias Probe",
+              "gloss": "Employee: Tobias Probe"
+            },
+            {
+              "id": "net",
+              "text": "Netto monatlich: 2.900,00 EUR",
+              "gloss": "Net monthly pay: EUR 2,900"
+            }
+          ]
+        },
+        {
+          "id": "p05",
+          "title": "Vehicle sale contract",
+          "original": "Kaufvertrag Kraftfahrzeug",
+          "lang": "de",
+          "gate": "source",
+          "kind": "sale-contract",
+          "issuer": "Autohaus Demo (fictional)",
+          "date": "2025-11-04",
+          "pages": 2,
+          "sort": {
+            "label": "sale-contract",
+            "confidence": 0.9
+          },
+          "key": "price",
+          "lines": [
+            {
+              "id": "seller",
+              "text": "Verkäufer: Tobias Probe",
+              "gloss": "Seller: Tobias Probe"
+            },
+            {
+              "id": "price",
+              "text": "Kaufpreis: 18.000,00 EUR",
+              "gloss": "Price: EUR 18,000"
+            }
+          ]
+        },
+        {
+          "id": "p07",
+          "title": "Gift letter",
+          "original": "Schenkungsbestätigung",
+          "lang": "de",
+          "gate": "source",
+          "kind": "gift-letter",
+          "issuer": "Helga Probe, private letter",
+          "date": "2026-02-02",
+          "pages": 1,
+          "sort": {
+            "label": "gift-letter",
+            "confidence": 0.95
+          },
+          "key": "gift",
+          "lines": [
+            {
+              "id": "gift",
+              "text": "Ich schenke meinem Sohn Tobias Probe 30.000,00 EUR.",
+              "gloss": "I give my son Tobias Probe EUR 30,000."
+            },
+            {
+              "id": "terms",
+              "text": "Eine Rückzahlung ist nicht vereinbart.",
+              "gloss": "No repayment is agreed."
+            }
+          ]
+        },
+        {
+          "id": "p08",
+          "title": "Donor's bank statement",
+          "original": "Kontoauszug, Helga Probe",
+          "lang": "de",
+          "gate": "source",
+          "kind": "statement",
+          "issuer": "Nordhafen Bank (fictional)",
+          "date": "2026-02-28",
+          "pages": 1,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.96
+          },
+          "key": "transfer",
+          "lines": [
+            {
+              "id": "opening",
+              "text": "Anfangssaldo 01.02.2026: 180.000,00 EUR",
+              "gloss": "Opening balance: EUR 180,000"
+            },
+            {
+              "id": "transfer",
+              "text": "05.02.2026 Überweisung an Tobias Probe: −30.000,00 EUR",
+              "gloss": "Transfer to Tobias Probe: −EUR 30,000",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Endsaldo 28.02.2026: 150.000,00 EUR",
+              "gloss": "Closing balance: EUR 150,000"
+            }
+          ]
+        },
+        {
+          "id": "p09",
+          "title": "Savings statements",
+          "original": "Sparkonto, Kontoauszüge 2023 bis 2026",
+          "lang": "de",
+          "gate": "source",
+          "kind": "statement",
+          "issuer": "Nordhafen Bank (fictional)",
+          "date": "2026-06-30",
+          "pages": 12,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.98
+          },
+          "key": "closing",
+          "lines": [
+            {
+              "id": "holder",
+              "text": "Kontoinhaber: Tobias Probe",
+              "gloss": "Account holder: Tobias Probe"
+            },
+            {
+              "id": "opening",
+              "text": "Anfangssaldo 01.01.2023: 0,00 EUR",
+              "gloss": "Opening balance: EUR 0"
+            },
+            {
+              "id": "salary",
+              "text": "Gehaltsüberträge, Summe: +72.000,00 EUR",
+              "gloss": "Salary transfers, total: +EUR 72,000",
+              "tx": true
+            },
+            {
+              "id": "vehicle",
+              "text": "04.11.2025 Autohaus Demo: +18.000,00 EUR",
+              "gloss": "Autohaus Demo: +EUR 18,000",
+              "tx": true
+            },
+            {
+              "id": "gift",
+              "text": "05.02.2026 Überweisung Helga Probe: +30.000,00 EUR",
+              "gloss": "Transfer from Helga Probe: +EUR 30,000",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Endsaldo 30.06.2026: 120.000,00 EUR",
+              "gloss": "Closing balance: EUR 120,000"
+            }
+          ]
+        },
+        {
+          "id": "p12",
+          "title": "US account statement",
+          "lang": "en",
+          "gate": "committed",
+          "kind": "statement",
+          "issuer": "Demo Federal Bank (fictional)",
+          "date": "2026-07-31",
+          "pages": 2,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.97
+          },
+          "key": "wire",
+          "lines": [
+            {
+              "id": "holder",
+              "text": "Account holder: Tobias Probe"
+            },
+            {
+              "id": "opening",
+              "text": "Beginning balance 0.00"
+            },
+            {
+              "id": "wire",
+              "text": "07/03 Incoming wire, Nordhafen Bank +131,650.00",
+              "tx": true
+            },
+            {
+              "id": "escrow",
+              "text": "07/07 To Demo Title & Escrow −110,000.00",
+              "tx": true
+            },
+            {
+              "id": "llc",
+              "text": "07/09 To Demo Bike Works LLC −21,650.00",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Ending balance 0.00"
+            }
+          ]
+        },
+        {
+          "id": "p13",
+          "title": "Purchase agreement",
+          "lang": "en",
+          "gate": "substantial",
+          "kind": "purchase-agreement",
+          "issuer": "Demo Bike Works LLC and Spoke & Chain Inc. (fictional)",
+          "date": "2026-07-06",
+          "pages": 18,
+          "sort": {
+            "label": "purchase-agreement",
+            "confidence": 0.91
+          },
+          "key": "price",
+          "lines": [
+            {
+              "id": "price",
+              "text": "Purchase price: USD 110,000"
+            },
+            {
+              "id": "paid",
+              "text": "Paid in full from escrow at closing"
+            }
+          ]
+        },
+        {
+          "id": "p14",
+          "title": "Escrow agreement",
+          "lang": "en",
+          "gate": "committed",
+          "kind": "escrow-agreement",
+          "issuer": "Demo Title & Escrow Co. (fictional)",
+          "date": "2026-07-07",
+          "pages": 6,
+          "sort": {
+            "label": "escrow-agreement",
+            "confidence": 0.93
+          },
+          "key": "release",
+          "lines": [
+            {
+              "id": "deposit",
+              "text": "Deposit: USD 110,000"
+            },
+            {
+              "id": "release",
+              "text": "Released to Seller on approval of Buyer's E-2 visa"
+            },
+            {
+              "id": "refund",
+              "text": "Refunded to Buyer if the visa is denied"
+            }
+          ]
+        },
+        {
+          "id": "p16",
+          "title": "LLC operating agreement",
+          "lang": "en",
+          "gate": "direct",
+          "kind": "operating-agreement",
+          "issuer": "Demo Bike Works LLC",
+          "date": "2026-06-20",
+          "pages": 9,
+          "sort": {
+            "label": "operating-agreement",
+            "confidence": 0.95
+          },
+          "key": "member",
+          "lines": [
+            {
+              "id": "member",
+              "text": "Sole member: Tobias Probe, 100%"
+            }
+          ]
+        },
+        {
+          "id": "p17",
+          "title": "LLC account statement",
+          "lang": "en",
+          "gate": "operating",
+          "kind": "statement",
+          "issuer": "Demo Federal Bank (fictional)",
+          "date": "2026-07-31",
+          "pages": 2,
+          "sort": {
+            "label": "statement",
+            "confidence": 0.96
+          },
+          "key": "closing",
+          "lines": [
+            {
+              "id": "holder",
+              "text": "Account holder: Demo Bike Works LLC"
+            },
+            {
+              "id": "opening",
+              "text": "Beginning balance 0.00"
+            },
+            {
+              "id": "in",
+              "text": "07/09 From Tobias Probe +21,650.00",
+              "tx": true
+            },
+            {
+              "id": "tools",
+              "text": "07/14 Demo Tool Supply −9,400.00",
+              "tx": true
+            },
+            {
+              "id": "lease",
+              "text": "07/21 Lease deposit −4,800.00",
+              "tx": true
+            },
+            {
+              "id": "closing",
+              "text": "Ending balance 7,450.00"
+            }
+          ]
+        }
+      ],
+      "accounts": {
+        "savings": {
+          "id": "savings",
+          "label": "Savings account, Germany",
+          "holder": "Tobias Probe",
+          "ccy": "EUR",
+          "periods": [
+            {
+              "from": "2023-01-01",
+              "to": "2024-12-31"
+            },
+            {
+              "from": "2025-01-01",
+              "to": "2026-06-30"
+            }
+          ],
+          "opening": 0,
+          "closing": 120000,
+          "srcClosing": {
+            "doc": "p09",
+            "line": "closing"
+          },
+          "srcHolder": {
+            "doc": "p09",
+            "line": "holder"
+          },
+          "credits": [
+            {
+              "id": "c-salary",
+              "label": "Salary savings",
+              "amount": 72000,
+              "counterparty": "Werkstatt Nord GmbH payroll",
+              "date": "2023-01 to 2026-06",
+              "src": {
+                "doc": "p09",
+                "line": "salary"
+              },
+              "evidence": [
+                "p04"
+              ],
+              "origin": "salary",
+              "singlePassLabel": "Salary savings"
+            },
+            {
+              "id": "c-vehicle",
+              "label": "Vehicle sale",
+              "amount": 18000,
+              "counterparty": "Autohaus Demo",
+              "date": "2025-11-04",
+              "src": {
+                "doc": "p09",
+                "line": "vehicle"
+              },
+              "evidence": [
+                "p05"
+              ],
+              "origin": "sale",
+              "singlePassLabel": "Vehicle sale"
+            },
+            {
+              "id": "c-gift",
+              "label": "Gift from parent",
+              "amount": 30000,
+              "counterparty": "Helga Probe",
+              "date": "2026-02-05",
+              "src": {
+                "doc": "p09",
+                "line": "gift"
+              },
+              "evidence": [
+                "p07",
+                "p08"
+              ],
+              "origin": "gift",
+              "singlePassLabel": "Gift from parent"
+            }
+          ],
+          "debits": []
+        },
+        "us": {
+          "id": "us",
+          "label": "Investor's US account",
+          "holder": "Tobias Probe",
+          "ccy": "USD",
+          "periods": [
+            {
+              "from": "2026-07-01",
+              "to": "2026-07-31"
+            }
+          ],
+          "opening": 0,
+          "closing": 0,
+          "srcClosing": {
+            "doc": "p12",
+            "line": "closing"
+          },
+          "srcHolder": {
+            "doc": "p12",
+            "line": "holder"
+          },
+          "credits": [
+            {
+              "id": "wire-in",
+              "label": "Incoming wire",
+              "amount": 131650,
+              "counterparty": "Nordhafen Bank",
+              "date": "2026-07-03",
+              "src": {
+                "doc": "p12",
+                "line": "wire"
+              },
+              "origin": "wire"
+            }
+          ],
+          "debits": [
+            {
+              "id": "to-escrow",
+              "label": "Purchase escrow",
+              "amount": 110000,
+              "counterparty": "Demo Title & Escrow Co.",
+              "date": "2026-07-07",
+              "src": {
+                "doc": "p12",
+                "line": "escrow"
+              },
+              "origin": "internal"
+            },
+            {
+              "id": "to-llc",
+              "label": "Transfer to the LLC",
+              "amount": 21650,
+              "counterparty": "Demo Bike Works LLC",
+              "date": "2026-07-09",
+              "src": {
+                "doc": "p12",
+                "line": "llc"
+              },
+              "origin": "internal"
+            }
+          ]
+        },
+        "llc": {
+          "id": "llc",
+          "label": "LLC operating account",
+          "holder": "Demo Bike Works LLC",
+          "ccy": "USD",
+          "periods": [
+            {
+              "from": "2026-07-01",
+              "to": "2026-07-31"
+            }
+          ],
+          "opening": 0,
+          "closing": 7450,
+          "srcClosing": {
+            "doc": "p17",
+            "line": "closing"
+          },
+          "srcHolder": {
+            "doc": "p17",
+            "line": "holder"
+          },
+          "credits": [
+            {
+              "id": "from-investor",
+              "label": "From the investor",
+              "amount": 21650,
+              "counterparty": "Tobias Probe",
+              "date": "2026-07-09",
+              "src": {
+                "doc": "p17",
+                "line": "in"
+              },
+              "origin": "internal"
+            }
+          ],
+          "debits": [
+            {
+              "id": "tools",
+              "label": "Workshop tools",
+              "amount": 9400,
+              "counterparty": "Demo Tool Supply",
+              "date": "2026-07-14",
+              "src": {
+                "doc": "p17",
+                "line": "tools"
+              },
+              "origin": "vendor"
+            },
+            {
+              "id": "lease",
+              "label": "Lease deposit",
+              "amount": 4800,
+              "counterparty": "Demo Lane Properties",
+              "date": "2026-07-21",
+              "src": {
+                "doc": "p17",
+                "line": "lease"
+              },
+              "origin": "vendor"
+            }
+          ]
+        }
+      },
+      "wire": {
+        "sentEur": 120000,
+        "feeUsd": 350,
+        "sentUsd": 131650,
+        "src": {
+          "doc": "p12",
+          "line": "wire"
+        }
+      },
+      "escrow": {
+        "amount": 110000,
+        "releaseOn": "visa-approval",
+        "refundOn": "visa-denial",
+        "holder": "Demo Title & Escrow Co.",
+        "src": {
+          "doc": "p14",
+          "line": "release"
+        }
+      },
+      "purchase": {
+        "price": 110000,
+        "src": {
+          "doc": "p13",
+          "line": "price"
+        },
+        "sellerNote": null
+      }
+    }
+  ]
+}
