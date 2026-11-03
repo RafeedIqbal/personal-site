@@ -24,7 +24,8 @@
     "@next/eslint-plugin-next": {
       "fast-glob": "$fast-glob"
     },
-    "zod": "^4.6.6"
+    "zod": "^4.6.6",
+    "minimatch": "$minimatch"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -34,6 +35,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "fast-glob": "file:./scripts/next-eslint-glob",
+    "minimatch": "file:./scripts/minimatch-compat",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
