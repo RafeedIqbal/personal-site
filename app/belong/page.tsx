@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { DemoProvider } from "@/components/belong/demo";
+import Masthead from "@/components/belong/Masthead";
+import Architecture from "@/sections/belong/Architecture";
 import BreakFile from "@/sections/belong/BreakFile";
 import Colophon from "@/sections/belong/Colophon";
 import Hero from "@/sections/belong/Hero";
 import Judged from "@/sections/belong/Judged";
-import Loop from "@/sections/belong/Loop";
 import NextStep from "@/sections/belong/NextStep";
 import Ownership from "@/sections/belong/Ownership";
 import Problem from "@/sections/belong/Problem";
-import System from "@/sections/belong/System";
 
 const title = "Making the machine right";
 const description =
@@ -40,12 +40,12 @@ export default function BelongPage() {
       <a className="bl-skip bl-ui" href="#break">
         Skip to the demo
       </a>
+      <Masthead />
       <main id="top">
         <Hero />
         <Problem />
+        <Architecture />
         <BreakFile />
-        <System />
-        <Loop />
         <Judged />
         <Ownership />
         <NextStep />

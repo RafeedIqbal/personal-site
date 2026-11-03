@@ -1,4 +1,4 @@
-import { Section } from "@/components/belong/Doc";
+import { Module } from "@/components/belong/Doc";
 
 const METRICS = [
   ["Silent errors", "Critical mistakes that reach review without a flag."],
@@ -12,8 +12,12 @@ const METRICS = [
 
 export default function Judged() {
   return (
-    <Section id="judged" n={5} title="How it gets judged">
-      <p>Baselines come from real files in the first sprints, so there are no targets before then.</p>
+    <Module
+      id="judged"
+      numeral="IV"
+      title="How it gets judged"
+      lede="Baselines come from real files in the first sprints, so there are no targets before then."
+    >
       <dl className="bl-pairs bl-ui">
         {METRICS.map(([name, definition]) => (
           <div key={name}>
@@ -22,6 +26,6 @@ export default function Judged() {
           </div>
         ))}
       </dl>
-    </Section>
+    </Module>
   );
 }

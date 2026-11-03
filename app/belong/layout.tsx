@@ -1,4 +1,4 @@
-import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader, Schibsted_Grotesk } from "next/font/google";
 import "./belong.css";
 
 const newsreader = Newsreader({
@@ -7,6 +7,13 @@ const newsreader = Newsreader({
   variable: "--font-newsreader",
   style: ["normal", "italic"],
   axes: ["opsz"],
+});
+
+const grotesk = Schibsted_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-grotesk-display",
+  weight: ["700", "800"],
 });
 
 const plexSans = IBM_Plex_Sans({
@@ -25,7 +32,7 @@ const plexMono = IBM_Plex_Mono({
 
 export default function BelongLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div id="belong" className={`belong ${newsreader.variable} ${plexSans.variable} ${plexMono.variable}`}>
+    <div id="belong" className={`belong ${newsreader.variable} ${grotesk.variable} ${plexSans.variable} ${plexMono.variable}`}>
       {children}
     </div>
   );

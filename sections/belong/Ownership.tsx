@@ -1,4 +1,4 @@
-import { Section } from "@/components/belong/Doc";
+import { Module } from "@/components/belong/Doc";
 import Timeline from "@/components/belong/Timeline";
 
 const AREAS = [
@@ -16,11 +16,12 @@ const RIGHTS = [
 
 export default function Ownership() {
   return (
-    <Section id="ownership" n={6} title="How I would own it">
-      <p>
-        The bar is to run the product without needing Achint in the loop. I would be in the Toronto office
-        every day.
-      </p>
+    <Module
+      id="ownership"
+      numeral="V"
+      title="How I would own it"
+      lede="The bar is to run the product without needing Achint in the loop. I would be in the Toronto office every day."
+    >
       <dl className="bl-pairs bl-ui">
         {AREAS.map(([area, proof]) => (
           <div key={area}>
@@ -29,7 +30,7 @@ export default function Ownership() {
           </div>
         ))}
       </dl>
-      <h3 className="bl-h3">Who decides</h3>
+      <h3 className="bl-subtitle">Who decides</h3>
       <dl className="bl-pairs bl-ui">
         {RIGHTS.map(([who, what]) => (
           <div key={who}>
@@ -38,9 +39,9 @@ export default function Ownership() {
           </div>
         ))}
       </dl>
-      <h3 className="bl-h3">Milestones</h3>
-      <p>Each milestone closes on a gate the attorneys can see. Every change ships in shadow mode first.</p>
+      <h3 className="bl-subtitle">Milestones</h3>
+      <p className="bl-text">Each milestone closes on a gate the attorneys can see.</p>
       <Timeline />
-    </Section>
+    </Module>
   );
 }

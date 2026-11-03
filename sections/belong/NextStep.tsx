@@ -1,4 +1,4 @@
-import { Section } from "@/components/belong/Doc";
+import { Module } from "@/components/belong/Doc";
 import { PROFILE } from "@/lib/content";
 
 const UNKNOWNS = [
@@ -12,15 +12,20 @@ const SUBJECT = encodeURIComponent("Paired session on an anonymized file");
 
 export default function NextStep() {
   return (
-    <Section id="next" n={7} title="What I need to learn">
+    <Module
+      id="next"
+      numeral="VI"
+      title="Next step"
+      lede="Some of this can only be settled from inside Belong, with real files."
+    >
       <ul className="bl-unknowns">
         {UNKNOWNS.map((q) => (
           <li key={q}>{q}</li>
         ))}
       </ul>
-      <p className="bl-lede">
-        Real files answer these. Your second interview step is a paired session on an anonymized file, and
-        I would like to start there.
+      <p className="bl-text">
+        Your second interview step is a paired session on an anonymized file. I would like to start there,
+        and answer these together.
       </p>
       <div className="bl-cta bl-ui">
         <a className="bl-btn bl-btn--primary" href={`mailto:${PROFILE.email}?subject=${SUBJECT}`}>
@@ -30,6 +35,6 @@ export default function NextStep() {
           Résumé<span className="sr-only"> (PDF)</span>
         </a>
       </div>
-    </Section>
+    </Module>
   );
 }
