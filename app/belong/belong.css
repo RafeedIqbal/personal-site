@@ -714,20 +714,6 @@ body:has(.belong) {
   }
 }
 
-.bl-unknowns {
-  padding-left: 1.2em;
-  list-style: disc;
-  font-size: 18px;
-  line-height: 1.5;
-}
-.bl-unknowns li + li {
-  margin-top: 6px;
-}
-.bl-cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
 
 /* ------------------------------------------------------------ architecture figures */
 
@@ -1012,8 +998,7 @@ body:has(.belong) {
 }
 
 .bl-frame > .bl-pairs,
-.bl-frame > .bl-time,
-.bl-frame > .bl-unknowns {
+.bl-frame > .bl-time {
   max-width: 920px;
 }
 

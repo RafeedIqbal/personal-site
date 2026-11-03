@@ -6,7 +6,6 @@ import BreakFile from "@/sections/belong/BreakFile";
 import Colophon from "@/sections/belong/Colophon";
 import Hero from "@/sections/belong/Hero";
 import Judged from "@/sections/belong/Judged";
-import NextStep from "@/sections/belong/NextStep";
 import Ownership from "@/sections/belong/Ownership";
 import Problem from "@/sections/belong/Problem";
 
@@ -48,7 +47,6 @@ export default function BelongPage() {
         <BreakFile />
         <Judged />
         <Ownership />
-        <NextStep />
       </main>
       <Colophon />
     </DemoProvider>
