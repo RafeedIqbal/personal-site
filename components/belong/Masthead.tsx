@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PROFILE } from "@/lib/content";
 
@@ -47,7 +48,9 @@ export default function Masthead() {
         Making the machine right
       </a>
       <span className="bl-mast__links">
-        <span className="bl-mast__name">Rafeed Iqbal</span>
+        <Link href="/" className="bl-mast__name" tabIndex={shown ? 0 : -1}>
+          Rafeed Iqbal
+        </Link>
         <a href={`mailto:${PROFILE.email}`} tabIndex={shown ? 0 : -1}>
           Contact
         </a>

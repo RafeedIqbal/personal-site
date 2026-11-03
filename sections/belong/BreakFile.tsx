@@ -8,11 +8,10 @@ export default function BreakFile() {
       numeral="III"
       title="See it run"
       lede="Mara Beispiel, a fictional German investor, is buying a coffee shop in the US. Inject an error and watch the architecture catch it."
-      after={
-        <Figure n={5} below caption="The accuracy layer, drawn inside Belong’s petition assembly.">
-          <Visualizer />
-        </Figure>
-      }
-    />
+    >
+      <Figure n={5} below wide caption="The accuracy layer, drawn inside Belong’s petition assembly.">
+        <Visualizer />
+      </Figure>
+    </Module>
   );
 }

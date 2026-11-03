@@ -12,7 +12,6 @@ export function Module({
   tone,
   word,
   children,
-  after,
 }: {
   id: string;
   numeral: string;
@@ -21,7 +20,6 @@ export function Module({
   tone?: "band";
   word?: string;
   children?: ReactNode;
-  after?: ReactNode;
 }) {
   return (
     <section
@@ -46,7 +44,6 @@ export function Module({
         </header>
         {children}
       </div>
-      {after && <div className="bl-wide">{after}</div>}
     </section>
   );
 }
@@ -64,15 +61,17 @@ export function Figure({
   n,
   caption,
   below,
+  wide,
   children,
 }: {
   n: number;
   caption: ReactNode;
   below?: boolean;
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
-    <figure className="bl-figure" data-below={below || undefined}>
+    <figure className={wide ? "bl-figure bl-figure--wide" : "bl-figure"} data-below={below || undefined}>
       <div className="bl-figure__body">{children}</div>
       <figcaption className="bl-figure__cap">
         <span className="bl-figure__n">fig. {n}</span> {caption}

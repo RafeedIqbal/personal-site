@@ -235,6 +235,13 @@ body:has(.belong) {
 .bl-figure__body {
   min-width: 0;
 }
+/* The demo breaks out of the text column to a fixed width, centred. */
+@media (min-width: 760px) {
+  .bl-figure--wide {
+    width: min(100vw - 48px, 1360px);
+    margin-left: calc((100% - min(100vw - 48px, 1360px)) / 2);
+  }
+}
 .bl-figure__cap {
   max-width: 40em;
   color: var(--muted);
