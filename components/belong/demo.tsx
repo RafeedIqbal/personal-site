@@ -351,4 +351,11 @@ export function useDemo() {
   return value;
 }
 
+// Brings the demo into view after a run starts. On phones that is the stage
+// under the error picker, so the stepper, tiles and trail share one screen.
+export function showDemo() {
+  const phone = window.matchMedia("(max-width: 759px)").matches;
+  document.getElementById(phone ? "bl-stage" : "instrument")?.scrollIntoView({ block: "start" });
+}
+
 export { EMPTY_LOG };

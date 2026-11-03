@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LAYERS, applyPatch, settle } from "@/lib/belong/checks";
 import { FILES, SCENARIOS } from "@/lib/belong/data";
 import { Brace } from "./Doc";
-import { LAYER_INDEX, useDemo } from "./demo";
+import { LAYER_INDEX, showDemo, useDemo } from "./demo";
 
 type LayerId = (typeof LAYERS)[number]["id"];
 type StoreId = "documents" | "ledger" | "rules" | "rulings" | "gold";
@@ -71,6 +71,14 @@ const STORES: { id: StoreId; name: string; what: string }[] = [
   { id: "gold", name: "Gold set", what: "Attorney-labeled, replayed in CI" },
 ];
 
+// Layers grouped by what they cost to run: braces over the row on desktop,
+// labels on the rail on phones.
+const TIERS = [
+  { from: 0, label: "Every file, plain code" },
+  { from: 4, label: "Only flagged items" },
+  { from: 6, label: "Every correction" },
+];
+
 // Which layer each demo error stops at, computed by the same check code.
 const CAUGHT_AT = SCENARIOS.map((scenario) => {
   const result = settle(applyPatch(FILES[0], scenario.patch), scenario);
@@ -84,78 +92,149 @@ function errorsFor(index: number): number[] {
   return SCENARIOS.filter((s) => s.ruling).map((s) => s.id);
 }
 
+// One layer's job, stack and contract. Desktop shows it in a panel under the
+// row; phones open it inside the tapped layer on the rail, with its stores.
+function LayerDetail({
+  index,
+  id,
+  inline = false,
+  onTry,
+}: {
+  index: number;
+  id: string;
+  inline?: boolean;
+  onTry: (scenarioId: number) => void;
+}) {
+  const layer = LAYERS[index];
+  const detail = DETAIL[layer.id];
+  const errors = errorsFor(index);
+  return (
+    <div
+      id={id}
+      className={`bl-sys__detail ${inline ? "bl-sys__detail--inline" : "bl-sys__detail--wide"}`}
+      aria-live={inline ? undefined : "polite"}
+    >
+      {!inline && <h3 className="bl-sys__name">{layer.name}</h3>}
+      <p className="bl-sys__job">{detail.job}</p>
+      <dl className="bl-sys__facts">
+        <div>
+          <dt>Built with</dt>
+          <dd>{detail.built}</dd>
+        </div>
+        <div>
+          <dt>Contract</dt>
+          <dd className="bl-num">{detail.contract}</dd>
+        </div>
+        {inline && (
+          <div>
+            <dt>Stores</dt>
+            <dd>
+              <ul className="bl-sys__keeps">
+                {STORES.filter((store) => detail.stores.includes(store.id)).map((store) => (
+                  <li key={store.id}>
+                    <span className="bl-sys__store">{store.name}</span>
+                    <span className="bl-sys__what">{store.what}</span>
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
+        <div>
+          <dt>{index <= 3 ? "Catches in the demo" : "Handles in the demo"}</dt>
+          <dd className="bl-sys__errors">
+            {errors.length === 0
+              ? "Nothing on its own. A parser never knows it misread; the balance check catches error 1."
+              : errors.map((scenarioId) => (
+                  <button key={scenarioId} type="button" className="bl-chip" onClick={() => onTry(scenarioId)}>
+                    <span className="bl-chip__n bl-num">{scenarioId}</span>
+                    {SCENARIOS.find((s) => s.id === scenarioId)?.chip}
+                  </button>
+                ))}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
 export default function SystemFigure() {
   const { dispatch } = useDemo();
   const [selected, setSelected] = useState<LayerId>("check");
   const index = LAYERS.findIndex((layer) => layer.id === selected);
   const detail = DETAIL[selected];
-  const errors = errorsFor(index);
 
-  const tryError = (id: number) => {
-    dispatch({ type: "start", scenarioId: id });
-    document.getElementById("instrument")?.scrollIntoView({ block: "start" });
+  const tryError = (scenarioId: number) => {
+    dispatch({ type: "start", scenarioId });
+    showDemo();
   };
 
+  // The detail exists twice and CSS shows one per breakpoint. When a tablet
+  // rotates across 900px with focus in the copy being hidden, hand focus to
+  // the selected layer instead of letting it drop to the page.
+  // The browser has already blurred it by then, so remember the last focus.
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    let last: HTMLElement | null = null;
+    const onFocus = (event: FocusEvent) => {
+      last = event.target instanceof HTMLElement ? event.target : null;
+    };
+    const list = window.matchMedia("(max-width: 899px)");
+    const onChange = () => {
+      const lost = document.activeElement === document.body || document.activeElement === last;
+      if (lost && last?.closest(".bl-sys__detail") && !last.offsetParent) {
+        el.querySelector<HTMLElement>('.bl-sys__layer[aria-pressed="true"]')?.focus();
+      }
+    };
+    el.addEventListener("focusin", onFocus);
+    list.addEventListener("change", onChange);
+    return () => {
+      el.removeEventListener("focusin", onFocus);
+      list.removeEventListener("change", onChange);
+    };
+  }, []);
+
   return (
-    <div className="bl-sys">
+    <div ref={root} className="bl-sys">
       <div className="bl-sys__tiers" aria-hidden="true">
-        <span style={{ gridColumn: "1 / 5" }}>
-          <Brace label="Every file, plain code" />
-        </span>
-        <span style={{ gridColumn: "5 / 7" }}>
-          <Brace label="Only flagged items" />
-        </span>
-        <span style={{ gridColumn: "7 / 8" }}>
-          <Brace label="Every correction" />
-        </span>
+        {TIERS.map((tier, i) => (
+          <span
+            key={tier.label}
+            style={{ gridColumn: `${tier.from + 1} / ${(TIERS[i + 1]?.from ?? LAYERS.length) + 1}` }}
+          >
+            <Brace label={tier.label} />
+          </span>
+        ))}
       </div>
       <ol className="bl-sys__layers" aria-label="The seven layers">
-        {LAYERS.map((layer, i) => (
-          <li key={layer.id}>
-            <button
-              type="button"
-              className="bl-sys__layer"
-              aria-pressed={layer.id === selected}
-              aria-controls="bl-sys-detail"
-              onClick={() => setSelected(layer.id)}
-            >
-              <span className="bl-sys__n">{String(i + 1).padStart(2, "0")}</span>
-              {layer.name}
-            </button>
-          </li>
-        ))}
+        {LAYERS.map((layer, i) => {
+          const tier = TIERS.find((t) => t.from === i);
+          const open = layer.id === selected;
+          return (
+            <li key={layer.id} data-open={open || undefined}>
+              {tier && <span className="bl-sys__tier">{tier.label}</span>}
+              <button
+                type="button"
+                className="bl-sys__layer"
+                aria-pressed={open}
+                aria-controls="bl-sys-detail bl-sys-detail-inline"
+                onClick={() => setSelected(layer.id)}
+              >
+                <span className="bl-sys__n">{String(i + 1).padStart(2, "0")}</span>
+                {layer.name}
+              </button>
+              {open && <LayerDetail index={i} id="bl-sys-detail-inline" inline onTry={tryError} />}
+            </li>
+          );
+        })}
       </ol>
       <p className="bl-sys__loop">
         <span aria-hidden="true">↺</span> Rulings and tests from Learn feed Check and Route on the next file.
       </p>
 
-      <div id="bl-sys-detail" className="bl-sys__detail" aria-live="polite">
-        <h3 className="bl-sys__name">{LAYERS[index].name}</h3>
-        <p className="bl-sys__job">{detail.job}</p>
-        <dl className="bl-sys__facts">
-          <div>
-            <dt>Built with</dt>
-            <dd>{detail.built}</dd>
-          </div>
-          <div>
-            <dt>Contract</dt>
-            <dd className="bl-num">{detail.contract}</dd>
-          </div>
-          <div>
-            <dt>{index <= 3 ? "Catches in the demo" : "Handles in the demo"}</dt>
-            <dd className="bl-sys__errors">
-              {errors.length === 0
-                ? "Nothing on its own. A parser never knows it misread; the balance check catches error 1."
-                : errors.map((id) => (
-                    <button key={id} type="button" className="bl-chip" onClick={() => tryError(id)}>
-                      <span className="bl-chip__n bl-num">{id}</span>
-                      {SCENARIOS.find((s) => s.id === id)?.chip}
-                    </button>
-                  ))}
-            </dd>
-          </div>
-        </dl>
-      </div>
+      <LayerDetail index={index} id="bl-sys-detail" onTry={tryError} />
 
       <ul className="bl-sys__stores" aria-label="Where the layers keep their state">
         {STORES.map((store) => (

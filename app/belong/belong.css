@@ -303,6 +303,12 @@ body:has(.belong) {
     width: 100%;
     padding-inline: 16px;
   }
+  .bl-frame > .bl-subtitle {
+    margin-top: 52px;
+  }
+  .bl-frame > .bl-figure {
+    margin-top: 28px;
+  }
 }
 
 /* masthead */
@@ -818,16 +824,116 @@ body:has(.belong) {
     gap: 20px;
   }
 }
+@media (min-width: 900px) {
+  .bl-sys__tier,
+  .bl-sys__detail--inline {
+    display: none;
+  }
+}
+/* Phones and tablets: one vertical rail from Read to Learn, broken by the
+   tier labels. The tapped layer opens its detail in place, stores included. */
 @media (max-width: 899px) {
-  .bl-sys__tiers {
+  .bl-sys__tiers,
+  .bl-sys__detail--wide,
+  .bl-sys__stores {
     display: none;
   }
   .bl-sys__layers {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .bl-sys__stores {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .bl-sys__layers::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 22px;
+    left: 15.5px;
+    width: 1px;
+    background: var(--band-rule);
+  }
+  .bl-sys__tier {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px 0 8px;
+    background: var(--band);
+    color: var(--band-muted);
+    font-family: var(--font-plex-sans), system-ui, sans-serif;
+    font-size: 13px;
+  }
+  .bl-sys__layers > li:first-child .bl-sys__tier {
+    padding-top: 0;
+  }
+  .bl-sys__tier::after {
+    content: "";
+    flex: 1;
+    border-top: 1px dotted var(--band-rule);
+  }
+  .bl-sys__layer,
+  .bl-sys__layer[aria-pressed="true"] {
+    grid-template-columns: 32px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 6px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--band-ink);
+    font-size: 16px;
+  }
+  .bl-sys__n {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--band-rule);
+    border-radius: 50%;
+    background: var(--band);
+    opacity: 1;
+    transition:
+      background-color 250ms var(--ease),
+      color 250ms var(--ease);
+  }
+  .bl-sys__layer:hover .bl-sys__n {
+    border-color: var(--band-ink);
+  }
+  .bl-sys__layer[aria-pressed="true"] .bl-sys__n {
+    border-color: var(--band-ink);
+    background: var(--band-ink);
+    color: var(--band);
+  }
+  .bl-sys__detail--inline {
+    gap: 12px;
+    margin: 2px 0 12px 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .bl-sys__detail--inline .bl-sys__job {
+    font-size: 19px;
+  }
+  .bl-sys__detail--inline .bl-chip {
+    min-height: 28px;
+    font-size: 12px;
+  }
+  .bl-sys__keeps {
+    display: grid;
+    gap: 6px;
+  }
+  .bl-sys__keeps li {
+    display: grid;
+  }
+  .bl-sys__keeps .bl-sys__what {
+    color: var(--band-muted);
+  }
+  .bl-sys__loop {
+    padding-left: 44px;
+    text-align: left;
   }
 }
 .bl-platform {
@@ -971,6 +1077,95 @@ body:has(.belong) {
   color: var(--ink-2);
   font-size: 14px;
   line-height: 1.5;
+}
+.bl-efig__toggle {
+  display: none;
+}
+@media (max-width: 899px) {
+  .bl-efig__toggle {
+    display: inline-flex;
+    justify-self: start;
+  }
+  .bl-efig__rules:not([data-open]) {
+    display: none;
+  }
+}
+
+/* Phones: routing steps and the learning loop read down one rail, like the
+   layers in fig. 1, and the guardrails become a plain list. */
+@media (max-width: 759px) {
+  .bl-rfig__steps,
+  .bl-loop__steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .bl-rfig__steps > li,
+  .bl-loop__steps > li {
+    position: relative;
+    padding: 0 0 22px 44px;
+    background: none;
+  }
+  .bl-rfig__steps > li:last-child,
+  .bl-loop__steps > li:last-child {
+    padding-bottom: 0;
+  }
+  .bl-rfig__steps > li:not(:last-child)::after,
+  .bl-loop__steps > li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    bottom: -14px;
+    left: 13.5px;
+    width: 1px;
+    background: var(--rule-2);
+  }
+  .bl-rfig__steps b::before,
+  .bl-loop__steps h3::before {
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    border: 1px solid var(--rule-2);
+    border-radius: 50%;
+    background: var(--page);
+    color: var(--ink-2);
+    font-family: var(--font-plex-mono), monospace;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .bl-rfig__steps b::before {
+    top: -4px;
+  }
+  .bl-loop__steps h3::before {
+    top: 0;
+  }
+  .bl-guards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .bl-guards > div {
+    padding: 14px 0;
+    border-top: 1px dotted var(--rule-2);
+    background: none;
+  }
+  .bl-guards > div:last-child {
+    border-bottom: 1px dotted var(--rule-2);
+  }
+  .bl-guards dt {
+    font-size: 18px;
+  }
 }
 
 .bl-frame > .bl-pairs,
@@ -1152,6 +1347,10 @@ body:has(.belong) {
   padding: 16px;
   background: var(--inset);
   container-type: inline-size;
+}
+/* On desktop the column scrolls when a route card grows; nothing in it shrinks. */
+.bl-app__main > * {
+  flex-shrink: 0;
 }
 @media (min-width: 1100px) {
   .bl-app__body {
@@ -1422,6 +1621,73 @@ body:has(.belong) {
 .bl-steps__token[data-tone="proven"] {
   border-color: var(--proven);
 }
+.bl-steps__now {
+  display: none;
+}
+
+/* Phones: the steps become a rail of bars, and one line names the current step. */
+@container (max-width: 560px) {
+  .bl-stepwrap {
+    overflow: visible;
+  }
+  .bl-steps {
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px 0 0;
+  }
+  .bl-steps li {
+    display: block;
+  }
+  .bl-steps li::after,
+  .bl-steps__token {
+    display: none;
+  }
+  .bl-steps__name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .bl-steps__dot {
+    display: block;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    transition:
+      background-color 350ms var(--ease),
+      transform 350ms var(--ease);
+  }
+  .bl-steps li[data-current] .bl-steps__dot {
+    transform: scaleY(1.67);
+  }
+  .bl-steps__now {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 9px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .bl-steps__now [data-tone] {
+    color: var(--ink);
+    font-weight: 600;
+    transition: color 350ms var(--ease);
+  }
+  .bl-steps__now [data-tone="proven"] {
+    color: var(--proven);
+  }
+  .bl-steps__now [data-tone="failed"] {
+    color: var(--failed);
+  }
+  .bl-steps__now [data-tone="routed"] {
+    color: var(--routed);
+  }
+  .bl-steps__now [data-tone="unsure"] {
+    color: var(--unsure-text);
+  }
+}
 
 .bl-status {
   min-height: 2.9em;
@@ -1489,6 +1755,46 @@ body:has(.belong) {
     grid-column: 1 / -1;
   }
 }
+/* Phones: two headline tiles over three small ones. */
+@container (max-width: 560px) {
+  .bl-tiles {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .bl-tile,
+  .bl-tile:last-child {
+    position: relative;
+    grid-column: span 2;
+    padding: 9px 10px 10px;
+  }
+  .bl-tile:nth-child(-n + 2) {
+    grid-column: span 3;
+  }
+  .bl-tile dt {
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+  }
+  .bl-tile__v {
+    margin-top: 3px;
+    font-size: 16px;
+  }
+  .bl-tile:nth-child(-n + 2) .bl-tile__v {
+    font-size: 20px;
+  }
+  .bl-tile__sub {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  /* The small tiles hide their notes from view (screen readers keep them);
+     the value itself still animates. */
+  .bl-tile:nth-child(n + 3) .bl-tile__sub {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
 
 .bl-card {
   border: 1px solid var(--rule);
@@ -1524,6 +1830,35 @@ body:has(.belong) {
   font-size: 12.5px;
 }
 
+/* Phones: fixed heights for anything that changes mid-run, so the tiles and
+   trail never move while the animation plays. The trail's flagged rows stand
+   in for the held list. */
+@container (max-width: 560px) {
+  .bl-crumbs__path,
+  .bl-crumbs__id {
+    display: none;
+  }
+  .bl-status {
+    min-height: calc(3 * 1.45em);
+    font-size: 13px;
+  }
+  .bl-card__head {
+    flex-direction: column;
+    align-items: start;
+    gap: 1px;
+    padding: 10px 14px;
+  }
+  .bl-held {
+    display: none;
+  }
+}
+/* The longest status needs a fourth line on the narrowest phones. */
+@container (max-width: 340px) {
+  .bl-status {
+    min-height: calc(4 * 1.45em);
+  }
+}
+
 /* trail */
 
 .bl-trail {
@@ -1532,6 +1867,7 @@ body:has(.belong) {
 }
 .bl-trail__graph {
   position: relative;
+  height: var(--trail-h, 210px);
 }
 .bl-trail__edges {
   position: absolute;
@@ -1561,7 +1897,9 @@ body:has(.belong) {
   stroke: var(--routed);
   stroke-width: 2;
 }
-.bl-trail__list {
+.bl-trail__list,
+.bl-trail__cols,
+.bl-trail__focus {
   display: none;
 }
 
@@ -1649,13 +1987,62 @@ body:has(.belong) {
   box-shadow: 0 0 0 2px var(--ink);
 }
 
+/* Phones: the same graph with dots for nodes (the label and amount stay in
+   each button's name), column names under it, then a row per flagged node. */
 @container (max-width: 560px) {
   .bl-trail__graph {
-    display: none;
+    --trail-h: 136px;
   }
-  .bl-trail__list {
+  .bl-trail__graph .bl-node {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-color: var(--rule-2);
+    border-radius: 50%;
+  }
+  .bl-trail__graph .bl-node__label,
+  .bl-trail__graph .bl-node__amt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .bl-trail__graph .bl-node__row {
+    display: flex;
+  }
+  .bl-trail__cols {
+    display: block;
+    position: relative;
+    height: 14px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 10.5px;
+    line-height: 14px;
+  }
+  .bl-trail__cols span {
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+  .bl-trail__focus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  .bl-trail__list[data-open] {
     display: grid;
     gap: 6px;
+    margin-top: 10px;
   }
   .bl-trail__list li[data-col="1"],
   .bl-trail__list li[data-col="2"] {
@@ -1668,6 +2055,66 @@ body:has(.belong) {
   .bl-trail__list .bl-node {
     width: 100%;
   }
+}
+.bl-trail__quiet {
+  flex: 1;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.bl-trail__flags {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+.bl-flag {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1px 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--surface);
+  text-align: left;
+  transition:
+    border-color 350ms var(--ease),
+    background-color 350ms var(--ease);
+}
+.bl-flag__label {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bl-flag__amt {
+  grid-row: 2;
+  color: var(--ink-2);
+  font-size: 11.5px;
+}
+.bl-flag .bl-tag {
+  grid-row: 1 / 3;
+  grid-column: 2;
+}
+.bl-flag[data-tone="failed"] {
+  border-color: var(--failed);
+  background: var(--failed-wash);
+}
+.bl-flag[data-tone="unsure"] {
+  border-color: var(--unsure);
+  background: var(--unsure-wash);
+}
+.bl-flag[data-tone="routed"] {
+  border-color: var(--routed);
+  background: var(--routed-wash);
+}
+.bl-flag[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.bl-trail__more {
+  min-height: 32px;
 }
 
 /* route card */
@@ -1713,67 +2160,12 @@ body:has(.belong) {
   font-size: 13px;
   font-weight: 500;
 }
-.bl-route__hide {
-  justify-self: end;
-  padding: 4px 10px;
-  border: 1px solid var(--rule-2);
-  border-radius: 6px;
-  font-size: 13px;
-}
 .bl-draft {
   padding: 6px 10px;
   border-left: 2px solid var(--proven);
   background: var(--inset);
   font-family: var(--font-newsreader), Georgia, serif;
   font-size: 15px;
-}
-.bl-peek__title {
-  font-family: var(--font-newsreader), Georgia, serif;
-  font-size: 17px;
-  font-weight: 500;
-}
-.bl-peek__actions {
-  display: flex;
-  gap: 8px;
-}
-@media (max-width: 759px) {
-  .bl-route[data-sheet="none"],
-  .bl-route[data-sheet="closed"] {
-    display: none;
-  }
-  .bl-route[data-sheet="peek"],
-  .bl-route[data-sheet="open"] {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 70;
-    border-width: 1px 0 0;
-    border-color: var(--rule-2);
-    border-radius: 12px 12px 0 0;
-  }
-  .bl-route[data-sheet="peek"] {
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
-    box-shadow: 0 -10px 30px rgb(16 30 46 / 0.12);
-  }
-  .bl-route[data-sheet="open"] {
-    max-height: 82dvh;
-    overflow-y: auto;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    box-shadow: 0 0 0 100vmax rgb(16 30 46 / 0.45);
-  }
-  html:has(.bl-route[data-sheet="peek"]) {
-    scroll-padding-bottom: 120px;
-  }
-}
-@media (min-width: 760px) {
-  .bl-route__hide,
-  .bl-show-route {
-    display: none;
-  }
-}
-.bl-show-route {
-  align-self: start;
 }
 
 /* nine gates */
@@ -1913,7 +2305,18 @@ body:has(.belong) {
     border-top: 0;
   }
 }
+/* Phones: the window runs edge to edge without its title bar, and the six
+   errors sit in a grid rather than a scroller that cuts them off. */
 @media (max-width: 759px) {
+  .bl-figure--wide .bl-figure__body {
+    margin-inline: -16px;
+  }
+  .bl-app {
+    border-width: 1px 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .bl-app__chrome,
   .bl-app__nav,
   .bl-app__product,
   .bl-app__user span:first-child {
@@ -1921,7 +2324,35 @@ body:has(.belong) {
   }
   .bl-app__top {
     gap: 12px;
-    padding: 0 14px;
+    min-height: 48px;
+    padding: 0 16px;
+  }
+  .bl-side {
+    padding: 12px 16px;
+  }
+  .bl-side__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .bl-side__item {
+    width: 100%;
+    min-height: 44px;
+    padding: 5px 8px 5px 6px;
+    border-radius: 8px;
+  }
+  .bl-side__name {
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+  .bl-app__main {
+    gap: 12px;
+    padding: 14px 16px 16px;
+    scroll-margin-top: calc(var(--mast) + 8px);
   }
 }
 

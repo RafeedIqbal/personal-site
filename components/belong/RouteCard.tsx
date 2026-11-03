@@ -12,11 +12,8 @@ import type {
   Scenario,
   Treatment,
 } from "@/lib/belong/types";
-import { EMPTY_LOG, useDemo, type View } from "./demo";
+import { EMPTY_LOG, showDemo, useDemo, type View } from "./demo";
 import { DocSheet } from "./Sheet";
-import { useFocusTrap } from "./useFocusTrap";
-
-export type SheetMode = "none" | "peek" | "open" | "closed";
 
 export function destinationName(view: View, to: Destination): string {
   if (to === "domain") return view.scenario?.model?.name ?? "Domain model";
@@ -226,7 +223,10 @@ function Actions() {
           <button
             type="button"
             className="bl-btn bl-btn--small bl-btn--primary"
-            onClick={() => dispatch({ type: "start", scenarioId: scenario.id, replay: true })}
+            onClick={() => {
+              dispatch({ type: "start", scenarioId: scenario.id, replay: true });
+              showDemo();
+            }}
           >
             Replay on a second file
           </button>
@@ -236,48 +236,13 @@ function Actions() {
   );
 }
 
-export function RouteCard({
-  sheet,
-  mobile,
-  onSheet,
-}: {
-  sheet: SheetMode;
-  mobile: boolean;
-  onSheet: (mode: "peek" | "open" | "closed") => void;
-}) {
+// Where the caught error goes and what the resolver is asked. It sits after
+// the trail at every width, so it grows without moving anything above it.
+export function RouteCard() {
   const { dispatch, view } = useDemo();
   const { run, scenario, settlement, file } = view;
   const routed = run && ["routed", "resolved", "learned"].includes(run.phase);
-  const panel = useRef<HTMLElement>(null);
-  const modal = mobile && sheet === "open";
-  useFocusTrap(panel, modal);
-  useEffect(() => {
-    if (!modal) return;
-    panel.current?.querySelector<HTMLElement>(".bl-route__title")?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onSheet("peek");
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [modal, onSheet]);
-
   const destinations = settlement.hops.map((h) => destinationName(view, h.to)).join(", then ");
-
-  if (mobile && sheet === "peek" && run) {
-    return (
-      <aside className="bl-route" aria-label="Route card" data-sheet="peek">
-        <p className="bl-peek__title">{run.singlePass ? "Single-pass pipeline" : `Routed to ${destinations}`}</p>
-        <div className="bl-peek__actions">
-          <button type="button" id="bl-open-route" className="bl-btn bl-btn--small" onClick={() => onSheet("open")}>
-            Open
-          </button>
-          <button type="button" className="bl-btn bl-btn--small bl-btn--quiet" onClick={() => onSheet("closed")}>
-            Hide
-          </button>
-        </div>
-      </aside>
-    );
-  }
 
   let body: React.ReactNode;
   if (!run || !scenario) {
@@ -290,7 +255,7 @@ export function RouteCard({
     body = (
       <>
         <div className="bl-route__head">
-          <h3 className="bl-route__title" tabIndex={-1}>
+          <h3 className="bl-route__title">
             <span className="bl-pill" data-tone="proven">
               Single-pass pipeline
             </span>
@@ -312,7 +277,7 @@ export function RouteCard({
     body = (
       <>
         <div className="bl-route__head">
-          <h3 className="bl-route__title" tabIndex={-1}>
+          <h3 className="bl-route__title">
             <span className="bl-pill" data-tone="routed">
               Routed to {destinations}
             </span>
@@ -333,19 +298,7 @@ export function RouteCard({
   }
 
   return (
-    <aside
-      ref={panel}
-      className="bl-route"
-      aria-label="Route card"
-      data-sheet={sheet}
-      role={modal ? "dialog" : undefined}
-      aria-modal={modal || undefined}
-    >
-      {modal && (
-        <button type="button" className="bl-route__hide" onClick={() => onSheet("peek")}>
-          Close
-        </button>
-      )}
+    <aside className="bl-route" aria-label="Route card">
       {body}
     </aside>
   );

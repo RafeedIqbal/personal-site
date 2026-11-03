@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { LAYERS, RULES, docById, logFor, nodeResults } from "@/lib/belong/checks";
 import { GATES, SCENARIOS } from "@/lib/belong/data";
 import type { Tiles } from "@/lib/belong/types";
-import { HOLD_WORDS, docTone, gateTone, nodeTone, useDemo, type View } from "./demo";
-import { destinationName, PacketPanel, RouteCard, type SheetMode } from "./RouteCard";
+import { HOLD_WORDS, docTone, gateTone, nodeTone, showDemo, useDemo, type View } from "./demo";
+import { destinationName, PacketPanel, RouteCard } from "./RouteCard";
 import { DocFacts, DocSheet, NodeChecks } from "./Sheet";
 import { StatusIcon, StatusTag, type Tone } from "./Status";
 import { FundTrail } from "./Trail";
@@ -119,7 +119,10 @@ function Sidebar() {
                 className="bl-side__item"
                 aria-pressed={active}
                 data-done={done || undefined}
-                onClick={() => dispatch({ type: "start", scenarioId: s.id })}
+                onClick={() => {
+                  dispatch({ type: "start", scenarioId: s.id });
+                  showDemo();
+                }}
               >
                 <span className="bl-side__mark bl-num" aria-hidden="true">
                   {done && !active ? <StatusIcon tone="proven" /> : s.id}
@@ -139,7 +142,11 @@ function Sidebar() {
           role="switch"
           aria-checked={state.singlePass}
           className="bl-switch"
-          onClick={() => dispatch({ type: "singlePass", on: !state.singlePass })}
+          onClick={() => {
+            dispatch({ type: "singlePass", on: !state.singlePass });
+            // Toggling mid-run restarts the error, so show it run again.
+            if (run) showDemo();
+          }}
         >
           <span className="bl-switch__track" aria-hidden="true" />
           Single-pass view
@@ -176,26 +183,46 @@ function Stepper() {
   const stages = run?.singlePass ? SINGLE_STAGES : LAYERS;
   const token = run ? Math.max(0, run.token) : 0;
   const tones = stages.map((_, i) => stageTone(view, i));
+  // The stage the token sits on, once the run has left "injected".
+  const current = run && run.phase !== "injected" ? Math.min(token, stages.length - 1) : -1;
+  const unit = run?.singlePass ? "steps" : "layers";
   return (
-    <div className="bl-stepwrap">
-      <ol
-        className="bl-steps"
-        aria-label={run?.singlePass ? "Single-pass pipeline" : "Pipeline layers"}
-        style={{ "--n": stages.length, "--t": token } as React.CSSProperties}
-      >
-        {stages.map((stage, i) => (
-          <li key={stage.id} data-tone={tones[i]}>
-            <span className="bl-steps__dot" aria-hidden="true" />
-            {stage.name}
-            {tones[i] === "failed" && view.settlement.primary && (
-              <span className="sr-only">, caught by {RULES[view.settlement.primary.rule].name}</span>
-            )}
-          </li>
-        ))}
-        {run && run.phase !== "injected" && (
-          <span className="bl-steps__token" data-tone={tones[Math.min(token, stages.length - 1)]} aria-hidden="true" />
+    <div className="bl-stepper">
+      <div className="bl-stepwrap">
+        <ol
+          className="bl-steps"
+          aria-label={run?.singlePass ? "Single-pass pipeline" : "Pipeline layers"}
+          style={{ "--n": stages.length, "--t": token } as React.CSSProperties}
+        >
+          {stages.map((stage, i) => (
+            <li key={stage.id} data-tone={tones[i]} data-current={i === current || undefined}>
+              <span className="bl-steps__dot" aria-hidden="true" />
+              <span className="bl-steps__name">{stage.name}</span>
+              {tones[i] === "failed" && view.settlement.primary && (
+                <span className="sr-only">, caught by {RULES[view.settlement.primary.rule].name}</span>
+              )}
+            </li>
+          ))}
+          {current >= 0 && <span className="bl-steps__token" data-tone={tones[current]} aria-hidden="true" />}
+        </ol>
+      </div>
+      {/* Phones draw the steps as a rail without names; this line names the current one. */}
+      <p className="bl-steps__now" aria-hidden="true">
+        {current >= 0 ? (
+          <>
+            <span data-tone={tones[current]}>
+              {current + 1} · {stages[current].name}
+            </span>
+            <span>
+              of {stages.length} {unit}
+            </span>
+          </>
+        ) : (
+          <span>
+            {stages.length} {unit}, {stages[0].name} to {stages[stages.length - 1].name}
+          </span>
         )}
-      </ol>
+      </p>
     </div>
   );
 }
@@ -312,6 +339,7 @@ function Drawer() {
   const panel = state.panel;
   const heading = useRef<HTMLHeadingElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
+  const nodeFor = useRef<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
   useFocusTrap(box, Boolean(panel));
 
@@ -320,6 +348,7 @@ function Drawer() {
     if (!returnTo.current && document.activeElement instanceof HTMLElement) {
       returnTo.current = document.activeElement;
     }
+    if (panel.kind === "node") nodeFor.current = panel.id;
     heading.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") dispatch({ type: "panel", panel: null });
@@ -330,8 +359,14 @@ function Drawer() {
 
   useEffect(() => {
     if (panel || !returnTo.current) return;
-    returnTo.current.focus({ preventScroll: true });
+    // A flagged row can disappear while its drawer is open (the error gets
+    // corrected); focus then goes to that node's dot instead.
+    const dot = nodeFor.current
+      ? document.querySelector<HTMLElement>(`.bl-trail__graph [data-node="${CSS.escape(nodeFor.current)}"]`)
+      : null;
+    (returnTo.current.isConnected ? returnTo.current : dot)?.focus({ preventScroll: true });
     returnTo.current = null;
+    nodeFor.current = null;
   }, [panel]);
 
   if (!panel) return null;
@@ -401,10 +436,6 @@ function Drawer() {
 export default function Visualizer() {
   const { state, dispatch, view } = useDemo();
   const reduce = useReducedMotion();
-  const root = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  const [sheetFor, setSheetFor] = useState<{ run: number; mode: "peek" | "open" | "closed" } | null>(null);
-  const mobile = useMedia("(max-width: 759px)");
   const { run } = state;
 
   // Drives a run through its phases. Reduced motion jumps to the same end state.
@@ -441,33 +472,6 @@ export default function Visualizer() {
     dispatch({ type: "finish", runId: run.id, scenarioId: run.scenarioId, delta: logFor(view.settlement) });
   }, [run, view.settlement, dispatch]);
 
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
-      threshold: 0.05,
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const routed = run && !run.singlePass && ["routed", "resolved", "learned"].includes(run.phase);
-  const ready = Boolean(run && (routed || (run.singlePass && view.settled)));
-  const chosen = run && sheetFor?.run === run.id ? sheetFor.mode : "peek";
-  const sheet: SheetMode = !run ? "none" : !ready ? "closed" : chosen === "open" || inView ? chosen : "closed";
-  const setSheet = (mode: "peek" | "open" | "closed") => {
-    if (!run) return;
-    setSheetFor({ run: run.id, mode });
-    if (mode === "open") return;
-    // Focus follows the sheet: to its peek bar, or to "Show route card" when hidden.
-    requestAnimationFrame(() => {
-      const next =
-        (mode === "peek" && document.querySelector<HTMLElement>("#bl-open-route")) ||
-        document.querySelector<HTMLElement>(".bl-show-route");
-      next?.focus();
-    });
-  };
-
   const edgeTone = (edgeId: string, _from: string, to: string): Tone => {
     const finding = view.settlement.findings.find((f) => f.target === edgeId);
     if (finding && view.checked && !run?.singlePass) return nodeTone(view, to).tone;
@@ -488,10 +492,16 @@ export default function Visualizer() {
     : holds.length === 0
       ? "Every route traced to a lawful origin"
       : `${holds.length} item${holds.length === 1 ? "" : "s"} held back`;
+  // What the phone trail says when no node is flagged.
+  const quiet = run?.singlePass
+    ? "No checks ran, so every dot stays green."
+    : run && !view.checked
+      ? "Checking every node."
+      : "Every node is proven. Tap a dot for its checks.";
   const status = statusText(view);
 
   return (
-    <div ref={root} className="bl-app bl-ui" id="instrument">
+    <div className="bl-app bl-ui" id="instrument">
       <div className="bl-app__chrome" aria-hidden="true">
         <i />
         <i />
@@ -519,7 +529,7 @@ export default function Visualizer() {
       </div>
       <div className="bl-app__body">
         <Sidebar />
-        <div className="bl-app__main">
+        <div className="bl-app__main" id="bl-stage">
           <div className="bl-crumbs">
             <span className="bl-crumbs__path">Petitions /</span>
             <b>{shown.investor.name}</b>
@@ -556,14 +566,10 @@ export default function Visualizer() {
               selected={state.panel?.kind === "node" ? state.panel.id : null}
               onSelect={(id) => dispatch({ type: "panel", panel: { kind: "node", id } })}
               label="Fund-flow trail. Select a node to see why it is green."
+              quiet={quiet}
             />
           </section>
-          <RouteCard sheet={sheet} mobile={mobile} onSheet={setSheet} />
-          {ready && sheet === "closed" && (
-            <button type="button" className="bl-btn bl-btn--small bl-btn--quiet bl-show-route" onClick={() => setSheet("open")}>
-              Show route card
-            </button>
-          )}
+          <RouteCard />
         </div>
         <GatesRail />
       </div>

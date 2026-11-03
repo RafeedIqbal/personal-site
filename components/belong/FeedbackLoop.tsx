@@ -2,7 +2,7 @@
 
 import { RULES, applyPatch, settle } from "@/lib/belong/checks";
 import { SCENARIOS, fileById } from "@/lib/belong/data";
-import { useDemo } from "./demo";
+import { showDemo, useDemo } from "./demo";
 import { StatusTag } from "./Status";
 
 const ERROR_SIX = SCENARIOS.find((s) => s.ruling) ?? SCENARIOS[5];
@@ -23,7 +23,7 @@ export default function FeedbackLoop() {
 
   const go = (replay: boolean) => {
     dispatch({ type: "start", scenarioId: ERROR_SIX.id, replay });
-    document.getElementById("instrument")?.scrollIntoView({ block: "start" });
+    showDemo();
   };
 
   return (
