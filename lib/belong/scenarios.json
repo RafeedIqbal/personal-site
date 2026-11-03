@@ -387,7 +387,7 @@
           "index": 1,
           "value": {
             "id": "c-spouse",
-            "label": "Transfer from Jonas Beispiel",
+            "label": "Transfer, J. Beispiel",
             "amount": 15000,
             "counterparty": "Jonas Beispiel",
             "date": "2026-01-14",
@@ -470,7 +470,7 @@
             "index": 1,
             "value": {
               "id": "c-spouse",
-              "label": "Transfer from Lea Probe",
+              "label": "Transfer, L. Probe",
               "amount": 8000,
               "counterparty": "Lea Probe",
               "date": "2026-01-20",

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { LAYERS, RULES, docById, logFor, money, nodeResults } from "@/lib/belong/checks";
+import { LAYERS, RULES, docById, logFor, nodeResults } from "@/lib/belong/checks";
 import { GATES, SCENARIOS } from "@/lib/belong/data";
 import type { Tiles } from "@/lib/belong/types";
-import { HOLD_WORDS, docTone, nodeTone, useDemo, type View } from "./demo";
-import { destinationName, RouteCard, type SheetMode } from "./RouteCard";
+import { HOLD_WORDS, docTone, gateTone, nodeTone, useDemo, type View } from "./demo";
+import { destinationName, PacketPanel, RouteCard, type SheetMode } from "./RouteCard";
 import { DocFacts, DocSheet, NodeChecks } from "./Sheet";
-import { StatusTag, type Tone } from "./Status";
+import { StatusIcon, StatusTag, type Tone } from "./Status";
 import { FundTrail } from "./Trail";
 import { useFocusTrap } from "./useFocusTrap";
 
@@ -25,303 +25,286 @@ function useMedia(query: string) {
 
 export const useReducedMotion = () => useMedia("(prefers-reduced-motion: reduce)");
 
+// Phase timing, in ms. One error takes about six seconds end to end.
+const PACE = { inject: 900, step: 700, caught: 1300, routed: 1300 };
+
 const SINGLE_STAGES = [
   { id: "documents", name: "Documents" },
   { id: "model", name: "One model call" },
   { id: "draft", name: "Draft" },
 ];
 
-// --------------------------------------------------------------- status copy
+const NUM = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+const usd = (value: number) => `$${NUM.format(value)}`;
+
+// --------------------------------------------------------------- copy
+
+const RESOLVED = {
+  clear: "Nothing to resolve.",
+  closed: "Corrected without an attorney.",
+  "waiting-client": "Waiting on the client.",
+  reserved: "Reserved for the attorney.",
+  "awaiting-ruling": "Your call: pick a treatment in the route card.",
+  "ruling-attached": "Ruling attached. Confirm it in the route card.",
+  ruled: "Ruled.",
+} as const;
 
 function statusText(view: View): string {
   const { run, scenario, settlement } = view;
-  if (!run || !scenario) {
-    return "Clean file. Every node is proven and the tiles are at baseline. Pick an error to inject.";
-  }
+  if (!run || !scenario) return "Clean file: every node is proven. Pick an error to inject.";
   if (run.singlePass) {
     return view.settled
-      ? `Generic single-pass pipeline: every label stays green. ${scenario.singlePass.result}`
-      : "Generic single-pass pipeline: one model reads the whole file once.";
+      ? `Every label stays green. ${scenario.singlePass.result}`
+      : "One model reads the whole file once.";
   }
-  const primary = settlement.primary;
   switch (run.phase) {
     case "injected":
       return run.replay
-        ? "Replaying error 6 on a second fictional file: EUR 8,000 of Tobias Probe's savings came from a spouse."
-        : `Error ${scenario.id} injected. ${scenario.injection}`;
+        ? "Second file: EUR 8,000 of Tobias Probe's savings came from a spouse."
+        : scenario.injection;
     case "running":
-      return "The token is moving through the layers.";
+      return "Running the file through the layers.";
     case "caught":
-      return primary
-        ? `Caught at ${LAYERS[view.catchIndex].name}. ${primary.detail}`
+      return settlement.primary
+        ? `Caught at ${LAYERS[view.catchIndex].name}. ${settlement.primary.detail}`
         : "No layer caught anything.";
     case "routed":
       return `Routed to ${settlement.hops.map((h) => destinationName(view, h.to)).join(", then ")}.`;
     case "resolved":
-      if (settlement.outcome === "awaiting-ruling") {
-        return "Reserved for the attorney. You play the attorney here: choose a treatment in the route card.";
-      }
-      if (settlement.outcome === "ruling-attached") {
-        return `Sent straight to the attorney with ruling ${settlement.hops[0].ruling?.id} attached. Confirm it in the route card.`;
-      }
-      return scenario.outcome;
+      return RESOLVED[settlement.outcome];
     case "learned":
-      return run.replay
-        ? `Ruling ${settlement.hops[0].ruling?.id} applied with one confirmation.`
-        : "Ruling saved. Replay the same error on a second file to see it used.";
+      return run.replay ? "Ruling reused with one confirmation." : "Ruling saved. Replay it on a second file.";
   }
 }
 
-const OUTCOME_NOTES = {
-  clear: { tone: "proven", note: "Nothing to resolve" },
-  closed: { tone: "proven", note: "Corrected" },
-  "waiting-client": { tone: "unsure", note: "Waiting on the client" },
-  reserved: { tone: "unsure", note: "Reserved for the attorney" },
-  "awaiting-ruling": { tone: "unsure", note: "Waiting for your ruling" },
-  "ruling-attached": { tone: "routed", note: "Ruling attached" },
-  ruled: { tone: "proven", note: "Ruled" },
-} as const;
-
 type StageTone = Tone | "idle" | "skip";
 
-function stageState(view: View, i: number): { tone: StageTone; note: string } {
-  const { run, settlement, shown } = view;
-  const docs = shown.documents.length;
-  const passNotes = [`${docs} documents read`, `${docs} labeled`, "Schemas valid", "All checks pass"];
-  if (!run) {
-    return i < 4 ? { tone: "proven", note: passNotes[i] } : { tone: "idle", note: "Nothing flagged" };
-  }
-  if (run.singlePass) {
-    const notes = [`${docs} documents`, "Labels and amounts", "Every label green"];
-    return run.token >= i && run.phase !== "injected"
-      ? { tone: "proven", note: notes[i] }
-      : { tone: "idle", note: "" };
-  }
-  const c = view.catchIndex;
+function stageTone(view: View, i: number): StageTone {
+  const { run, settlement } = view;
+  if (!run) return i < 4 ? "proven" : "idle";
   const reached = run.phase !== "injected" && run.token >= i;
-  if (i < c) return reached || view.checked ? { tone: "proven", note: passNotes[i] } : { tone: "idle", note: "" };
-  if (i === c) {
-    if (!view.checked) return { tone: reached ? "pending" : "idle", note: reached ? "Checking" : "" };
-    const rule = settlement.primary ? RULES[settlement.primary.rule].name : "";
-    return { tone: "failed", note: `Caught: ${rule}` };
+  if (run.singlePass) return reached ? "proven" : "idle";
+  const c = view.catchIndex;
+  if (i < c) return reached || view.checked ? "proven" : "idle";
+  if (i === c) return view.checked ? "failed" : reached ? "pending" : "idle";
+  if (i < 4) return view.checked ? "skip" : "idle";
+  if (i === 4) return run.token >= 4 ? "routed" : "idle";
+  if (i === 5) {
+    if (!view.settled) return "idle";
+    const outcome = settlement.outcome;
+    if (outcome === "closed" || outcome === "ruled") return "proven";
+    return outcome === "ruling-attached" ? "routed" : "unsure";
   }
-  if (i < 4) return view.checked ? { tone: "skip", note: "Not reached" } : { tone: "idle", note: "" };
-  if (i === 4) {
-    return run.token >= 4
-      ? { tone: "routed", note: settlement.hops.map((h) => destinationName(view, h.to)).join(", then ") }
-      : { tone: "idle", note: "" };
-  }
-  if (i === 5) return view.settled ? OUTCOME_NOTES[settlement.outcome] : { tone: "idle", note: "" };
-  if (run.phase === "learned") {
-    const id = settlement.hops[0]?.ruling?.id ?? "R-1";
-    return { tone: "proven", note: run.replay ? `Ruling ${id} reused` : "Ruling saved" };
-  }
-  return { tone: "idle", note: run.scenarioId === 6 && view.settled ? "After your ruling" : "" };
+  return run.phase === "learned" ? "proven" : "idle";
 }
 
 // --------------------------------------------------------------- pieces
 
-function ScenarioBar() {
+function Sidebar() {
   const { state, dispatch, view } = useDemo();
-  const { run, scenario } = view;
+  const { run } = view;
+  const log = state.log;
   return (
-    <div className="bl-bar">
-      <div className="bl-bar__row">
-        <div className="bl-bar__chips" role="group" aria-label="Errors you can inject">
-          {SCENARIOS.map((s) => (
-            <button
-              key={s.id}
-              id={`chip-${s.id}`}
-              type="button"
-              className="bl-chip"
-              aria-pressed={run?.scenarioId === s.id && !run.replay}
-              onClick={() => dispatch({ type: "start", scenarioId: s.id })}
-            >
-              <span className="bl-chip__n bl-num">{s.id}</span>
-              {s.chip}
-            </button>
-          ))}
-        </div>
-        <div className="bl-bar__tools">
-          <button
-            type="button"
-            className="bl-btn bl-btn--quiet"
-            onClick={() => dispatch({ type: "reset" })}
-            disabled={!run}
-          >
-            Reset
-          </button>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={state.singlePass}
-            className="bl-switch"
-            onClick={() => dispatch({ type: "singlePass", on: !state.singlePass })}
-          >
-            <span className="bl-switch__track" aria-hidden="true" />
-            Single-pass view
-          </button>
-        </div>
-      </div>
-      <p className="bl-bar__desc">
-        {run && scenario ? (
-          <>
-            <span className="bl-bar__type">{run.replay ? "Replay, second file" : scenario.failureType}</span>
-            {run.replay
-              ? "EUR 8,000 of Tobias Probe's savings came from a spouse. Ruling R-1 already exists."
-              : scenario.injection}
-          </>
-        ) : (
-          <>
-            <span className="bl-bar__type">Clean file</span>
-            Mara Beispiel, Demo Street Coffee LLC, consular route. One error runs at a time.
-          </>
-        )}
-      </p>
-    </div>
-  );
-}
-
-function Tray() {
-  const { dispatch, view } = useDemo();
-  const [open, setOpen] = useState(false);
-  const docs = view.shown.documents;
-  return (
-    <div className="bl-tray">
-      <button
-        type="button"
-        className="bl-tray__toggle"
-        aria-expanded={open}
-        aria-controls="bl-tray-list"
-        onClick={() => setOpen((v) => !v)}
-      >
-        File tray <span className="bl-num">{docs.length} documents</span>
-      </button>
-      <h3 className="bl-tray__title">
-        File tray <span className="bl-num">{docs.length}</span>
-      </h3>
-      <div id="bl-tray-list" className="bl-tray__list" data-open={open || undefined}>
-        {GATES.map((gate) => {
-          const inGate = docs.filter((doc) => doc.gate === gate.id);
-          if (inGate.length === 0) return null;
+    <nav className="bl-side" aria-label="Errors you can inject">
+      <p className="bl-cap">Break the file</p>
+      <ul className="bl-side__list">
+        {SCENARIOS.map((s) => {
+          const active = run?.scenarioId === s.id && !run.replay;
+          const done = state.done.includes(s.id);
           return (
-            <div key={gate.id} className="bl-tray__gate">
-              <p className="bl-tray__gname">{gate.name}</p>
-              <ul>
-                {inGate.map((doc) => {
-                  const affected = Boolean(view.run) && view.affected.includes(doc.id);
-                  return (
-                    <li key={doc.id}>
-                      <button
-                        type="button"
-                        className="bl-doc"
-                        data-affected={affected || undefined}
-                        onClick={() => dispatch({ type: "panel", panel: { kind: "doc", id: doc.id } })}
-                      >
-                        <span className="bl-doc__thumb" aria-hidden="true">
-                          <i />
-                          <i />
-                          <i />
-                        </span>
-                        <span className="bl-doc__title">
-                          {doc.title}
-                          {doc.lang === "de" && (
-                            <abbr className="bl-doc__lang" title="German">
-                              DE
-                            </abbr>
-                          )}
-                        </span>
-                        <span className="bl-doc__meta">
-                          <StatusTag {...docTone(view, doc.id)} />
-                          {affected && <span className="bl-doc__changed">Changed by this error</span>}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <li key={s.id}>
+              <button
+                id={`chip-${s.id}`}
+                type="button"
+                className="bl-side__item"
+                aria-pressed={active}
+                data-done={done || undefined}
+                onClick={() => dispatch({ type: "start", scenarioId: s.id })}
+              >
+                <span className="bl-side__mark bl-num" aria-hidden="true">
+                  {done && !active ? <StatusIcon tone="proven" /> : s.id}
+                </span>
+                <span className="bl-side__text">
+                  <span className="bl-side__name">{s.chip}</span>
+                  <span className="bl-side__sub">{s.failureType}</span>
+                </span>
+              </button>
+            </li>
           );
         })}
+      </ul>
+      <div className="bl-side__tools">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={state.singlePass}
+          className="bl-switch"
+          onClick={() => dispatch({ type: "singlePass", on: !state.singlePass })}
+        >
+          <span className="bl-switch__track" aria-hidden="true" />
+          Single-pass view
+        </button>
+        <button type="button" className="bl-link-btn" onClick={() => dispatch({ type: "reset" })} disabled={!run}>
+          Reset file
+        </button>
       </div>
-    </div>
+      <dl className="bl-side__log" aria-label="Run log">
+        <div>
+          <dt>Closed by a model</dt>
+          <dd className="bl-num">{log.closedNoAttorney}</dd>
+        </div>
+        <div>
+          <dt>Sent to the client</dt>
+          <dd className="bl-num">{log.sentToClient}</dd>
+        </div>
+        <div>
+          <dt>Sent to an attorney</dt>
+          <dd className="bl-num">{log.sentToAttorney}</dd>
+        </div>
+        <div>
+          <dt>Rulings</dt>
+          <dd className="bl-num">{log.rulings}</dd>
+        </div>
+      </dl>
+    </nav>
   );
 }
 
-function Rail() {
+function Stepper() {
   const { view } = useDemo();
   const { run } = view;
   const stages = run?.singlePass ? SINGLE_STAGES : LAYERS;
-  const states = stages.map((_, i) => stageState(view, i));
   const token = run ? Math.max(0, run.token) : 0;
-  const tokenTone =
-    run && !run.singlePass && view.checked
-      ? (states[Math.min(token, stages.length - 1)].tone as string)
-      : "ink";
+  const tones = stages.map((_, i) => stageTone(view, i));
   return (
-    <div className="bl-railwrap">
+    <div className="bl-stepwrap">
       <ol
-        className="bl-rail"
-        aria-label={run?.singlePass ? "Generic single-pass pipeline" : "Pipeline layers"}
+        className="bl-steps"
+        aria-label={run?.singlePass ? "Single-pass pipeline" : "Pipeline layers"}
         style={{ "--n": stages.length, "--t": token } as React.CSSProperties}
       >
         {stages.map((stage, i) => (
-          <li key={stage.id} className="bl-stage" data-tone={states[i].tone}>
-            <span className="bl-stage__dot" aria-hidden="true" />
-            <span className="bl-stage__name">{stage.name}</span>
-            <span className="bl-stage__note">{states[i].note}</span>
+          <li key={stage.id} data-tone={tones[i]}>
+            <span className="bl-steps__dot" aria-hidden="true" />
+            {stage.name}
+            {tones[i] === "failed" && view.settlement.primary && (
+              <span className="sr-only">, caught by {RULES[view.settlement.primary.rule].name}</span>
+            )}
           </li>
         ))}
         {run && run.phase !== "injected" && (
-          <span className="bl-token" data-tone={tokenTone} aria-hidden="true" />
+          <span className="bl-steps__token" data-tone={tones[Math.min(token, stages.length - 1)]} aria-hidden="true" />
         )}
       </ol>
     </div>
   );
 }
 
-const TILE_DEFS: { key: keyof Tiles; label: string; pct?: boolean }[] = [
-  { key: "intoEnterprise", label: "Into the enterprise" },
-  { key: "qualifying", label: "Qualifying" },
-  { key: "atRisk", label: "At risk" },
-  { key: "notYetDeployed", label: "Not yet deployed" },
-  { key: "weakestControl", label: "Weakest control", pct: true },
+function useTween(target: number, reduce: boolean) {
+  const [value, setValue] = useState(target);
+  const from = useRef(target);
+  useEffect(() => {
+    let frame = 0;
+    const start = performance.now();
+    const origin = from.current;
+    const tick = (now: number) => {
+      const p = reduce ? 1 : Math.min(1, (now - start) / 700);
+      const next = origin + (target - origin) * (1 - (1 - p) ** 3);
+      from.current = next;
+      setValue(next);
+      if (p < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, reduce]);
+  return Math.round(value);
+}
+
+const TILE_DEFS: { key: keyof Tiles; label: string; sub: string; tone?: "proven" | "unsure" }[] = [
+  { key: "intoEnterprise", label: "Into the enterprise", sub: "Capital contributed" },
+  { key: "qualifying", label: "Qualifying", sub: "Traced and committed", tone: "proven" },
+  { key: "atRisk", label: "At risk", sub: "Spent or in escrow", tone: "proven" },
+  { key: "notYetDeployed", label: "Not yet deployed", sub: "Still in the bank", tone: "unsure" },
+  { key: "weakestControl", label: "Weakest control", sub: "Lowest on any route" },
 ];
 
-export function TilesPanel({ view }: { view: View }) {
-  const { tiles, baseline, holds } = view;
-  const show = (value: number, pct?: boolean) => (pct ? `${value}%` : money("USD", value));
+function Tile({ def, value, base, reduce }: { def: (typeof TILE_DEFS)[number]; value: number; base: number; reduce: boolean }) {
+  const shown = useTween(value, reduce);
+  const pct = def.key === "weakestControl";
+  const format = (n: number) => (pct ? `${n}%` : usd(n));
+  const changed = value !== base;
   return (
-    <div className="bl-tilewrap">
-      <dl className="bl-tiles">
-        {TILE_DEFS.map(({ key, label, pct }) => {
-          const changed = tiles[key] !== baseline[key];
-          return (
-            <div key={key} className="bl-tile" data-changed={changed || undefined}>
-              <dt>{label}</dt>
-              <dd className="bl-tile__v bl-num">{show(tiles[key], pct)}</dd>
-              {changed && (
-                <dd className="bl-tile__was">
-                  was <span className="bl-num">{show(baseline[key], pct)}</span>
-                </dd>
-              )}
-            </div>
-          );
-        })}
-      </dl>
-      {holds.length > 0 && (
-        <ul className="bl-held" aria-label="Held back from qualifying">
-          {holds.map((hold) => (
-            <li key={hold.target}>
-              <StatusTag {...HOLD_WORDS[hold.kind]} />
-              <span className="bl-num">{money("USD", hold.amountUsd)}</span>
-              {!hold.counts && <span className="bl-muted">never counted as investment</span>}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="bl-tile" data-changed={changed || undefined}>
+      <dt>{def.label}</dt>
+      <dd className="bl-tile__v" data-tone={def.tone}>
+        {format(shown)}
+      </dd>
+      <dd className="bl-tile__sub">{changed ? `was ${format(base)}` : def.sub}</dd>
     </div>
   );
+}
+
+function TilesPanel({ view, reduce }: { view: View; reduce: boolean }) {
+  return (
+    <dl className="bl-tiles">
+      {TILE_DEFS.map((def) => (
+        <Tile key={def.key} def={def} value={view.tiles[def.key]} base={view.baseline[def.key]} reduce={reduce} />
+      ))}
+    </dl>
+  );
+}
+
+function GatesRail() {
+  const { dispatch, view } = useDemo();
+  const [open, setOpen] = useState(false);
+  return (
+    <aside className="bl-gates" aria-label="The nine gates">
+      <button
+        type="button"
+        className="bl-gates__toggle"
+        aria-expanded={open}
+        aria-controls="bl-gate-list"
+        onClick={() => setOpen((v) => !v)}
+      >
+        The nine gates
+      </button>
+      <p className="bl-cap bl-gates__title">The nine gates</p>
+      <ul id="bl-gate-list" className="bl-gates__list" data-open={open || undefined}>
+        {GATES.map((gate) => {
+          const status = gateTone(view, gate.id);
+          const empty = status.count === "—";
+          return (
+            <li key={gate.id}>
+              <button
+                type="button"
+                className="bl-gate"
+                disabled={empty}
+                onClick={() => dispatch({ type: "panel", panel: { kind: "gate", id: gate.id } })}
+              >
+                <span className="bl-gate__mark" data-tone={status.tone} aria-hidden="true" />
+                <span className="bl-gate__name">{gate.name}</span>
+                <span className="bl-gate__count bl-num">{status.count}</span>
+                <span className="sr-only">, {status.word}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
+  );
+}
+
+function trailLabel(view: View, nodeId: string): string | undefined {
+  const labels: Record<string, string> = {
+    "account:savings": view.shown.accounts.savings.label,
+    "account:us": view.shown.accounts.us.label,
+    "account:llc": view.shown.accounts.llc.label,
+    escrow: "Purchase escrow",
+    spend: "Equipment and lease",
+    idle: "Not yet deployed",
+    "note:seller": "Seller note",
+  };
+  return labels[nodeId] ?? view.shown.accounts.savings.credits.find((c) => `credit:${c.id}` === nodeId)?.label;
 }
 
 function Drawer() {
@@ -352,11 +335,51 @@ function Drawer() {
   }, [panel]);
 
   if (!panel) return null;
-  const doc = panel.kind === "doc" ? docById(view.shown, panel.id) : undefined;
-  const node = panel.kind === "node" ? panel.id : null;
-  const title = doc
-    ? doc.title
-    : (FundTrailLabel(view, node as string) ?? "Trail node");
+  let title = "Packet";
+  let body: React.ReactNode = <PacketPanel view={view} />;
+  if (panel.kind === "doc") {
+    const doc = docById(view.shown, panel.id);
+    title = doc?.title ?? "Document";
+    const primary = view.settlement.primary;
+    body = doc && (
+      <>
+        <DocFacts doc={doc} />
+        <DocSheet doc={doc} highlight={primary?.src?.doc === doc.id ? primary.src.line : undefined} tone="failed" />
+      </>
+    );
+  } else if (panel.kind === "node") {
+    title = trailLabel(view, panel.id) ?? "Trail node";
+    body = (
+      <>
+        {view.run?.singlePass && (
+          <p className="bl-muted">The single-pass pipeline ran none of these checks.</p>
+        )}
+        <NodeChecks results={nodeResults(view.results, panel.id)} file={view.shown} />
+      </>
+    );
+  } else if (panel.kind === "gate") {
+    const gate = GATES.find((g) => g.id === panel.id);
+    title = gate?.name ?? "Gate";
+    body = (
+      <ul className="bl-gate-docs">
+        {view.shown.documents
+          .filter((doc) => doc.gate === panel.id)
+          .map((doc) => (
+            <li key={doc.id}>
+              <button
+                type="button"
+                className="bl-gate-doc"
+                data-affected={(view.run && view.affected.includes(doc.id)) || undefined}
+                onClick={() => dispatch({ type: "panel", panel: { kind: "doc", id: doc.id } })}
+              >
+                <span>{doc.title}</span>
+                <StatusTag {...docTone(view, doc.id)} />
+              </button>
+            </li>
+          ))}
+      </ul>
+    );
+  }
 
   return (
     <div ref={box} className="bl-drawer" role="dialog" aria-modal="true" aria-labelledby="bl-drawer-title">
@@ -364,68 +387,16 @@ function Drawer() {
         <h3 id="bl-drawer-title" ref={heading} tabIndex={-1}>
           {title}
         </h3>
-        <button type="button" className="bl-btn bl-btn--quiet" onClick={() => dispatch({ type: "panel", panel: null })}>
+        <button type="button" className="bl-btn bl-btn--small bl-btn--quiet" onClick={() => dispatch({ type: "panel", panel: null })}>
           Close
         </button>
       </div>
-      <div className="bl-drawer__body">
-        {doc && (
-          <>
-            <DocFacts doc={doc} />
-            <DocSheet doc={doc} highlight={view.settlement.primary?.src?.doc === doc.id ? view.settlement.primary.src.line : undefined} tone="failed" />
-          </>
-        )}
-        {node && (
-          <>
-            <p className="bl-muted">
-              {view.run?.singlePass
-                ? "The single-pass pipeline ran no checks here. Below is what the checks find when run separately on the same file."
-                : "Every check below ran in your browser on this file."}
-            </p>
-            <NodeChecks results={nodeResults(view.results, node)} file={view.shown} />
-          </>
-        )}
-      </div>
+      <div className="bl-drawer__body">{body}</div>
     </div>
   );
 }
 
-function FundTrailLabel(view: View, nodeId: string): string | undefined {
-  if (nodeId === "account:savings") return view.shown.accounts.savings.label;
-  if (nodeId === "account:us") return view.shown.accounts.us.label;
-  if (nodeId === "account:llc") return view.shown.accounts.llc.label;
-  if (nodeId === "escrow") return "Purchase escrow";
-  if (nodeId === "spend") return "Equipment and lease";
-  if (nodeId === "idle") return "Not yet deployed";
-  if (nodeId === "note:seller") return "Seller note";
-  return view.shown.accounts.savings.credits.find((c) => `credit:${c.id}` === nodeId)?.label;
-}
-
-function RunLogBar() {
-  const { state } = useDemo();
-  const entries = [
-    { label: "Closed without an attorney", value: state.log.closedNoAttorney },
-    { label: "Sent to the client", value: state.log.sentToClient },
-    { label: "Sent to an attorney", value: state.log.sentToAttorney },
-    { label: "Rulings created", value: state.log.rulings },
-  ];
-  return (
-    <div className="bl-log">
-      <h3 className="bl-log__title">Run log</h3>
-      <dl>
-        {entries.map((entry) => (
-          <div key={entry.label}>
-            <dt>{entry.label}</dt>
-            <dd className="bl-num">{entry.value}</dd>
-          </div>
-        ))}
-      </dl>
-      <p className="bl-log__note">Counts demo events in this visit only. It never claims time saved.</p>
-    </div>
-  );
-}
-
-// --------------------------------------------------------------- instrument
+// --------------------------------------------------------------- the window
 
 export default function Visualizer() {
   const { state, dispatch, view } = useDemo();
@@ -454,20 +425,20 @@ export default function Visualizer() {
     }
     switch (run.phase) {
       case "injected":
-        return step("running", 0, 320);
+        return step("running", 0, PACE.inject);
       case "running":
-        if (run.token < last) return step("running", run.token + 1, 240);
-        return step(run.singlePass ? "resolved" : "caught", run.token, 240);
+        if (run.token < last) return step("running", run.token + 1, PACE.step);
+        return step(run.singlePass ? "resolved" : "caught", run.token, PACE.step);
       case "caught":
-        return step("routed", 4, 520);
+        return step("routed", 4, PACE.caught);
       case "routed":
-        return step("resolved", 5, 520);
+        return step("resolved", 5, PACE.routed);
     }
   }, [run, view.catchIndex, reduce, dispatch]);
 
   useEffect(() => {
     if (!run || run.singlePass || run.phase !== "resolved") return;
-    dispatch({ type: "finish", runId: run.id, delta: logFor(view.settlement) });
+    dispatch({ type: "finish", runId: run.id, scenarioId: run.scenarioId, delta: logFor(view.settlement) });
   }, [run, view.settlement, dispatch]);
 
   useEffect(() => {
@@ -483,13 +454,7 @@ export default function Visualizer() {
   const routed = run && !run.singlePass && ["routed", "resolved", "learned"].includes(run.phase);
   const ready = Boolean(run && (routed || (run.singlePass && view.settled)));
   const chosen = run && sheetFor?.run === run.id ? sheetFor.mode : "peek";
-  const sheet: SheetMode = !run
-    ? "none"
-    : !ready
-      ? "closed"
-      : chosen === "open" || inView
-        ? chosen
-        : "closed";
+  const sheet: SheetMode = !run ? "none" : !ready ? "closed" : chosen === "open" || inView ? chosen : "closed";
   const setSheet = (mode: "peek" | "open" | "closed") => {
     if (!run) return;
     setSheetFor({ run: run.id, mode });
@@ -509,35 +474,100 @@ export default function Visualizer() {
     return "neutral";
   };
 
+  const { scenario, shown, holds } = view;
+  const caption = !run || !scenario
+    ? "Clean file"
+    : run.replay
+      ? "Replay, second file"
+      : run.singlePass
+        ? `Single-pass view, error ${scenario.id} of 6`
+        : `Error ${scenario.id} of 6`;
+  const caseId = shown.id === "demo-2" ? "DEMO-2026-0002" : "DEMO-2026-0001";
+  const trailNote = run?.singlePass
+    ? "No checks ran"
+    : holds.length === 0
+      ? "Every route traced to a lawful origin"
+      : `${holds.length} item${holds.length === 1 ? "" : "s"} held back`;
+  const status = statusText(view);
+
   return (
-    <div ref={root} className="bl-viz bl-ui" id="instrument">
-      <ScenarioBar />
-      <div className="bl-viz__body">
-        <Tray />
-        <div className="bl-viz__main">
-          <Rail />
-          <p className="bl-viz__status" role="status" aria-live="polite">
-            {statusText(view)}
+    <div ref={root} className="bl-app bl-ui" id="instrument">
+      <div className="bl-app__chrome" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <span>Break this file · {caption}</span>
+      </div>
+      <div className="bl-app__top">
+        <span className="bl-app__brand">
+          <span className="bl-app__mark">Belong</span>
+          <span className="bl-app__product">E-2 petition assembly</span>
+        </span>
+        <span className="bl-app__nav" aria-hidden="true">
+          <span>Petitions</span>
+          <span>Reference</span>
+        </span>
+        <span className="bl-app__user">
+          <span>
+            <b>You</b>
+            <small>Immigration attorney</small>
+          </span>
+          <span className="bl-app__avatar" aria-hidden="true">
+            Y
+          </span>
+        </span>
+      </div>
+      <div className="bl-app__body">
+        <Sidebar />
+        <div className="bl-app__main">
+          <div className="bl-crumbs">
+            <span className="bl-crumbs__path">Petitions /</span>
+            <b>{shown.investor.name}</b>
+            <span className="bl-num bl-crumbs__id">{caseId}</span>
+            <span className="bl-pill bl-pill--soft">E-2</span>
+            <span className="bl-crumbs__route">DE → US</span>
+          </div>
+          <Stepper />
+          <p className="bl-status" role="status" aria-live="polite">
+            <span key={status} className="bl-fade">
+              {status}
+            </span>
           </p>
-          <FundTrail
-            file={view.shown}
-            toneOf={(id) => nodeTone(view, id)}
-            edgeTone={edgeTone}
-            selected={state.panel?.kind === "node" ? state.panel.id : null}
-            onSelect={(id) => dispatch({ type: "panel", panel: { kind: "node", id } })}
-            label="Fund trail. Select a node to see its checks."
-          />
-          <TilesPanel view={view} />
+          <TilesPanel view={view} reduce={reduce} />
+          <section className="bl-card" aria-labelledby="bl-trail-title">
+            <header className="bl-card__head">
+              <h3 id="bl-trail-title">Fund-flow trail</h3>
+              <p>{trailNote}</p>
+              {holds.length > 0 && !run?.singlePass && (
+                <ul className="bl-held">
+                  {holds.map((hold) => (
+                    <li key={hold.target}>
+                      <StatusTag {...HOLD_WORDS[hold.kind]} />
+                      <span className="bl-num">{usd(hold.amountUsd)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </header>
+            <FundTrail
+              file={shown}
+              toneOf={(id) => nodeTone(view, id)}
+              edgeTone={edgeTone}
+              selected={state.panel?.kind === "node" ? state.panel.id : null}
+              onSelect={(id) => dispatch({ type: "panel", panel: { kind: "node", id } })}
+              label="Fund-flow trail. Select a node to see why it is green."
+            />
+          </section>
+          <RouteCard sheet={sheet} mobile={mobile} onSheet={setSheet} />
           {ready && sheet === "closed" && (
-            <button type="button" className="bl-btn bl-btn--quiet bl-show-route" onClick={() => setSheet("open")}>
+            <button type="button" className="bl-btn bl-btn--small bl-btn--quiet bl-show-route" onClick={() => setSheet("open")}>
               Show route card
             </button>
           )}
         </div>
-        <RouteCard sheet={sheet} mobile={mobile} onSheet={setSheet} />
-        <Drawer />
+        <GatesRail />
       </div>
-      <RunLogBar />
+      <Drawer />
     </div>
   );
 }

@@ -8,31 +8,31 @@ import { LAYER_INDEX, useDemo } from "./demo";
 const COPY: Record<string, { job: string; shape: string }> = {
   read: {
     job: "Extracts text, tables and each value’s page position.",
-    shape: "I would choose the parser through a bake-off on Belong’s own files, because public leaderboards do not cover them.",
+    shape: "Parser chosen by a bake-off on Belong’s own files.",
   },
   sort: {
-    job: "Labels each document and its legal gate with calibrated confidence.",
-    shape: "This strengthens Sorting. Cross-document checks then catch the mistakes a confidence score misses, such as a wrong label at 0.97.",
+    job: "Labels each document and its gate, with a confidence score.",
+    shape: "Builds on Sorting. Cross-document checks catch confident mistakes.",
   },
   normalize: {
-    job: "Converts non-standard financial documents into one schema.",
-    shape: "The original value, its source page and any translation stay together, so every number can be traced back to a page.",
+    job: "Puts every financial document into one schema.",
+    shape: "Keeps the original value, its page and its translation together.",
   },
   check: {
     job: "Runs versioned rules in plain code.",
-    shape: "Fund trace nodes earn their labels from these results. The checks cost almost nothing per file, so they run on everything.",
+    shape: "Fund trace nodes earn their labels here, on every file, at almost no cost.",
   },
   route: {
     job: "Sends each flagged item to the right resolver.",
-    shape: "This extends the pattern of questions reserved to the attorney that Belong already has.",
+    shape: "Extends “reserved to the attorney”.",
   },
   resolve: {
-    job: "Lets a frontier model, a domain model, the client or an attorney close the item.",
-    shape: "The attorney remains the final authority. Model calls run only on flagged items, which keeps cost per file down.",
+    job: "A model, the client or an attorney closes the item.",
+    shape: "The attorney stays the final authority.",
   },
   learn: {
-    job: "Turns corrections into rulings, tests and approved training data.",
-    shape: "I call them rulings, because one attorney’s correction is not legal precedent.",
+    job: "Turns corrections into rulings, tests and training data.",
+    shape: "Rulings, not precedent: one correction is not law.",
   },
 };
 
@@ -50,7 +50,7 @@ function errorsFor(index: number): number[] {
 
 export default function SystemLayers() {
   const { dispatch } = useDemo();
-  const [open, setOpen] = useState<string | null>("check");
+  const [open, setOpen] = useState<string | null>(null);
   const list = useRef<HTMLOListElement>(null);
 
   // Draw the diagram as it scrolls in. Rows already on screen, or any row
@@ -107,10 +107,10 @@ export default function SystemLayers() {
                   <p>{copy.shape}</p>
                   <p className="bl-layer__catches">
                     {errors.length === 0 ? (
-                      "Catches nothing on its own here. A reader never knows it misread; the balance check catches error 1."
+                      "A reader never knows it misread. The balance check catches error 1."
                     ) : (
                       <>
-                        {index <= 3 ? "Catches in the demo:" : "Used by:"}{" "}
+                        {index <= 3 ? "Catches" : "Handles"}{" "}
                         {errors.map((id) => (
                           <button key={id} type="button" className="bl-chip bl-chip--small" onClick={() => tryError(id)}>
                             <span className="bl-chip__n bl-num">{id}</span>
@@ -121,12 +121,6 @@ export default function SystemLayers() {
                     )}
                   </p>
                 </div>
-              )}
-              {layer.id === "check" && (
-                <p className="bl-layer__aside">Clear items pass straight through to drafting.</p>
-              )}
-              {layer.id === "learn" && (
-                <p className="bl-layer__aside">Rulings and tests feed Check and Route on the next file.</p>
               )}
             </div>
           </li>

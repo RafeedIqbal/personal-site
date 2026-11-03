@@ -2,17 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { DemoProvider } from "@/components/belong/demo";
 import BreakFile from "@/sections/belong/BreakFile";
 import Colophon from "@/sections/belong/Colophon";
-import Coverage from "@/sections/belong/Coverage";
-import Evidence from "@/sections/belong/Evidence";
 import Hero from "@/sections/belong/Hero";
 import Judged from "@/sections/belong/Judged";
-import Knowledge from "@/sections/belong/Knowledge";
 import Loop from "@/sections/belong/Loop";
-import Milestones from "@/sections/belong/Milestones";
 import NextStep from "@/sections/belong/NextStep";
 import Ownership from "@/sections/belong/Ownership";
 import Problem from "@/sections/belong/Problem";
-import Routing from "@/sections/belong/Routing";
 import System from "@/sections/belong/System";
 
 const title = "Making the machine right";
@@ -35,11 +30,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6F4EE" },
-    { media: "(prefers-color-scheme: dark)", color: "#10171E" },
-  ],
-  colorScheme: "light dark",
+  themeColor: "#EDF0F3",
+  colorScheme: "light",
 };
 
 export default function BelongPage() {
@@ -52,15 +44,10 @@ export default function BelongPage() {
         <Hero />
         <Problem />
         <BreakFile />
-        <Coverage />
         <System />
-        <Routing />
-        <Evidence />
-        <Knowledge />
         <Loop />
         <Judged />
         <Ownership />
-        <Milestones />
         <NextStep />
       </main>
       <Colophon />

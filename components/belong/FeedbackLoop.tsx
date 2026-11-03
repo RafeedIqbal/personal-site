@@ -1,14 +1,14 @@
 "use client";
 
-import { applyPatch, settle } from "@/lib/belong/checks";
+import { RULES, applyPatch, settle } from "@/lib/belong/checks";
 import { SCENARIOS, fileById } from "@/lib/belong/data";
 import { useDemo } from "./demo";
 import { StatusTag } from "./Status";
 
 const ERROR_SIX = SCENARIOS.find((s) => s.ruling) ?? SCENARIOS[5];
 
-// Correction, ruling, test, training data: driven by the reader's ruling, and
-// the test really runs the router on the second file.
+// Correction, ruling, test, training data: driven by the reader's ruling in
+// error 6. The test really runs the router on the second file.
 export default function FeedbackLoop() {
   const { state, dispatch } = useDemo();
   const ruling = state.rulings[0];
@@ -31,63 +31,36 @@ export default function FeedbackLoop() {
       <ol className="bl-loop__steps">
         <li>
           <h3>Correction</h3>
-          {option ? (
-            <p>You chose: {option.label.toLowerCase()}.</p>
-          ) : (
-            <p className="bl-muted">Waiting for an attorney’s answer on error 6.</p>
-          )}
+          <p>{option ? `You chose: ${option.label.toLowerCase()}.` : "An attorney answers the packet for error 6."}</p>
         </li>
         <li>
           <h3>Ruling</h3>
-          {ruling ? (
-            <p>
-              <span className="bl-num">{ruling.id}</span>, consular route, effective{" "}
-              <span className="bl-num">{ruling.effective}</span>. Scoped to transfers from a spouse into the
-              investor’s sole account.
-            </p>
-          ) : (
-            <p className="bl-muted">None yet.</p>
-          )}
+          <p>
+            {ruling
+              ? `${ruling.id}, effective ${ruling.effective}, consular route.`
+              : "Saved with an effective date and a filing route."}
+          </p>
+          <p className="bl-loop__path">
+            E-2 › Source of funds › {RULES.origin.name} rule › {RULES.origin.citation} › {ruling?.id ?? "ruling"}
+          </p>
         </li>
         <li>
           <h3>Test</h3>
-          <pre className="bl-code">
-            <code>{`test("spouse transfer goes to the attorney with ${ruling?.id ?? "R-1"}", () => {
-  const item = settle(secondFile, error6, { rulings });
-  expect(item.hops[0].to).toBe("attorney");
-  expect(item.hops[0].ruling.id).toBe("${ruling?.id ?? "R-1"}");
-});`}</code>
-          </pre>
+          <p>The same error on a second file must reach the attorney with the ruling attached.</p>
           {ruling ? (
-            passes ? (
-              <StatusTag tone="proven" word="Passes, run in your browser" />
-            ) : (
-              <StatusTag tone="failed" word="Fails" />
-            )
+            <StatusTag tone={passes ? "proven" : "failed"} word={passes ? "Passes" : "Fails"} />
           ) : (
             <StatusTag tone="neutral" word="Not run yet" />
           )}
         </li>
         <li>
-          <h3>Approved training data</h3>
-          <p>
-            The packet and the attorney’s answer are queued as a training example. No model sees it until an
-            attorney signs off and the client’s consent covers it.
-          </p>
-          <StatusTag tone={ruling ? "unsure" : "neutral"} word={ruling ? "Waiting for sign-off" : "Nothing queued"} />
+          <h3>Training data</h3>
+          <p>Queued, and used only after attorney sign-off and client consent.</p>
         </li>
       </ol>
-      <p className="bl-loop__cta">
-        {ruling ? (
-          <button type="button" className="bl-btn" onClick={() => go(true)}>
-            Replay error 6 on a second file
-          </button>
-        ) : (
-          <button type="button" className="bl-btn" onClick={() => go(false)}>
-            Rule on error 6
-          </button>
-        )}
-      </p>
+      <button type="button" className="bl-btn" onClick={() => go(Boolean(ruling))}>
+        {ruling ? "Replay error 6 on a second file" : "Rule on error 6"}
+      </button>
     </div>
   );
 }

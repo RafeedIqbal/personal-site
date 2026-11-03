@@ -2,10 +2,10 @@
 
 import { money, trail } from "@/lib/belong/checks";
 import type { CaseFile, TrailNode } from "@/lib/belong/types";
-import { StatusTag, type Tone } from "./Status";
+import { StatusIcon, type Tone } from "./Status";
 
-const ROW_H = 100;
-const ROWS = 5;
+const HEIGHT = 210;
+const COLUMNS = [8.5, 29, 50, 71, 91.5];
 
 type ToneOf = (nodeId: string) => { tone: Tone; word: string };
 
@@ -22,25 +22,33 @@ function NodeButton({
   onSelect: (id: string) => void;
   style?: React.CSSProperties;
 }) {
+  // State shows as border colour plus a distinct icon; the word is in the
+  // tooltip and for screen readers, and the trail header names held amounts.
   return (
     <button
       type="button"
       className="bl-node"
       data-tone={status.tone}
       aria-pressed={selected}
+      title={`${node.label}: ${status.word}`}
       onClick={() => onSelect(node.id)}
       style={style}
     >
       <span className="bl-node__label">{node.label}</span>
-      <span className="bl-node__amt bl-num">{money(node.ccy, node.amount)}</span>
-      <StatusTag {...status} />
+      <span className="bl-node__row">
+        <span className="bl-node__amt bl-num">{money(node.ccy, node.amount)}</span>
+        <span className="bl-node__state" data-tone={status.tone}>
+          <StatusIcon tone={status.tone} />
+          <span className="sr-only">{status.word}</span>
+        </span>
+      </span>
     </button>
   );
 }
 
-// The fund trail drawn top-down: sources, savings, the wire, the US account,
-// then escrow and the operating account. Below ~560px of its own width it
-// becomes a list (container query in belong.css).
+// The fund-flow trail, left to right like Belong's Fund trace: sources,
+// savings, US account, escrow and the operating account, then where the money
+// went. Below ~560px of its own width it becomes a list (container query).
 export function FundTrail({
   file,
   toneOf,
@@ -58,16 +66,15 @@ export function FundTrail({
 }) {
   const { nodes, edges } = trail(file);
   const byId = new Map(nodes.map((n) => [n.id, n]));
-  const y = (row: number) => row * ROW_H + ROW_H / 2;
-  const height = ROWS * ROW_H;
-  const wire = edges.find((e) => e.id === "edge:wire");
+  const x = (node: TrailNode) => COLUMNS[node.col];
+  const y = (node: TrailNode) => node.y * HEIGHT;
 
   return (
     <div className="bl-trail" role="group" aria-label={label}>
-      <div className="bl-trail__graph" style={{ height }}>
+      <div className="bl-trail__graph" style={{ height: HEIGHT }}>
         <svg
           className="bl-trail__edges"
-          viewBox={`0 0 100 ${height}`}
+          viewBox={`0 0 100 ${HEIGHT}`}
           preserveAspectRatio="none"
           aria-hidden="true"
           focusable="false"
@@ -75,24 +82,18 @@ export function FundTrail({
           {edges.map((edge) => {
             const a = byId.get(edge.from) as TrailNode;
             const b = byId.get(edge.to) as TrailNode;
-            const mid = (y(a.row) + y(b.row)) / 2;
-            const tone = edgeTone?.(edge.id, edge.from, edge.to) ?? "neutral";
+            const mid = (x(a) + x(b)) / 2;
             return (
               <path
                 key={edge.id}
-                d={`M ${a.x} ${y(a.row)} C ${a.x} ${mid}, ${b.x} ${mid}, ${b.x} ${y(b.row)}`}
-                data-tone={tone}
+                d={`M ${x(a)} ${y(a)} C ${mid} ${y(a)}, ${mid} ${y(b)}, ${x(b)} ${y(b)}`}
+                data-tone={edgeTone?.(edge.id, edge.from, edge.to) ?? "neutral"}
                 data-dashed={edge.dashed || undefined}
                 vectorEffect="non-scaling-stroke"
               />
             );
           })}
         </svg>
-        {wire?.label && (
-          <span className="bl-trail__wire bl-num" style={{ top: ROW_H * 2 - 8 }}>
-            Wire {wire.label}
-          </span>
-        )}
         {nodes.map((node) => (
           <NodeButton
             key={node.id}
@@ -100,18 +101,15 @@ export function FundTrail({
             status={toneOf(node.id)}
             selected={selected === node.id}
             onSelect={onSelect}
-            style={{ left: `${node.x}%`, top: y(node.row) }}
+            style={{ left: `${x(node)}%`, top: y(node) }}
           />
         ))}
       </div>
       <ol className="bl-trail__list">
         {[...nodes]
-          .sort((a, b) => a.row - b.row || a.x - b.x)
+          .sort((a, b) => a.col - b.col || a.y - b.y)
           .map((node) => (
-            <li key={node.id} data-row={node.row}>
-              {node.id === "account:us" && wire?.label && (
-                <span className="bl-trail__wire-inline bl-num">Wire {wire.label}</span>
-              )}
+            <li key={node.id} data-col={node.col}>
               <NodeButton
                 node={node}
                 status={toneOf(node.id)}

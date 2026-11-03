@@ -41,12 +41,6 @@ export function DocSheet({
           </li>
         ))}
       </ol>
-      {doc.lang === "de" && (
-        <figcaption className="bl-sheet__cap">
-          English lines are simulated machine translation, a reading aid only.
-          A filing needs a certified translation.
-        </figcaption>
-      )}
     </figure>
   );
 }
@@ -57,8 +51,7 @@ export function DocFacts({ doc }: { doc: Doc }) {
       <div>
         <dt>Labeled as</dt>
         <dd>
-          {KIND_NAMES[doc.sort.label]}, <span className="bl-num">{doc.sort.confidence.toFixed(2)}</span>{" "}
-          <span className="bl-sim">Simulated model output</span>
+          {KIND_NAMES[doc.sort.label]}, <span className="bl-num">{doc.sort.confidence.toFixed(2)}</span>
         </dd>
       </div>
       <div>

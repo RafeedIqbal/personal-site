@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  KIND_NAMES,
-  RULES,
-  docById,
-  fill,
-  makeRuling,
-  money,
-} from "@/lib/belong/checks";
+import { KIND_NAMES, RULES, docById, fill, makeRuling, money } from "@/lib/belong/checks";
 import { GATES } from "@/lib/belong/data";
 import type {
   CaseFile,
@@ -21,7 +14,6 @@ import type {
 } from "@/lib/belong/types";
 import { EMPTY_LOG, useDemo, type View } from "./demo";
 import { DocSheet } from "./Sheet";
-import { Simulated, StatusTag } from "./Status";
 import { useFocusTrap } from "./useFocusTrap";
 
 export type SheetMode = "none" | "peek" | "open" | "closed";
@@ -41,20 +33,16 @@ const QUESTION_NAMES = {
   "loan-or-gift": "gift or loan",
 } as const;
 
-function reason(view: View, hop: RouteHop, index: number): string {
-  const name = destinationName(view, hop.to);
+function reason(hop: RouteHop): string {
   if (hop.reason === "ruling") {
-    return `A hard rule sends ${QUESTION_NAMES[hop.question]} questions to the attorney. Ruling ${hop.ruling?.id} is attached, so the attorney confirms instead of starting over.`;
+    return `Ruling ${hop.ruling?.id} already covers ${QUESTION_NAMES[hop.question]}, so the attorney confirms instead of starting over.`;
   }
   if (hop.reason === "reserved") {
-    const lead = index > 0 ? `The ${destinationName(view, "domain").toLowerCase()} raised a ${QUESTION_NAMES[hop.question]} question. ` : "";
-    return `${lead}A hard rule reserves ${QUESTION_NAMES[hop.question]} questions to the attorney. No model can override it.`;
+    return `Questions about ${QUESTION_NAMES[hop.question]} are reserved to the attorney by a hard rule.`;
   }
-  if (hop.reason === "model-failed") {
-    return "The model's answer did not satisfy the arithmetic, so the item goes to the attorney.";
-  }
-  if (hop.reason === "unsure") return "The router was unsure, so the item goes to an attorney.";
-  return `The ${name.toLowerCase()} is the cheapest destination likely to resolve this. Router score ${hop.score?.toFixed(2)}, simulated.`;
+  if (hop.reason === "model-failed") return "The model's answer failed the arithmetic, so an attorney decides.";
+  if (hop.reason === "unsure") return "The router was unsure, so an attorney decides.";
+  return `The cheapest destination likely to resolve it (router score ${hop.score?.toFixed(2)}).`;
 }
 
 const ROUTES = {
@@ -62,6 +50,7 @@ const ROUTES = {
   uscis: "Inside the US, Form I-129",
 };
 
+// The packet a resolver receives: the page crop and the one exact question.
 export function Packet({
   file,
   scenario,
@@ -81,15 +70,7 @@ export function Packet({
         {primary.extracted && (
           <div>
             <dt>Extracted value</dt>
-            <dd>
-              <span className="bl-num">{primary.extracted}</span>
-              {primary.reviewer.includes("simulated") && (
-                <>
-                  {" "}
-                  <Simulated />
-                </>
-              )}
-            </dd>
+            <dd className="bl-num">{primary.extracted}</dd>
           </div>
         )}
         <div>
@@ -100,7 +81,7 @@ export function Packet({
         </div>
         <div>
           <dt>Citation</dt>
-          <dd className="bl-num">{RULES[primary.rule].citation ?? "Arithmetic, no citation needed"}</dd>
+          <dd className="bl-num">{RULES[primary.rule].citation ?? "Arithmetic"}</dd>
         </div>
         <div>
           <dt>Candidate answers</dt>
@@ -121,10 +102,67 @@ export function Packet({
   );
 }
 
-function Resolution() {
+// Everything behind "Open packet": router inputs, the packet, and what the
+// resolver sent back.
+export function PacketPanel({ view }: { view: View }) {
+  const { scenario, settlement, file } = view;
+  const primary = settlement.primary;
+  if (!scenario || !primary) return null;
+  const doc = primary.src ? docById(file, primary.src.doc) : undefined;
+  const hard = settlement.hops[0]?.hard;
+  const inputs = [
+    ["Gate", GATES.find((g) => g.id === doc?.gate)?.name ?? "Source of funds"],
+    ["Document type", doc ? KIND_NAMES[doc.sort.label] : "Ledger"],
+    ["Failed check", RULES[primary.rule].name],
+    ["Confidence", doc ? doc.sort.confidence.toFixed(2) : "n/a"],
+    [
+      "Amount at issue",
+      primary.amountLabel.startsWith("EUR")
+        ? `${primary.amountLabel}, ${money("USD", primary.amountUsd)}`
+        : primary.amountLabel,
+    ],
+    ["Language", doc?.lang === "de" ? "German" : "English"],
+    ["Filing route", ROUTES[file.investor.route]],
+    ["Past correction rate", hard ? "Not used, hard rule" : (scenario.router?.correctionRate ?? "")],
+  ];
+  return (
+    <>
+      <section className="bl-panel-sec">
+        <h4>Router inputs</h4>
+        <dl className="bl-facts bl-facts--grid">
+          {inputs.map(([k, v]) => (
+            <div key={k}>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+      <section className="bl-panel-sec">
+        <h4>Packet</h4>
+        <Packet file={file} scenario={scenario} primary={primary} />
+      </section>
+      {view.settled && scenario.model && settlement.hops.some((h) => h.to === scenario.model?.kind) && (
+        <section className="bl-panel-sec">
+          <h4>{scenario.model.name} answered</h4>
+          <p>{scenario.model.output}</p>
+        </section>
+      )}
+      {view.settled && scenario.client && settlement.hops.some((h) => h.to === "client") && (
+        <section className="bl-panel-sec">
+          <h4>Sent to the client, in {scenario.client.language}</h4>
+          <p lang="de">{scenario.client.message}</p>
+          <p className="bl-sheet__gloss">{scenario.client.gloss}</p>
+        </section>
+      )}
+    </>
+  );
+}
+
+function Actions() {
   const { state, dispatch, view } = useDemo();
   const { run, scenario, settlement, file } = view;
-  const result = useRef<HTMLDivElement>(null);
+  const result = useRef<HTMLParagraphElement>(null);
   const decided = Boolean(run?.treatment || run?.confirmed);
   // The ruling buttons disappear once used, so focus moves to what they produced.
   useEffect(() => {
@@ -152,106 +190,46 @@ function Resolution() {
     dispatch({ type: "confirm", runId: run.id, delta });
   };
 
-  return (
-    <div className="bl-route__section">
-      <h4 className="bl-route__k">Resolution</h4>
-      {scenario.model && hops.some((h) => h.to === scenario.model?.kind) && (
-        <div className="bl-model">
-          <p className="bl-model__who">{scenario.model.name}</p>
-          <p>{scenario.model.output}</p>
-          <Simulated />
-          {outcome === "closed" && (
-            <p className="bl-model__check">
-              <StatusTag tone="proven" word="Proven" /> The balance check re-ran on the new value and passed.
-            </p>
-          )}
-        </div>
-      )}
-      {scenario.client && hops.some((h) => h.to === "client") && (
-        <div className="bl-model">
-          <p className="bl-model__who">Client portal message, in {scenario.client.language}</p>
-          <p lang="de">{scenario.client.message}</p>
-          <p className="bl-sheet__gloss">{scenario.client.gloss}</p>
-          <Simulated>Simulated message and translation</Simulated>
-        </div>
-      )}
-
-      {outcome === "awaiting-ruling" && scenario.ruling && (
-        <fieldset className="bl-ruling">
-          <legend>You are the attorney. How should this be treated?</legend>
-          <p className="bl-ruling__flag">Simulated ruling, not legal advice</p>
-          {scenario.ruling.options.map((option) => (
-            <button key={option.id} type="button" className="bl-ruling__opt" onClick={() => rule(option.id)}>
-              <span className="bl-ruling__label">{option.label}</span>
-              <span className="bl-ruling__effect">{option.effect}</span>
-            </button>
-          ))}
-        </fieldset>
-      )}
-
-      {outcome === "ruling-attached" && attached && (
-        <div className="bl-ruling">
-          <p className="bl-ruling__flag">Simulated ruling, not legal advice</p>
-          <p>
-            <span className="bl-num">{attached.id}</span>, effective{" "}
-            <span className="bl-num">{attached.effective}</span>: {attached.text}
-          </p>
-          <button type="button" className="bl-btn" onClick={confirm}>
-            Confirm ruling {attached.id}
+  if (outcome === "awaiting-ruling" && scenario.ruling) {
+    return (
+      <div className="bl-route__actions" role="group" aria-label="Rule as the attorney">
+        {scenario.ruling.options.map((option) => (
+          <button key={option.id} type="button" className="bl-btn bl-btn--small" onClick={() => rule(option.id)}>
+            {option.label}
           </button>
-        </div>
-      )}
-
-      {outcome === "ruled" && (
-        <div className="bl-ruling" ref={result} tabIndex={-1}>
-          <p className="bl-ruling__flag">Simulated ruling, not legal advice</p>
-          <p>
-            {run.replay
-              ? `Ruling ${attached?.id} applied after one confirmation. No new policy was needed.`
-              : `Saved as ruling ${state.rulings[state.rulings.length - 1]?.id}: ${state.rulings[state.rulings.length - 1]?.text}`}
-          </p>
-          {!run.replay && (
-            <button
-              type="button"
-              className="bl-btn"
-              onClick={() => dispatch({ type: "start", scenarioId: scenario.id, replay: true })}
-            >
-              Replay on a second file
-            </button>
-          )}
-        </div>
-      )}
-
-      <p className="bl-route__outcome">
-        {outcome === "ruled"
-          ? scenario.ruling?.options.find((o) => o.id === applied)?.effect
-          : scenario.outcome}
-      </p>
-      <p className="bl-muted">
-        <span className="bl-route__k-inline">Captured:</span> {scenario.capture}
-      </p>
-    </div>
-  );
-}
-
-function SinglePassCard({ view }: { view: View }) {
-  const { scenario, file, settled } = view;
+        ))}
+      </div>
+    );
+  }
+  if (outcome === "ruling-attached" && attached) {
+    return (
+      <div className="bl-route__actions">
+        <button type="button" className="bl-btn bl-btn--small bl-btn--primary" onClick={confirm}>
+          Confirm ruling {attached.id}
+        </button>
+      </div>
+    );
+  }
+  const text =
+    outcome === "ruled"
+      ? scenario.ruling?.options.find((o) => o.id === applied)?.effect
+      : scenario.outcome;
   return (
     <>
-      <h3 className="bl-route__title" tabIndex={-1}>Generic single-pass pipeline</h3>
-      <p>
-        One model reads the file and writes the draft. No checks run, so every
-        label stays green. This is a generic pattern, not Belong&rsquo;s product.
+      <p className="bl-route__outcome" ref={result} tabIndex={-1}>
+        {outcome === "ruled" && !run.replay && <>Saved as ruling {state.rulings[state.rulings.length - 1]?.id}. </>}
+        {outcome === "ruled" && run.replay && <>Ruling {attached?.id} applied. </>}
+        {text}
       </p>
-      {scenario && settled && (
-        <div className="bl-route__section">
-          <h4 className="bl-route__k">Draft line it writes</h4>
-          <blockquote className="bl-draft">{fill(scenario.singlePass.draft, file)}</blockquote>
-          <p>
-            <StatusTag tone="proven" word="Proven" /> {scenario.singlePass.result}
-          </p>
-          <Simulated />
-          <p className="bl-muted">Turn off the single-pass view to see the same error caught.</p>
+      {outcome === "ruled" && !run.replay && (
+        <div className="bl-route__actions">
+          <button
+            type="button"
+            className="bl-btn bl-btn--small bl-btn--primary"
+            onClick={() => dispatch({ type: "start", scenarioId: scenario.id, replay: true })}
+          >
+            Replay on a second file
+          </button>
         </div>
       )}
     </>
@@ -267,7 +245,7 @@ export function RouteCard({
   mobile: boolean;
   onSheet: (mode: "peek" | "open" | "closed") => void;
 }) {
-  const { view } = useDemo();
+  const { dispatch, view } = useDemo();
   const { run, scenario, settlement, file } = view;
   const routed = run && ["routed", "resolved", "learned"].includes(run.phase);
   const panel = useRef<HTMLElement>(null);
@@ -283,18 +261,17 @@ export function RouteCard({
     return () => window.removeEventListener("keydown", onKey);
   }, [modal, onSheet]);
 
+  const destinations = settlement.hops.map((h) => destinationName(view, h.to)).join(", then ");
+
   if (mobile && sheet === "peek" && run) {
-    const title = run.singlePass
-      ? "Generic single-pass pipeline"
-      : `Routed to ${settlement.hops.map((h) => destinationName(view, h.to)).join(", then ")}`;
     return (
       <aside className="bl-route" aria-label="Route card" data-sheet="peek">
-        <p className="bl-peek__title">{title}</p>
+        <p className="bl-peek__title">{run.singlePass ? "Single-pass pipeline" : `Routed to ${destinations}`}</p>
         <div className="bl-peek__actions">
-          <button type="button" id="bl-open-route" className="bl-btn" onClick={() => onSheet("open")}>
-            Open route card
+          <button type="button" id="bl-open-route" className="bl-btn bl-btn--small" onClick={() => onSheet("open")}>
+            Open
           </button>
-          <button type="button" className="bl-btn bl-btn--quiet" onClick={() => onSheet("closed")}>
+          <button type="button" className="bl-btn bl-btn--small bl-btn--quiet" onClick={() => onSheet("closed")}>
             Hide
           </button>
         </div>
@@ -305,98 +282,52 @@ export function RouteCard({
   let body: React.ReactNode;
   if (!run || !scenario) {
     body = (
-      <>
-        <h3 className="bl-route__title" tabIndex={-1}>Route card</h3>
-        <p className="bl-muted">
-          When a layer catches an error, this card shows where the item goes,
-          why it goes there, and the packet the resolver receives.
-        </p>
-      </>
+      <p className="bl-route__idle">
+        When a layer catches an error, this card shows where it goes and what the resolver is asked.
+      </p>
     );
   } else if (run.singlePass) {
-    body = <SinglePassCard view={view} />;
-  } else if (!routed || !settlement.primary) {
     body = (
       <>
-        <h3 className="bl-route__title" tabIndex={-1}>Route card</h3>
-        <p className="bl-muted">Waiting for a layer to catch the error.</p>
+        <div className="bl-route__head">
+          <h3 className="bl-route__title" tabIndex={-1}>
+            <span className="bl-pill" data-tone="proven">
+              Single-pass pipeline
+            </span>
+          </h3>
+        </div>
+        <p className="bl-route__reason">One model reads the file and writes the draft. Nothing checks it.</p>
+        {view.settled && (
+          <>
+            <blockquote className="bl-draft">{fill(scenario.singlePass.draft, file)}</blockquote>
+            <p className="bl-route__outcome">{scenario.singlePass.result}</p>
+          </>
+        )}
       </>
     );
+  } else if (!routed || !settlement.primary) {
+    body = <p className="bl-route__idle">Waiting for a layer to catch the error.</p>;
   } else {
-    const primary = settlement.primary;
-    const doc = primary.src ? docById(file, primary.src.doc) : undefined;
-    const gate = GATES.find((g) => g.id === doc?.gate)?.name ?? "Lawful source";
-    const usdNote = primary.amountLabel.startsWith("EUR")
-      ? `, ${money("USD", primary.amountUsd)}`
-      : "";
-    const hard = settlement.hops[0].hard;
+    const last = settlement.hops[settlement.hops.length - 1];
     body = (
       <>
-        <h3 className="bl-route__title" tabIndex={-1}>
-          Routed to{" "}
-          {settlement.hops.map((hop, i) => (
-            <span key={i}>
-              {i > 0 && ", then "}
-              {destinationName(view, hop.to)}
+        <div className="bl-route__head">
+          <h3 className="bl-route__title" tabIndex={-1}>
+            <span className="bl-pill" data-tone="routed">
+              Routed to {destinations}
             </span>
-          ))}
-        </h3>
-        {settlement.hops.map((hop, i) => (
-          <p key={i}>{reason(view, hop, i)}</p>
-        ))}
-
-        <div className="bl-route__section">
-          <h4 className="bl-route__k">Router inputs</h4>
-          <dl className="bl-facts bl-facts--grid">
-            <div>
-              <dt>Gate</dt>
-              <dd>{gate}</dd>
-            </div>
-            <div>
-              <dt>Document type</dt>
-              <dd>{doc ? KIND_NAMES[doc.sort.label] : "Ledger"}</dd>
-            </div>
-            <div>
-              <dt>Failed check</dt>
-              <dd>{RULES[primary.rule].name}</dd>
-            </div>
-            <div>
-              <dt>Confidence</dt>
-              <dd>
-                <span className="bl-num">{doc ? doc.sort.confidence.toFixed(2) : "n/a"}</span>{" "}
-                <span className="bl-sim">Demo value</span>
-              </dd>
-            </div>
-            <div>
-              <dt>Amount at issue</dt>
-              <dd className="bl-num">
-                {primary.amountLabel}
-                {usdNote}
-              </dd>
-            </div>
-            <div>
-              <dt>Language</dt>
-              <dd>{doc?.lang === "de" ? "German" : "English"}</dd>
-            </div>
-            <div>
-              <dt>Filing route</dt>
-              <dd>{ROUTES[file.investor.route]}</dd>
-            </div>
-            <div>
-              <dt>Past correction rate</dt>
-              <dd>
-                {hard ? "Not used, hard rule" : scenario.router?.correctionRate}{" "}
-                {!hard && <span className="bl-sim">Demo value</span>}
-              </dd>
-            </div>
-          </dl>
+          </h3>
+          <button
+            type="button"
+            className="bl-link-btn"
+            onClick={() => dispatch({ type: "panel", panel: { kind: "packet" } })}
+          >
+            Open packet
+          </button>
         </div>
-
-        <div className="bl-route__section">
-          <h4 className="bl-route__k">Packet</h4>
-          <Packet file={file} scenario={scenario} primary={primary} />
-        </div>
-        <Resolution />
+        <p className="bl-route__reason">{reason(last)}</p>
+        <p className="bl-question">{fill(scenario.packet.question, file)}</p>
+        <Actions />
       </>
     );
   }

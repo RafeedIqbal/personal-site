@@ -46,11 +46,11 @@ There is no test runner. `npm run lint` is the only automated check; smoke-test 
 
 ## /belong proposal page
 
-`app/belong/` is a separate, unlisted page (noindex via metadata and an `X-Robots-Tag` header in `next.config.ts`; not in the sitemap, robots.txt or homepage) with its own paper-and-ink design system in `app/belong/belong.css` (classes prefixed `bl-`, tokens scoped to `.belong`, light and dark). Its layout loads Newsreader, IBM Plex Sans and IBM Plex Mono only for that route.
+`app/belong/` is a separate, unlisted page (noindex via metadata and an `X-Robots-Tag` header in `next.config.ts`; not in the sitemap, robots.txt or homepage). It uses a single light theme on Belong's own palette, defined in `app/belong/belong.css` (classes prefixed `bl-`, tokens scoped to `.belong`), and its layout loads Newsreader, IBM Plex Sans and IBM Plex Mono only for that route.
 
-- **Data is JSON, logic is pure.** The fictional E-2 files live in `lib/belong/case.json`, the six injectable errors (as path patches) in `lib/belong/scenarios.json`. `lib/belong/checks.ts` holds every check, the router, `settle()` and the tile math; it has no runtime imports so `npm run test:belong` (`scripts/belong-checks.test.mjs`, Node type stripping) can load it directly. Tile values and "caught by" labels must always come from these functions, never from stored results.
-- **Instrument state** is a reducer in `components/belong/demo.tsx` (`DemoProvider`), shared with § 8 and § 9 so the reader's ruling from error 6 shows up there. `Visualizer.tsx` drives the phases with timers; reduced motion jumps to the same end state.
-- Sections live in `sections/belong/`, page primitives (`Section`, `Row`, `Inf`) in `components/belong/Doc.tsx`, and every external claim cites an entry in `lib/belong/sources.ts`.
+- **Data is JSON, logic is pure.** The fictional E-2 files live in `lib/belong/case.json` (documents grouped by Belong's nine gates), the six injectable errors (as path patches) in `lib/belong/scenarios.json`. `lib/belong/checks.ts` holds every check, the router, `settle()`, the tile math and the horizontal `trail()` layout; it has no runtime imports so `npm run test:belong` (`scripts/belong-checks.test.mjs`, Node type stripping) can load it directly. Tile values and "caught by" labels must always come from these functions.
+- **The demo is a Belong-style app window** (`components/belong/Visualizer.tsx`): errors in the sidebar, the seven layers as a stepper, tiles, the fund-flow trail, a short route card (full packet in the drawer) and the nine-gates rail. It fits one desktop screen. State is a reducer in `components/belong/demo.tsx` (`DemoProvider`), shared with § 4 so the reader's ruling from error 6 shows up there; phase timing is `PACE` in `Visualizer.tsx`, and reduced motion jumps to the same end state.
+- Sections live in `sections/belong/` (seven numbered sections after the hero). Sources appear only in the footer's Table of Authorities (`sections/belong/Colophon.tsx`), cited in Bluebook form; the only disclaimer is the footer line.
 
 ## Conventions
 

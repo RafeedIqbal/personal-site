@@ -23,17 +23,9 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-// Applies a saved theme before paint so the page never flashes the wrong one.
-const THEME_SCRIPT = `try{var t=localStorage.getItem("belong-theme");if(t==="light"||t==="dark")document.getElementById("belong").dataset.theme=t}catch(e){}`;
-
 export default function BelongLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      id="belong"
-      className={`belong ${newsreader.variable} ${plexSans.variable} ${plexMono.variable}`}
-      suppressHydrationWarning
-    >
-      <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+    <div id="belong" className={`belong ${newsreader.variable} ${plexSans.variable} ${plexMono.variable}`}>
       {children}
     </div>
   );

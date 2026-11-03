@@ -4,13 +4,17 @@
 export type Ccy = "EUR" | "USD";
 export type FilingRoute = "consular" | "uscis";
 
+// Belong's nine E-2 gates, as named on its public product screens.
 export type GateId =
   | "nationality"
-  | "source"
+  | "ownership"
   | "committed"
+  | "source"
   | "substantial"
   | "operating"
-  | "direct";
+  | "marginality"
+  | "direct"
+  | "intent";
 
 export type DocKind =
   | "passport"
@@ -278,13 +282,15 @@ export interface Settlement {
   flagged: Hold[];
 }
 
+// Horizontal fund-flow layout: col 0 (sources) to 4 (spent), y as a 0-1
+// fraction of the trail's height.
 export interface TrailNode {
   id: string;
   label: string;
   ccy: Ccy;
   amount: number;
-  x: number;
-  row: number;
+  col: number;
+  y: number;
 }
 
 export interface TrailEdge {

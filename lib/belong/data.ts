@@ -12,9 +12,12 @@ export const fileById = (id: string) =>
 
 export const GATES: { id: GateId; name: string }[] = [
   { id: "nationality", name: "Treaty nationality" },
-  { id: "source", name: "Lawful source" },
-  { id: "committed", name: "At risk and committed" },
-  { id: "substantial", name: "Substantial" },
-  { id: "operating", name: "Real and operating" },
-  { id: "direct", name: "Develop and direct" },
+  { id: "ownership", name: "Ownership & control" },
+  { id: "committed", name: "Investment committed" },
+  { id: "source", name: "Source of funds" },
+  { id: "substantial", name: "Substantiality" },
+  { id: "operating", name: "Real & operating" },
+  { id: "marginality", name: "Marginality" },
+  { id: "direct", name: "Develop & direct" },
+  { id: "intent", name: "Intent to depart" },
 ];

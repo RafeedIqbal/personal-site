@@ -920,7 +920,7 @@ export function makeRuling(
 
 export function trail(file: CaseFile): { nodes: TrailNode[]; edges: TrailEdge[] } {
   const { savings, us, llc } = file.accounts;
-  const { escrow, wire, fx } = file;
+  const { escrow } = file;
   const note = file.purchase.sellerNote;
   const spent = total(llc.debits);
   const toLlc = total(llc.credits);
@@ -931,19 +931,19 @@ export function trail(file: CaseFile): { nodes: TrailNode[]; edges: TrailEdge[] 
     label: credit.label,
     ccy: "EUR",
     amount: credit.amount,
-    x: ((i + 0.5) / credits.length) * 100,
-    row: 0,
+    col: 0,
+    y: (i + 0.5) / credits.length,
   }));
   nodes.push(
-    { id: "account:savings", label: savings.label, ccy: "EUR", amount: savings.closing, x: 50, row: 1 },
-    { id: "account:us", label: us.label, ccy: "USD", amount: total(us.credits), x: 50, row: 2 },
-    { id: "escrow", label: "Purchase escrow", ccy: "USD", amount: escrow.amount, x: 26, row: 3 },
-    { id: "account:llc", label: llc.label, ccy: "USD", amount: toLlc, x: 70, row: 3 },
-    { id: "spend", label: "Equipment and lease", ccy: "USD", amount: spent, x: 54, row: 4 },
-    { id: "idle", label: "Not yet deployed", ccy: "USD", amount: toLlc - spent, x: 86, row: 4 },
+    { id: "account:savings", label: "Savings, Germany", ccy: "EUR", amount: savings.closing, col: 1, y: 0.5 },
+    { id: "account:us", label: "US account", ccy: "USD", amount: total(us.credits), col: 2, y: note ? 0.36 : 0.5 },
+    { id: "escrow", label: "Purchase escrow", ccy: "USD", amount: escrow.amount, col: 3, y: 0.25 },
+    { id: "account:llc", label: "LLC operating", ccy: "USD", amount: toLlc, col: 3, y: 0.72 },
+    { id: "spend", label: "Equipment, lease", ccy: "USD", amount: spent, col: 4, y: 0.55 },
+    { id: "idle", label: "Not yet deployed", ccy: "USD", amount: toLlc - spent, col: 4, y: 0.87 },
   );
   if (note) {
-    nodes.push({ id: "note:seller", label: "Seller note", ccy: "USD", amount: note.amount, x: 14, row: 2 });
+    nodes.push({ id: "note:seller", label: "Seller note", ccy: "USD", amount: note.amount, col: 2, y: 0.82 });
   }
 
   const edges: TrailEdge[] = credits.map((credit) => ({
@@ -952,12 +952,7 @@ export function trail(file: CaseFile): { nodes: TrailNode[]; edges: TrailEdge[] 
     to: "account:savings",
   }));
   edges.push(
-    {
-      id: "edge:wire",
-      from: "account:savings",
-      to: "account:us",
-      label: `at ${fx.rate.toFixed(2)}, less ${money("USD", wire.feeUsd)} fee`,
-    },
+    { id: "edge:wire", from: "account:savings", to: "account:us" },
     { id: "edge:escrow", from: "account:us", to: "escrow" },
     { id: "edge:llc", from: "account:us", to: "account:llc" },
     { id: "edge:spend", from: "account:llc", to: "spend" },

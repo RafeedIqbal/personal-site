@@ -1,26 +1,31 @@
-import { Inf, Row, Section } from "@/components/belong/Doc";
+import { Section } from "@/components/belong/Doc";
 import SystemLayers from "@/components/belong/SystemLayers";
+
+const DESTINATIONS = [
+  { name: "Frontier model", job: "Bad reads", guard: "Its answer must satisfy the arithmetic." },
+  { name: "Domain model", job: "Recurring document families", guard: "Only where evals show it wins." },
+  { name: "Client portal", job: "Missing evidence", guard: "Asks in the client’s language." },
+  { name: "Attorney", job: "Reserved questions and legal meaning", guard: "Nothing closes without them." },
+];
 
 export default function System() {
   return (
-    <Section id="system" n={5} title="The system">
-      <Row>
-        <p>
-          I would run the cheapest reliable check first and spend attorney time only where judgment is
-          needed. Clear items pass straight through. Everything else reaches a resolver, and attorney
-          decisions flow back into the next run.
-        </p>
-      </Row>
-      <Row notes={["ocr"]}>
-        <SystemLayers />
-      </Row>
-      <Row notes={["home", "h1b"]}>
-        <p>
-          Belong already uses a fine-tuned language model, so I would evaluate that model before tuning
-          another. Gates, rules and rulings are data scoped by visa and filing route.{" "}
-          <Inf>That way L-1 arrives as configuration after E-2 and cap-exempt H-1B, not as a rewrite.</Inf>
-        </p>
-      </Row>
+    <Section id="system" n={3} title="How it works">
+      <p>
+        Run the cheapest reliable check first, and spend attorney time only where judgment is needed.
+      </p>
+      <SystemLayers />
+      <h3 className="bl-h3">Who looks next</h3>
+      <p>Your voice agent decides who reaches an attorney’s calendar. This decides what does.</p>
+      <dl className="bl-dests bl-ui">
+        {DESTINATIONS.map((d) => (
+          <div key={d.name}>
+            <dt>{d.name}</dt>
+            <dd>{d.job}</dd>
+            <dd className="bl-dests__guard">{d.guard}</dd>
+          </div>
+        ))}
+      </dl>
     </Section>
   );
 }

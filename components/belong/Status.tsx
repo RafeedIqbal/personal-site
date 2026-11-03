@@ -36,7 +36,3 @@ export function StatusTag({ tone, word }: { tone: Tone; word: string }) {
     </span>
   );
 }
-
-export function Simulated({ children = "Simulated model output" }: { children?: string }) {
-  return <span className="bl-sim">{children}</span>;
-}

@@ -53,7 +53,11 @@ export interface Run {
   confirmed: boolean;
 }
 
-export type Panel = { kind: "doc"; id: string } | { kind: "node"; id: string };
+export type Panel =
+  | { kind: "doc"; id: string }
+  | { kind: "node"; id: string }
+  | { kind: "gate"; id: string }
+  | { kind: "packet" };
 
 interface State {
   seq: number;
@@ -62,13 +66,14 @@ interface State {
   rulings: Ruling[];
   log: RunLog;
   logged: number[];
+  done: number[];
   panel: Panel | null;
 }
 
 type Action =
   | { type: "start"; scenarioId: number; replay?: boolean }
   | { type: "step"; runId: number; phase: Phase; token: number }
-  | { type: "finish"; runId: number; delta: RunLog }
+  | { type: "finish"; runId: number; scenarioId: number; delta: RunLog }
   | { type: "rule"; runId: number; ruling: Ruling; delta: RunLog }
   | { type: "confirm"; runId: number; delta: RunLog }
   | { type: "reset" }
@@ -126,6 +131,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         log: addLog(state.log, action.delta),
         logged: [...state.logged, action.runId],
+        done: state.done.includes(action.scenarioId) ? state.done : [...state.done, action.scenarioId],
       };
     case "rule":
       if (!state.run || !current(action.runId)) return state;
@@ -304,6 +310,17 @@ export function docTone(view: View, docId: string): { tone: Tone; word: string }
   return { tone: "failed", word: "Flagged" };
 }
 
+// Belong-style gate marker: worst document status in the gate, with a count.
+export function gateTone(view: View, gateId: string): { tone: Tone; word: string; count: string } {
+  const docs = view.shown.documents.filter((doc) => doc.gate === gateId);
+  if (docs.length === 0) return { tone: "neutral", word: "Not in this demo", count: "—" };
+  const tones = docs.map((doc) => docTone(view, doc.id));
+  const accepted = tones.filter((t) => t.tone === "proven").length;
+  const worst =
+    tones.find((t) => t.tone === "failed") ?? tones.find((t) => t.tone === "unsure") ?? tones[0];
+  return { tone: worst.tone, word: worst.word, count: `${accepted}/${docs.length}` };
+}
+
 interface DemoContext {
   state: State;
   dispatch: Dispatch<Action>;
@@ -320,6 +337,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     rulings: [],
     log: EMPTY_LOG,
     logged: [],
+    done: [],
     panel: null,
   });
   const view = useMemo(() => derive(state), [state]);

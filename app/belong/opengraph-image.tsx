@@ -15,12 +15,12 @@ export default function OpengraphImage() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: "64px 72px",
-        backgroundColor: "#F6F4EE",
-        color: "#14202B",
+        backgroundColor: "#EDF0F3",
+        color: "#101E2E",
         fontFamily: "serif",
       }}
     >
-      <div style={{ display: "flex", fontSize: 24, color: "#5C6670", fontFamily: "sans-serif" }}>
+      <div style={{ display: "flex", fontSize: 24, color: "#5A6B7D", fontFamily: "sans-serif" }}>
         A working proposal, November 2026
       </div>
       <div style={{ display: "flex", flexDirection: "column", fontSize: 64, lineHeight: 1.08 }}>
@@ -32,13 +32,13 @@ export default function OpengraphImage() {
           display: "flex",
           justifyContent: "space-between",
           paddingTop: 24,
-          borderTop: "2px solid #14202B",
+          borderTop: "2px solid #101E2E",
           fontSize: 26,
           fontFamily: "sans-serif",
         }}
       >
         <span>Break a fictional E-2 file and watch it get caught.</span>
-        <span style={{ color: "#5C6670" }}>Rafeed Iqbal</span>
+        <span style={{ color: "#5A6B7D" }}>Rafeed Iqbal</span>
       </div>
     </div>,
     size,
