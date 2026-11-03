@@ -99,54 +99,29 @@ body:has(.belong) {
   margin-top: 16px;
 }
 
-/* Framed modules: a full-width rule, then a frame with bracket corners. */
+/* Modules: open sections separated by space alone. */
 .bl-module {
   position: relative;
-  padding-top: 28px;
   scroll-margin-top: var(--mast);
-}
-.bl-module::before {
-  content: "";
-  position: absolute;
-  top: 28px;
-  right: 16px;
-  left: 16px;
-  border-top: 1px solid var(--rule-2);
 }
 .bl-frame {
   position: relative;
   z-index: 1;
   width: min(100% - 48px, 1240px);
-  margin: 12px auto 0;
-  padding: clamp(40px, 6vw, 72px) clamp(16px, 4vw, 56px) clamp(72px, 9vw, 120px);
-  border: 1px solid var(--rule-2);
-  border-bottom: 0;
-  border-radius: 16px 16px 0 0;
+  margin: 0 auto;
+  padding: clamp(56px, 7vw, 96px) clamp(16px, 4vw, 56px) clamp(72px, 9vw, 120px);
 }
 .bl-frame > * + * {
   margin-top: 24px;
 }
-.bl-module--cont {
-  padding-top: 0;
-}
-.bl-module--cont::before {
-  display: none;
-}
 .bl-module--cont .bl-frame {
-  margin-top: 0;
   padding-top: clamp(24px, 4vw, 48px);
-  border-top: 0;
-  border-radius: 0;
 }
 
 .bl-module[data-tone="band"] {
   overflow: hidden;
   background: var(--band);
   color: var(--band-ink);
-}
-.bl-module[data-tone="band"]::before,
-.bl-module[data-tone="band"] .bl-frame {
-  border-color: var(--band-rule);
 }
 .bl-module__word {
   position: absolute;
@@ -317,15 +292,9 @@ body:has(.belong) {
   }
 }
 @media (max-width: 759px) {
-  .bl-module::before {
-    right: 0;
-    left: 0;
-  }
   .bl-frame {
     width: 100%;
     padding-inline: 16px;
-    border: 0;
-    border-radius: 0;
   }
 }
 
@@ -1006,7 +975,6 @@ body:has(.belong) {
 
 .bl-foot {
   padding: 56px 0 72px;
-  border-top: 1px solid var(--rule-2);
   font-size: 15px;
   line-height: 1.55;
 }

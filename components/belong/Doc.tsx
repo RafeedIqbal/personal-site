@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-// Page primitives for /belong. A Module is a framed section (thin side rules,
-// bracket corners, a heavy title over a light serif lede); a Figure carries a
+// Page primitives for /belong. A Module is an open section (a heavy title over
+// a light serif lede, separated from the next by space); a Figure carries a
 // short "fig." caption; Numerals and Brace are the display devices.
 
 export function Module({
