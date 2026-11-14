@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Papa from "papaparse";
 import { CAPABILITIES, CSV_FIELDS, LIMITS, QUALIFICATIONS, REGIONS, contracts, dateLabel, exportBrief, fingerprint, inferMapping, matchRecord, mergeRecords, money, normalize, normalizeCsvRow, safeUrl, validateClaims } from "@/supabase/functions/_shared/domain";
 import type { Answer, Citation, ColumnMapping, ProcurementRecord, Profile, Run, Source, Stage, Workspace as WorkspaceData } from "@/supabase/functions/_shared/domain";
 import { applyScenario, initialWorkspace, preparedAnswer, PUBLIC_SNAPSHOT, SCENARIOS } from "@/lib/publicus/seed";
-import { api, backendConfigured, connectWorkspace, downloadText, readWorkspace, upload } from "@/lib/publicus/client";
+import { api, backendConfigured, connectWorkspace, downloadText, readWorkspace, upload, type Session } from "@/lib/publicus/client";
 
 type View = "vendor" | "government" | "sources";
 type Dataset = "sample" | "public" | "upload";
@@ -52,6 +52,10 @@ export default function Workspace() {
   const shell = useRef<HTMLDivElement>(null);
   const stateRef = useRef(workspace);
   const patchQueue = useRef(Promise.resolve());
+  const applyJobSnapshot = useCallback((next: Session) => {
+    setRuns(next.runs);
+    setWorkspace((current) => ({ ...next.workspace, profile: current.profile, saved: current.saved, notes: current.notes, reviewed: current.reviewed }));
+  }, []);
 
   useEffect(() => { stateRef.current = workspace; }, [workspace]);
   useEffect(() => {
@@ -67,11 +71,11 @@ export default function Workspace() {
     if (!remote || !runs.some((run) => run.status === "queued" || run.status === "processing")) return;
     let stopped = false;
     const timer = setInterval(async () => {
-      try { const next = await readWorkspace(); if (!stopped) { setRuns(next.runs); setWorkspace((current) => ({ ...next.workspace, profile: current.profile, saved: current.saved, notes: current.notes, reviewed: current.reviewed })); } }
+      try { const next = await readWorkspace(); if (!stopped) applyJobSnapshot(next); }
       catch (e) { if (!stopped) setError(e instanceof Error ? e.message : "Could not refresh the job."); }
     }, 2500);
     return () => { stopped = true; clearInterval(timer); };
-  }, [remote, runs]);
+  }, [remote, runs, applyJobSnapshot]);
   useEffect(() => { const changed = () => setFull(document.fullscreenElement === shell.current); document.addEventListener("fullscreenchange", changed); return () => document.removeEventListener("fullscreenchange", changed); }, []);
 
   const dataRecords = useMemo(() => workspace.records.filter((r) => r.origin === dataset), [workspace.records, dataset]);
@@ -117,7 +121,8 @@ export default function Workspace() {
   async function enqueue(kind: string, input: Record<string, unknown>) {
     await patchQueue.current;
     await api("enqueue", { kind, input });
-    const next = await readWorkspace(); setRuns(next.runs); setMessage("Job queued. You can keep exploring while it runs.");
+    // Fast jobs can finish before this first read, with no polling cycle needed.
+    applyJobSnapshot(await readWorkspace()); setMessage("Job queued. You can keep exploring while it runs.");
   }
   function inspect(citation: Citation) { setSource({ id: citation.sourceId, quote: citation.quote, page: citation.page }); }
   function setProfile(profile: Profile) {
@@ -154,7 +159,7 @@ export default function Workspace() {
             <div className="px-detail-section"><h5>A source-backed explanation</h5><p className="px-small-note">{ai ? "Ask about this record. Quotations are checked against source text; interpretation still needs review." : "Explore a prepared explanation calculated from the current records. Connect Gemini for open-ended questions."}</p><div className="px-answer-actions"><button className="px-button px-button-white" disabled={busy} onClick={() => answer(view === "vendor" ? "Why does this opportunity match, and what should I review?" : "What changed in this contract, and what needs review?", false)}>{view === "vendor" ? "Explain this match" : "Explain these changes"}<span aria-hidden="true">↗</span></button></div>{ai && <AskForm busy={busy} ask={(question) => answer(question, true)}/>} {latestAnswer && <AnswerCard answer={latestAnswer} stale={latestAnswer.fingerprint !== fingerprint(workspace.records, workspace.profile)} inspect={inspect}/>}</div>
           </> : <div className="px-empty"><h4>The evidence starts here.</h4><p>Select a record to follow its requirements, amendments and source documents.</p></div>}</div>
         </div>
-      </> : <Sources workspace={workspace} remote={remote} ai={ai} busy={busy} runs={runs} connect={connect} loadSnapshot={loadSnapshot} enqueue={(kind, input) => task(() => enqueue(kind, input))} task={task} update={update} openSource={(id) => setSource({ id })} importComplete={() => { setDataset("upload"); setMessage("CSV records imported. Select Your uploads to explore them."); }} retry={(runId) => task(async () => { await api("retry", { runId }); const next = await readWorkspace(); setRuns(next.runs); })}/>}
+      </> : <Sources workspace={workspace} remote={remote} ai={ai} busy={busy} runs={runs} connect={connect} loadSnapshot={loadSnapshot} enqueue={(kind, input) => task(() => enqueue(kind, input))} task={task} update={update} openSource={(id) => setSource({ id })} importComplete={() => { setDataset("upload"); setMessage("CSV records imported. Select Your uploads to explore them."); }} retry={(runId) => task(async () => { await api("retry", { runId }); applyJobSnapshot(await readWorkspace()); })}/>}
     </div>
     <div className="px-bottom"><div className="px-scenario"><span>Stress-test the evidence</span><label><span className="px-sr">Evidence scenario</span><select disabled={busy} value={workspace.scenario} onChange={(event) => scenario(event.target.value)}>{SCENARIOS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</select></label></div><div className="px-bottom-right"><span>{dataset === "sample" ? `Sample clock · ${dateLabel(workspace.asOf)}` : "Dates checked against today"}</span><button onClick={() => setResetOpen(true)}>Reset workspace</button></div></div>
     {profileOpen && <Modal title="Your vendor profile" close={() => setProfileOpen(false)}><ProfileEditor profile={workspace.profile} save={setProfile}/></Modal>}

@@ -57,5 +57,8 @@ Provisioned the dedicated `personal-site-publicus` project (`clfgowkxumajjjfxkfw
 - A second real Gemini request extracted a synthetic procurement document and marked the record for human review.
 - Hosted verification exposed a cold-start timeout and a completion/read race. Wake-up and cron timeouts now allow 10 seconds, and workspace reads follow job-status reads so completed results cannot disappear when polling stops. The checks were rerun successfully after deployment of both fixes.
 - Observed scheduled worker HTTP 202 responses without timeouts.
+- The hosted CanadaBuys connector imported 120 records. Synthetic hosted test workspaces and their original uploaded files were removed afterward.
+- The production page connected to its private workspace and displayed a real Gemini answer with a validated quotation. The résumé, social image and no-index response headers returned successfully; `/publicus` remains absent from the sitemap.
+- A browser regression check forced a job to complete before the very first status read. Its answer rendered after exactly one read, without relying on a later polling cycle. Both enqueue and retry now apply the complete workspace snapshot, while preserving current profile edits and notes.
 
 Vercel Production has the hosted Supabase URL and publishable key. Model and worker secrets are configured in Supabase and excluded from Git. Scanned/image-only PDFs still require OCR before upload; this prototype does not include an OCR service. No job application was submitted.
