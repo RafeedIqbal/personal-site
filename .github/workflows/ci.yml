@@ -28,6 +28,7 @@ jobs:
       - run: npm ci
       - run: npm run test:dependencies
       - run: npm run test:belong
+      - run: npm run test:publicus
       - run: npm run lint
       - run: npm run typecheck
       - run: npm audit --audit-level=moderate

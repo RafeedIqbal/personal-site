@@ -51,7 +51,7 @@ export function aiEnabled() { return Boolean(Deno.env.get("GEMINI_API_KEY")); }
 export async function wakeWorker() {
   const secret = Deno.env.get("PUBLICUS_WORKER_SECRET");
   if (!secret) return; // The durable job remains queued until the scheduled worker is configured.
-  try { await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/publicus-worker`, { method: "POST", headers: { "Content-Type": "application/json", "X-Worker-Secret": secret }, body: "{}", signal: AbortSignal.timeout(1500) }); } catch { /* A timed-out HTTP request is not a job failure; cron resumes queued work. */ }
+  try { await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/publicus-worker`, { method: "POST", headers: { "Content-Type": "application/json", "X-Worker-Secret": secret }, body: "{}", signal: AbortSignal.timeout(10_000) }); } catch { /* A timed-out HTTP request is not a job failure; cron resumes queued work. */ }
 }
 export async function purgeWorkspace(id: string, owner: string) {
   const db = admin(), prefix = `${owner}/${id}`;

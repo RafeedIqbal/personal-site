@@ -1,6 +1,6 @@
-# Publicus verification — 14 November 2026
+# Publicus verification — 14–15 November 2026
 
-Implementation branch: `codex/publicus-application`. Preview: `http://localhost:3001/publicus`.
+Implementation branch: `codex/publicus-application`, integrated with the latest portfolio updates on `main`. Release route: `https://www.rafeed.dev/publicus`.
 
 ## Automated checks
 
@@ -9,7 +9,8 @@ Implementation branch: `codex/publicus-application`. Preview: `http://localhost:
 - `npm run test:publicus` — 13 deterministic domain tests: qualification invalidation, cumulative amendments, conflicting values, buyer/contract isolation, absent original awards, missing sources, invalid citations, zero vs missing amounts, deadline offsets, CSV mapping, quoted CSV boundaries and current/stale exports.
 - `npm run test:belong` and `npm run test:dependencies` — passed. Existing Belong code was not changed.
 - `deno check` for both Edge Functions — passed.
-- `deno test --allow-env --config supabase/functions/deno.json supabase/functions/tests/gemini.test.ts` — two tests passed. These intercept all network requests and validate the current Interactions request format, disabled provider interaction storage, quota reservation and quotation validation. **No real Gemini request was made.**
+- `deno test --allow-env --config supabase/functions/deno.json supabase/functions/tests/gemini.test.ts` — two tests passed. These intercept all network requests and validate the current Interactions request format, disabled provider interaction storage, quota reservation and quotation validation. These unit tests do not call Gemini; separate hosted checks below do.
+- After merging the portfolio updates, lint, type checks, build, 13 Publicus tests, 14 Belong tests, 9 dependency checks and all 14 Playwright portfolio checks passed. Publicus domain tests are also included in CI.
 - Real PDF parser smoke test on the public résumé — one page extracted successfully.
 
 ## Local Supabase integration
@@ -45,6 +46,16 @@ Playwright against the production server:
 
 Screenshots are in the ignored `output/playwright/` directory: `publicus-desktop-final.png`, `publicus-workspace-final.png` and `publicus-mobile-final.png`.
 
-## Remaining external configuration
+## Hosted Supabase verification
 
-No hosted Supabase project was provisioned or deployed, and no application was submitted. The user will supply the hosted Supabase configuration and Gemini key. A live model extraction/answer still needs verification against that project. The checked-in setup guide covers deployment, worker scheduling and secret names. Scanned/image-only PDFs require OCR before upload; this prototype does not include an OCR service.
+Provisioned the dedicated `personal-site-publicus` project (`clfgowkxumajjjfxkfwa`, Canada Central), applied three migrations and deployed both Edge Functions. Configured anonymous auth, production origins, Edge secrets and the Vault-backed minute cron tick.
+
+- Anonymous sessions bootstrap distinct workspaces. Cross-user reads, client-side writes and service-only quota RPCs are denied.
+- An untrusted origin is rejected; the worker rejects unauthenticated requests.
+- A synthetic CSV uploads through a signed URL, remains private from the second session, completes through the durable queue and exposes an owner-only source download.
+- A **real Gemini 4 Hydrogen request** returned two claims with validated source citations about a fictional tender's qualification and closing date.
+- A second real Gemini request extracted a synthetic procurement document and marked the record for human review.
+- Hosted verification exposed a cold-start timeout and a completion/read race. Wake-up and cron timeouts now allow 10 seconds, and workspace reads follow job-status reads so completed results cannot disappear when polling stops. The checks were rerun successfully after deployment of both fixes.
+- Observed scheduled worker HTTP 202 responses without timeouts.
+
+Vercel Production has the hosted Supabase URL and publishable key. Model and worker secrets are configured in Supabase and excluded from Git. Scanned/image-only PDFs still require OCR before upload; this prototype does not include an OCR service. No job application was submitted.

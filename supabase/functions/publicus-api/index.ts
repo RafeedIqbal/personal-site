@@ -31,11 +31,13 @@ Deno.serve(async (request: Request) => {
       return json({ ok: true }, headers);
     }
     const workspace = await ownedWorkspace(user.id);
-    const result = () => ({ workspace: { ...workspace.state, id: workspace.id, expiresAt: workspace.expires_at }, aiEnabled: aiEnabled(), workerEnabled: Boolean(Deno.env.get("PUBLICUS_WORKER_SECRET")) });
+    const result = (current = workspace) => ({ workspace: { ...current.state, id: current.id, expiresAt: current.expires_at }, aiEnabled: aiEnabled(), workerEnabled: Boolean(Deno.env.get("PUBLICUS_WORKER_SECRET")) });
     if (input.action === "bootstrap" || input.action === "get") {
       const { data: runs, error } = await db.from("publicus_runs").select("id,status,progress,error,attempts,created_at").eq("workspace_id", workspace.id).order("created_at", { ascending: false }).limit(15);
       if (error) throw error;
-      return json({ ...result(), runs }, headers);
+      // Read state after job status. A completed job must include its committed
+      // result, otherwise the browser could stop polling with an older snapshot.
+      return json({ ...result(await ownedWorkspace(user.id)), runs }, headers);
     }
     if (input.action === "patch") {
       const patch = input.patch as Partial<Workspace>;
