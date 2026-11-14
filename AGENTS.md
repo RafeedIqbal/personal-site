@@ -18,6 +18,7 @@ Run commands from the repository root.
 - `npm run build`: create the production build.
 - `npm run start`: serve the production build locally.
 - `npm run lint`: run ESLint with the Next.js and TypeScript ruleset.
+- `npm run test:ui`: build the production app and run Playwright browser and axe accessibility checks.
 
 Example:
 
@@ -36,10 +37,10 @@ Use TypeScript with strict typing and React function components. Follow the exis
 Run `npm run lint` before opening a PR.
 
 ## Testing Guidelines
-There is no automated test runner configured yet, and no coverage gate is enforced. For now:
+Playwright tests are colocated in `sections/Portfolio.test.ts`. Install Chromium with `npx playwright install chromium`, then run `npm run test:ui`. The suite starts its own production server on port 3035; keep that port free. No coverage gate is enforced.
 
-- treat `npm run lint` as the required automated check;
-- smoke-test UI changes in the local app;
+- run `npm run lint` and the browser suite for UI changes;
+- smoke-test visual changes in the local app;
 - include manual verification notes in the PR.
 
 If you add tests, prefer colocated `*.test.tsx` or `*.test.ts` files near the feature they cover.

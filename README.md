@@ -1,6 +1,6 @@
 # personal-site
 
-Terminal-style personal portfolio built with Next.js 16, React 19, and Tailwind CSS v4. A graphite workspace pairs readable case summaries and real project previews with file-tree navigation. The optional desktop terminal (press `` ` ``) and arcade load on demand; Framer Motion is confined to the terminal's help panel.
+Terminal-style personal portfolio built with Next.js 16, React 19, and Tailwind CSS v4. A graphite workspace pairs readable case summaries and real project previews with file-tree navigation. The optional desktop terminal (press Ctrl + backtick) and arcade load on demand; Framer Motion is confined to the terminal's help panel.
 
 The reading view, mobile section menu, and case disclosures work without JavaScript. Screenshot previews open in a full-color dialog with JavaScript or link directly to the image without it. Capture provenance and redesign verification are recorded in [docs/portfolio-redesign.md](docs/portfolio-redesign.md).
 
@@ -20,22 +20,25 @@ npm run dev
 - `npm run start`: serve the production build locally
 - `npm run lint`: run ESLint
 - `npm run test:dependencies`: check the ESLint dependency replacements (fast-glob and minimatch)
+- `npm run test:ui`: build the app and run the Playwright browser and axe accessibility checks
 - `npm run typecheck`: generate route types and check TypeScript without emitting files
 
 ## Verification
 
-Pull requests and pushes run a locked dependency install, ESLint, TypeScript, a dependency audit, and a production build in GitHub Actions. Run the same checks locally before review:
+Pull requests and pushes run a locked dependency install, ESLint, TypeScript, a dependency audit, a production build, and Playwright browser checks in GitHub Actions. Run the same checks locally before review:
 
 ```bash
 npm run lint
 npm run test:dependencies
 npm run typecheck
 npm audit --audit-level=moderate
-npm run build
-npm run start
+npx playwright install chromium
+npm run test:ui
 ```
 
-Smoke-test the production server on desktop and mobile, including keyboard navigation, the terminal and games, résumé downloads, and external links. Check reduced-motion and JavaScript-disabled rendering after changing animations. The build downloads the Google Fonts used by `next/font` and requires network access; fonts are then served by the app.
+Install Chromium once per Playwright version. `test:ui` builds the production app, starts its own server on `127.0.0.1:3035`, and stops it afterward; keep that port free. After an existing build, use `npx playwright test` to run the suite without rebuilding.
+
+For visual review, start the production server with `npm run start` and smoke-test desktop and mobile layouts, keyboard navigation, the terminal and games, résumé downloads, and external links. Check reduced-motion and JavaScript-disabled rendering after changing animations. The build downloads the Google Fonts used by `next/font` and requires network access; fonts are then served by the app.
 
 Dependency security updates and the ESLint dependency overrides (fast-glob and minimatch) are documented in [docs/dependency-security.md](docs/dependency-security.md).
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NAV_ITEMS, PROFILE } from "@/lib/content";
 
 interface NavProps {
@@ -8,9 +8,12 @@ interface NavProps {
   terminalAvailable: boolean;
 }
 
+const subscribe = () => () => {};
+
 export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
   const [activeId, setActiveId] = useState("whoami");
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+  const enhanced = useSyncExternalStore(subscribe, () => true, () => false);
 
   useEffect(() => {
     const sections = NAV_ITEMS.map(({ id }) =>
@@ -54,9 +57,9 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
 
   return (
     <>
-      <header className="mobile-header lg:hidden">
+      <header className="mobile-header lg:hidden" data-enhanced={enhanced}>
         <div className="flex min-h-16 items-center justify-between gap-3 px-5 sm:px-8">
-          <a href="#whoami" onClick={closeMenu} className="font-mono text-xs">
+          <a href="#whoami" onClick={closeMenu} className="inline-flex min-h-11 items-center font-mono text-xs">
             <span className="text-accent">~</span>/rafeed.dev
           </a>
           <a
@@ -118,7 +121,7 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
           <span className="text-accent">~</span>/rafeed.dev
         </a>
         <div className="px-6 pt-9 pb-5">
-          <span className="font-mono text-[11px] text-muted">explorer</span>
+          <span className="font-mono text-xs text-muted">explorer</span>
           <p className="mt-2 text-sm font-medium">Rafeed Iqbal</p>
         </div>
         <nav
@@ -135,7 +138,7 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
               <span aria-hidden="true" className="tree-branch" />
               <span>
                 <span className="block text-[13px]">{item.label}</span>
-                <span className="mt-0.5 block font-mono text-[10px] text-muted">
+                <span className="mt-0.5 block font-mono text-xs text-muted">
                   {item.file}
                 </span>
               </span>
@@ -149,7 +152,8 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
               onClick={onOpenTerminal}
               aria-haspopup="dialog"
               className="terminal-launcher"
-              title="Open terminal (backtick)"
+              title="Open terminal (Ctrl + backtick)"
+              aria-keyshortcuts="Control+`"
             >
               <span>
                 <span className="mr-2 text-accent" aria-hidden="true">
@@ -157,13 +161,13 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
                 </span>
                 Open terminal
               </span>
-              <kbd className="kbd">`</kbd>
+              <kbd className="kbd">Ctrl + `</kbd>
             </button>
           )}
           <a
             href={PROFILE.resumeUrl}
             download
-            className="flex min-h-8 items-center justify-between font-mono text-[11px] text-muted hover:text-fg"
+            className="flex min-h-11 items-center justify-between font-mono text-xs text-muted hover:text-fg"
           >
             Download résumé <span aria-hidden="true">↓</span>
             <span className="sr-only"> (PDF)</span>

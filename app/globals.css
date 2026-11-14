@@ -76,7 +76,7 @@ main:focus {
   border-bottom: 1px solid var(--color-line);
   padding: 0 48px;
   font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 10px;
+  font-size: 12px;
 }
 .desktop-nav-link {
   display: flex;
@@ -133,15 +133,17 @@ main:focus {
 }
 .terminal-launcher {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 42px;
+  min-height: 44px;
   padding: 8px 10px;
   border: 1px solid var(--color-line);
   border-radius: 4px;
   font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 10px;
+  font-size: 12px;
 }
 .terminal-launcher:hover {
   background: var(--color-surface);
@@ -151,15 +153,18 @@ main:focus {
   border: 1px solid var(--color-line);
   border-radius: 3px;
   padding: 1px 5px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-muted);
 }
 .mobile-header {
-  position: sticky;
+  position: static;
   top: 0;
   z-index: 30;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-line);
+}
+.mobile-header[data-enhanced="true"] {
+  position: sticky;
 }
 .mobile-menu {
   border-top: 1px solid var(--color-line);
@@ -173,7 +178,7 @@ main:focus {
 .mobile-menu[open] .menu-indicator {
   transform: rotate(45deg);
 }
-.mobile-menu nav {
+.mobile-header[data-enhanced="true"] .mobile-menu nav {
   max-height: calc(100dvh - 110px);
   overflow-y: auto;
 }
@@ -195,22 +200,6 @@ main:focus {
   padding: 48px 0 56px;
   scroll-margin-top: 128px;
 }
-.current-work {
-  border-left: 1px solid var(--color-line);
-  padding-left: 24px;
-}
-.current-work-link {
-  display: block;
-  padding-bottom: 18px;
-  font-size: 15px;
-}
-.current-work-link:hover > span:first-child {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.current-work-link:last-of-type {
-  padding-bottom: 0;
-}
 .button-primary,
 .button-secondary {
   display: inline-flex;
@@ -222,7 +211,7 @@ main:focus {
   border-radius: 4px;
   padding: 12px 17px;
   font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   transition:
     background-color 150ms,
@@ -240,19 +229,23 @@ main:focus {
   background: var(--color-surface);
   border-color: var(--color-muted);
 }
-.small-link {
+.portfolio-shell .small-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 4px;
   transition: text-decoration-color 150ms;
 }
-.small-link:hover {
+.portfolio-shell .small-link:hover {
   color: var(--color-fg);
   text-decoration-color: currentColor;
 }
 .portfolio-section {
   border-top: 1px solid var(--color-line);
-  padding: 60px 0;
+  padding: 48px 0;
   scroll-margin-top: 128px;
 }
 .featured-project {
@@ -262,11 +255,16 @@ main:focus {
   scroll-margin-top: 128px;
 }
 .featured-project + .featured-project {
+  margin-top: 48px;
   border-top: 1px solid var(--color-line);
   padding-top: 48px;
 }
 .supporting-project {
+  display: grid;
+  gap: 20px;
   min-width: 0;
+  padding: 28px 0;
+  border-top: 1px solid var(--color-line);
   scroll-margin-top: 128px;
 }
 .project-copy {
@@ -310,6 +308,7 @@ main:focus {
 }
 .screenshot-caption {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -317,7 +316,7 @@ main:focus {
   padding: 12px;
   color: var(--color-muted);
   font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .screenshot-caption > span:last-child {
@@ -341,6 +340,12 @@ main:focus {
 .image-dialog::backdrop {
   background: rgb(0 0 0 / 85%);
 }
+.image-dialog-toolbar {
+  background: var(--color-surface);
+}
+.image-dialog-toolbar > p {
+  flex: 1 1 220px;
+}
 .image-dialog-image {
   display: block;
   width: 100%;
@@ -349,7 +354,7 @@ main:focus {
   object-fit: contain;
 }
 .case-details {
-  margin-top: 24px;
+  margin-top: 8px;
   border-top: 1px solid var(--color-line);
 }
 .case-details summary {
@@ -360,7 +365,7 @@ main:focus {
   gap: 15px;
   list-style: none;
   font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 11px;
+  font-size: 12px;
 }
 .case-details summary::-webkit-details-marker {
   display: none;
@@ -391,39 +396,11 @@ main:focus {
 .contact-section {
   padding-bottom: 64px;
 }
-@media (max-width: 1279px) {
-  .current-work {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-    padding-left: 0;
-    border-left: 0;
-  }
-  .current-work-link {
-    padding-bottom: 0;
-  }
-  .work-availability {
-    grid-column: 1 / -1;
-    margin-top: 0;
-  }
-}
 @media (min-width: 640px) {
   .experience-row {
     grid-template-columns: 165px minmax(0, 1fr);
     gap: 32px;
     padding: 36px 0;
-  }
-}
-@media (min-width: 640px) and (max-width: 1279px) {
-  .current-work {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .work-availability {
-    grid-column: auto;
-    border-top: 0;
-    border-left: 1px solid var(--color-line);
-    padding-top: 0;
-    padding-left: 20px;
   }
 }
 @media (min-width: 1024px) {
@@ -432,15 +409,17 @@ main:focus {
     scroll-margin-top: 32px;
   }
   .portfolio-section {
-    padding: 76px 0;
+    padding: 64px 0;
     scroll-margin-top: 32px;
   }
   .featured-project {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
     gap: 32px;
     scroll-margin-top: 32px;
   }
   .supporting-project {
+    grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.3fr);
+    gap: 32px;
     scroll-margin-top: 32px;
   }
   .project-image {
@@ -462,5 +441,32 @@ main:focus {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Portfolio-only refinements; other routes keep their own presentation. */
+.portfolio-shell {
+  scrollbar-color: var(--color-line) var(--color-bg);
+}
+.portfolio-shell :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+.hero-email {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.terminal-dialog {
+  scrollbar-color: var(--color-muted) var(--color-surface);
+}
+.terminal-dialog [aria-label="Command help"] button:focus-visible {
+  outline-offset: -2px;
+}
+.terminal-arcade button {
+  min-height: 44px;
+}
+@media (min-width: 1280px) {
+  .website-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

@@ -3,6 +3,7 @@ import Screenshot from "@/components/Screenshot";
 import { WEBSITES } from "@/lib/content";
 
 export default function Websites() {
+  const featured = WEBSITES.filter((website) => website.featured);
   return (
     <section
       id="websites"
@@ -13,14 +14,14 @@ export default function Websites() {
         id="websites-title"
         command="ls websites/"
         title="Out on the web"
-        description="A closer look at the storefronts, product sites, and brand experiences I’ve built."
-        right={`${WEBSITES.length} websites`}
+        description="Storefronts and company websites I’ve built."
+        right={`${featured.length} featured / ${WEBSITES.length} websites`}
       />
-      <div className="grid gap-x-7 gap-y-10 sm:grid-cols-2">
-        {WEBSITES.map((website) => (
+      <div className="website-gallery grid gap-x-7 gap-y-10 sm:grid-cols-2">
+        {featured.map((website) => (
           <article key={website.slug} className="min-w-0">
             <Screenshot image={website.image} compact />
-            <div className="mt-5 flex items-start justify-between gap-3">
+            <div className="mt-5 flex items-center justify-between gap-3">
               <h3 className="min-w-0 break-words text-lg font-medium tracking-[-0.025em]">
                 <a
                   href={website.url}
@@ -39,7 +40,7 @@ export default function Websites() {
             <p className="mt-2 text-base leading-relaxed text-muted">
               {website.description}
             </p>
-            <p className="mt-3 font-mono text-[10px] text-muted">
+            <p className="mt-3 font-mono text-xs leading-relaxed text-muted">
               {website.stack}{" "}
               <span aria-hidden="true" className="mx-1">
                 /

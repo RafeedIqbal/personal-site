@@ -16,6 +16,7 @@ export default function Screenshot({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const titleId = useId();
+  const captionId = useId();
 
   useEffect(() => {
     if (!open) return;
@@ -34,7 +35,7 @@ export default function Screenshot({
         ref={linkRef}
         href={image.src}
         className="screenshot"
-        aria-label={`Enlarge screenshot: ${image.label}`}
+        aria-labelledby={captionId}
         aria-haspopup="dialog"
         onClick={(event) => {
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
@@ -58,11 +59,22 @@ export default function Screenshot({
           className="preview-image"
         />
         <span className="screenshot-expand" aria-hidden="true">
-          ↗
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6" />
+          </svg>
         </span>
-        <span className="screenshot-caption">
+        <span id={captionId} className="screenshot-caption">
           <span>{image.label}</span>
-          <span aria-hidden="true">View image</span>
+          <span>View image</span>
         </span>
       </a>
       <dialog
@@ -92,17 +104,28 @@ export default function Screenshot({
         }}
       >
         <div className="image-dialog-content">
-          <div className="flex items-center justify-between gap-4 border-b border-line px-4 py-3 font-mono text-xs">
+          <div className="image-dialog-toolbar flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line px-4 py-2 font-mono text-xs">
             <p id={titleId}>{image.label}</p>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={close}
-              className="min-h-11 shrink-0 px-2 text-muted hover:text-fg"
-              autoFocus
-            >
-              Close <span aria-hidden="true">[esc]</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <a
+                href={image.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center text-fg underline decoration-line underline-offset-4 hover:decoration-muted"
+              >
+                Open full-size image
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={close}
+                className="min-h-11 shrink-0 px-2 text-muted hover:text-fg"
+                autoFocus
+              >
+                Close <span aria-hidden="true">[esc]</span>
+              </button>
+            </div>
           </div>
           {open && (
             <Image

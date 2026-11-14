@@ -57,6 +57,14 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       top: bodyRef.current.scrollHeight,
       behavior: reduceMotion ? "instant" : "smooth",
     });
+    const onResize = () => {
+      const body = bodyRef.current;
+      if (body && document.activeElement === inputRef.current) {
+        body.scrollTo({ top: body.scrollHeight, behavior: "instant" });
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [history, showHelp, reduceMotion]);
 
   // Opening a game grows the panel; align the arcade heading with the top of
@@ -126,6 +134,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       e.preventDefault();
       if (showHelp) {
         setShowHelp(false);
+        focusPrompt();
       } else if (gamePanelOpen) {
         closeGames();
       } else {
@@ -305,7 +314,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] font-mono"
+      className="terminal-dialog fixed inset-0 z-[60] font-mono"
       role="dialog"
       aria-modal="true"
       aria-label="Terminal"
@@ -317,7 +326,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       <div
         ref={panelRef}
         className="absolute bottom-4 left-1/2 flex max-h-[calc(100dvh-32px)] w-[min(880px,calc(100vw-32px))] -translate-x-1/2 flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.4)] sm:bottom-11 sm:max-h-[calc(100dvh-60px)]"
-        style={{ height: gamePanelOpen ? "min(78dvh, 700px)" : 440 }}
+        style={{ height: gamePanelOpen || showHelp ? "min(78dvh, 700px)" : 440 }}
         onClick={focusPrompt}
       >
         {/* Header */}
@@ -326,14 +335,13 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
             <span className="text-accent">●</span> visitor@rafeed.dev
           </span>
           <button
-            aria-label="Close terminal"
             onClick={(e) => {
               e.stopPropagation();
               onClose();
             }}
-            className="text-xs text-subtle transition-colors hover:text-white"
+            className="min-h-11 px-2 text-xs text-subtle transition-colors hover:text-white"
           >
-            [esc]
+            Close terminal <span aria-hidden="true">[esc]</span>
           </button>
         </div>
 
@@ -353,64 +361,6 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
               Type <span className="text-fg">games</span> if bored.
             </p>
           </div>
-
-          {/* Help card */}
-          <AnimatePresence>
-            {showHelp && (
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: reduceMotion ? 0 : 0.15 }}
-                className="overflow-hidden"
-              >
-                <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs">
-                  <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
-                    <span className="font-bold text-fg">
-                      available commands
-                    </span>
-                    <button
-                      aria-label="Close command help"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowHelp(false);
-                        focusPrompt();
-                      }}
-                      className="text-subtle transition-colors hover:text-white"
-                    >
-                      [esc]
-                    </button>
-                  </div>
-                  <div className="space-y-0.5 px-3 py-2">
-                    {HELP_COMMANDS.map(
-                      ({ command: cmd, description: desc }) => (
-                        <div
-                          key={cmd}
-                          className="flex flex-wrap justify-between gap-x-4 gap-y-0.5"
-                        >
-                          <button
-                            className="text-left text-fg hover:underline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (cmd) {
-                                setInput(cmd.replace(/<[^>]+>/g, ""));
-                                setHistoryIndex(-1);
-                                setShowHelp(false);
-                                inputRef.current?.focus();
-                              }
-                            }}
-                          >
-                            {cmd}
-                          </button>
-                          <span className="text-subtle">{desc}</span>
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {gamePanelOpen && (
             <div
@@ -461,6 +411,60 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
           <p role="status" className="sr-only">
             {announcement}
           </p>
+
+          {/* Help card */}
+          <AnimatePresence>
+            {showHelp && (
+              <motion.div
+                initial={reduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reduceMotion ? 0 : 0.15 }}
+                className="shrink-0 overflow-hidden"
+              >
+                <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs" role="region" aria-label="Command help">
+                  <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
+                    <span className="font-bold text-fg">
+                      available commands
+                      <span className="ml-2 font-normal text-subtle">({HELP_COMMANDS.length})</span>
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowHelp(false);
+                        focusPrompt();
+                      }}
+                      className="min-h-11 px-2 text-subtle transition-colors hover:text-white"
+                    >
+                      Close help <span aria-hidden="true">[esc]</span>
+                    </button>
+                  </div>
+                  <div className="grid max-h-[min(32dvh,320px)] grid-cols-2 gap-x-3 overflow-y-auto overscroll-contain px-2 py-1">
+                    {HELP_COMMANDS.map(
+                      ({ command: cmd, description: desc }) => (
+                        <button
+                          key={cmd}
+                          className="flex min-h-11 w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded px-2 py-2 text-left text-fg hover:bg-surface"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (cmd) {
+                              setInput(cmd.replace(/<[^>]+>/g, ""));
+                              setHistoryIndex(-1);
+                              setShowHelp(false);
+                              inputRef.current?.focus();
+                            }
+                          }}
+                        >
+                          <span>{cmd}</span>
+                          <span className="text-subtle">{desc}</span>
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Active input prompt — part of the content flow */}
           <div className="flex items-start gap-2 text-xs">

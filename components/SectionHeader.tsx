@@ -14,8 +14,14 @@ export default function SectionHeader({
   right,
 }: SectionHeaderProps) {
   return (
-    <div className="mb-9 sm:mb-11">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px]">
+    <div className="mb-8 sm:mb-10">
+      <h2
+        id={id}
+        className="text-[clamp(28px,3.5vw,38px)] font-medium leading-tight tracking-[-0.03em]"
+      >
+        {title}
+      </h2>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
         <span className="text-muted">
           <span className="mr-2 text-accent" aria-hidden="true">
             $
@@ -24,12 +30,6 @@ export default function SectionHeader({
         </span>
         {right && <span className="text-muted">{right}</span>}
       </div>
-      <h2
-        id={id}
-        className="text-[clamp(28px,3.5vw,38px)] font-medium leading-tight tracking-[-0.035em]"
-      >
-        {title}
-      </h2>
       {description && (
         <p className="mt-3 max-w-[62ch] text-base leading-relaxed text-muted">
           {description}
