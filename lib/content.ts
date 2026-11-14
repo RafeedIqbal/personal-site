@@ -8,12 +8,12 @@ export const PROFILE = {
   githubUrl: "https://github.com/RafeedIqbal",
   resumeUrl: "/Rafeed_Iqbal_Resume.pdf",
   title: "Software Engineer & Product Leader",
-  tagline: "Building products at the intersection of code and strategy.",
+  tagline: "Building fragrance software at BaseNote. Previously led product and engineering at Icon Training.",
   availability: "Open to software engineering & product roles",
   workPreference: "Remote or hybrid",
   heroParagraph:
-    "I build software and lead the product work around it. From AI assistants and operational platforms to the teams that bring them to life.",
-  bio: "I’m a software engineer and product leader who enjoys working across the whole product: understanding the problem, designing the system, and getting it into people’s hands. Today, I’m building fragrance technology at BaseNote. Previously, I led product and engineering at Icon Training.",
+    "I’m the founding engineer at BaseNote, building software for fragrance development, production, and storefronts. Previously, I led product and engineering at Icon Training and grew the team from 2 to 8.",
+  bio: "I enjoy working across a whole product, from understanding the problem and designing the system to getting it into people’s hands.",
 };
 
 export const EDUCATION = {
@@ -59,7 +59,7 @@ export const EXPERIENCE: Experience[] = [
   },
   {
     date: "Sep 2023 – Aug 2024",
-    impact: "255 interface errors resolved",
+    impact: "255 interface errors reduced to 0; average resolution under one day",
     role: "SAP Analyst, S/4HANA Key User (Co-op)",
     company: "Sanofi Pasteur",
     location: "Toronto, Canada",
@@ -124,7 +124,7 @@ export const PROJECTS: Project[] = [
     slug: "palette-knife",
     name: "Palette Knife",
     summary:
-      "An open-source Python toolkit for repeatable web scraping, with resumable workflows, a local dashboard, and exports that retain source provenance.",
+      "A Python toolkit for collecting web data through reusable workflows, with a local dashboard for tracking each crawl.",
     stack: ["Python", "SQLite", "TOML", "CSS / XPath"],
     description:
       "A configurable web scraping toolkit built around TOML workflows, CSS/XPath selectors, and custom Python adapters. A durable SQLite queue preserves progress across interruptions, while a local dashboard tracks each crawl. Includes JSON, JSONL, and CSV exports with source metadata, machine-readable CLI output, and a portable agent skill.",
@@ -166,7 +166,6 @@ export const PROJECTS: Project[] = [
       "Bajan's Bangla interface with its companion avatar, voice controls, and conversation panel",
       "Bangla voice companion",
     ),
-    featured: true,
   },
   {
     slug: "id8",
@@ -190,7 +189,6 @@ export const PROJECTS: Project[] = [
       "id8 application showing the project workspace and generation pipeline",
       "Application workspace",
     ),
-    featured: true,
   },
   {
     slug: "e-predict",
@@ -243,6 +241,8 @@ export const PROFESSIONAL_WORK: Project[] = [
     category: "Fragrance technology",
     featured: true,
     stack: ["Multi-tenant SaaS", "RAG", "Shopify Hydrogen"],
+    summary:
+      "Sole engineer building an ERP for perfumers, connecting inventory, production, AI assistants, and storefronts.",
     description:
       "Connecting fragrance creation with the systems that turn it into a product: AI assistants, inventory, production, and storefronts.",
     contribution: "Founding engineer · Architecture through rollout",
@@ -251,7 +251,7 @@ export const PROFESSIONAL_WORK: Project[] = [
     approach:
       "Build the ERP and storefronts as one connected platform, with Blend Engine and Alchemy Engine using retrieval to ground recommendations in the chemists’ experimental data.",
     result:
-      "End-to-end ownership of the platform and first licensed-client pilot, alongside a launched Shopify Hydrogen storefront integrated with production and fulfilment.",
+      "Ownership of the first licensed-client pilot, plus a launched Shopify Hydrogen storefront connected to production and fulfilment.",
     websiteUrl: "https://www.basenotesolutions.com/private-label",
     image: screenshot(
       "sites/basenote-solutions",
@@ -265,6 +265,8 @@ export const PROFESSIONAL_WORK: Project[] = [
     category: "AI fitness coaching",
     featured: true,
     stack: ["AI features", "Product strategy", "Next.js"],
+    summary:
+      "Led product direction and engineering for an AI fitness coaching app.",
     description:
       "Helped trainers and athletes scale their coaching through AI avatars, while building the team and product behind the experience.",
     contribution: "Head of Product and Engineering",
@@ -293,6 +295,7 @@ export interface Website {
   type: string;
   description: string;
   image: PortfolioImage;
+  featured?: boolean;
 }
 
 export const WEBSITES: Website[] = [
@@ -326,6 +329,7 @@ export const WEBSITES: Website[] = [
   },
   {
     slug: "alpac-london",
+    featured: true,
     name: "alpaclondon.com",
     url: "https://alpaclondon.com/",
     stack: "Shopify Hydrogen",
@@ -340,16 +344,17 @@ export const WEBSITES: Website[] = [
   },
   {
     slug: "arizmi-labs",
+    featured: true,
     name: "arizmilabs.com",
     url: "https://www.arizmilabs.com/",
     stack: "Next.js",
     type: "consultancy",
     description:
-      "A digital home for a team that designs and builds new products.",
+      "A website for a consultancy that designs and builds new products.",
     image: screenshot(
       "sites/arizmi-labs",
       "Arizmi Labs website presenting its product development services",
-      "Consultancy website",
+      "Arizmi Labs website",
     ),
   },
   {
@@ -368,16 +373,17 @@ export const WEBSITES: Website[] = [
   },
   {
     slug: "riveli-mn",
+    featured: true,
     name: "rivelimn.com",
     url: "https://rivelimn.com",
     stack: "Next.js, Payload CMS",
     type: "consultancy",
     description:
-      "Brand, customer experience, and growth strategy in a focused web experience.",
+      "A website for a brand and growth strategy consultancy.",
     image: screenshot(
       "sites/riveli-mn",
       "Rive and Limn brand and growth strategy website",
-      "Consultancy website",
+      "Rive & Limn website",
     ),
   },
 ];
@@ -405,7 +411,7 @@ export const CAPABILITIES = [
     description:
       "Turn knowledge and model output into features people can use.",
     tools: "RAG, Google Gemini, machine learning, SQL",
-    evidence: "Fragrance assistants, id8, and energy forecasting",
+    evidence: "See the id8 application workflow",
     href: "#work-id8",
   },
   {

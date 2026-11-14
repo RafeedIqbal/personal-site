@@ -118,7 +118,7 @@ export default function BackgroundEffect() {
       if (disposed || motionQuery.matches || document.hidden) return;
       // Keep the effect in the empty space around content and workspace chrome.
       const elements = document.querySelectorAll(
-        "main h1, main h2, main h3, main h4, main p, main ul, main a, main button, main span, main summary, .hero-section > div:first-child, .work-availability, aside, header, footer",
+        "main :is(h1, h2, h3, h4, h5, h6), main p, main ul, main a, main button, main span, main summary, aside, header, footer",
       );
       const rects: [number, number, number, number][] = [];
       const viewportBottom = window.innerHeight + EXCLUSION_VIEWPORT_MARGIN;

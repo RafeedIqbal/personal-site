@@ -18,12 +18,12 @@ export default function About() {
           {PROFILE.bio}
         </p>
         <div className="border-l border-line pl-6">
-          <p className="mb-3 font-mono text-[11px] text-muted">Education</p>
+          <p className="mb-3 font-mono text-xs text-muted">Education</p>
           <h3 className="text-xl font-medium tracking-[-0.02em]">
             {EDUCATION.school}
           </h3>
           <p className="mt-2 text-sm text-body">{EDUCATION.degree}</p>
-          <p className="mt-3 font-mono text-[11px] leading-relaxed text-muted">
+          <p className="mt-3 font-mono text-xs leading-relaxed text-muted">
             {EDUCATION.years}
             <br />
             {EDUCATION.location}

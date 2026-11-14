@@ -69,3 +69,75 @@ Added Palette Knife as a featured project, with repository-backed copy and termi
 The capture uses the bundled synthetic demo: two local pages completed and three records saved. The preview is labeled as a local demo; it contains no third-party crawl data.
 
 Local validation passed: lint, typecheck, production build, server-rendered content, layouts at 320–1920px, image enlargement and focus restoration, case disclosures, terminal listing/details/autocomplete, and content, keyboard disclosure, and direct image access without JavaScript. No browser console errors were reported. Review captures are in ignored `output/playwright/palette-knife-desktop.png` and `output/playwright/palette-knife-mobile.png`. These checks cover the local production build.
+
+## Refined terminal review — 14 November 2026
+
+Implemented the approved design, copy, and accessibility plan for the main portfolio. `/belong` was excluded. The graphite palette, green accent, Space Grotesk, JetBrains Mono, desktop file tree, ASCII interaction, terminal, and existing factual content remain the basis of the site.
+
+### Design and copy
+
+- The hero states the current BaseNote role and previous Icon Training leadership directly, including the existing team-growth result. Removed the repeated current/previous sidebar within the hero.
+- BaseNote, Icon Training, and Palette Knife are the three featured projects. Each shows the role, a plain-language summary, and the outcome before its case disclosure. Bajan, id8, E-Predict, and SyncMaster use compact rows with images and technical detail inside native disclosures.
+- The website gallery features ALPAC London, Arizmi Labs, and Rive & Limn. All six website records remain available through the terminal. Existing screenshot assets and provenance labels are preserved.
+- Section headings lead their command labels. Metadata is at least 12px, secondary links have larger targets, and reduced repetition and spacing shorten the default reading path.
+- Removed the generic skills introduction, made the id8 evidence link describe its actual destination, shortened the About copy, and brought the existing Sanofi resolution result into the experience highlight.
+
+Reference browsing covered [Minimal Gallery](https://minimal.gallery/websites/), [One Page Love](https://onepagelove.com/), and [Siteinspire](https://www.siteinspire.com/websites). The compact project index takes cues from [Kalok Yeung](https://minimal.gallery/kalok-yeung/); visible project outcomes take cues from [Oluwatobi Salawu](https://onepagelove.com/oluwatobi-salawu). These informed hierarchy and restraint; no reference artwork or website code was copied. The existing assets support this direction without 3D assets or a new runtime package.
+
+### Accessibility and interaction
+
+- Screenshot links use their visible captions as accessible names. The image dialog adds a clearly labeled full-size image link, keeps focus contained, closes with Escape, and restores focus to the trigger.
+- The terminal shortcut is now **Ctrl + backtick**. A bare backtick does not trigger a global action. Help commands and shared arcade controls have targets at least 44px tall, with visible close/focus/resume labels that match their accessible names.
+- Help follows command history, and opening it expands the terminal. Its heading, command list, and prompt remain available after long output.
+- The mobile menu becomes sticky after hydration. With JavaScript disabled it stays in normal document flow, so an expanded menu does not cover anchor destinations.
+- Arcade changes cover shared controls only. Tetris still lacks a complete nonvisual representation of its board; that gameplay accessibility work was explicitly deferred. Automated scans are not a claim of complete accessibility conformance.
+
+### Verification and reproduction
+
+Added `@playwright/test` and `@axe-core/playwright` as development dependencies, with a colocated suite in `sections/Portfolio.test.ts`. No runtime dependency was added.
+
+For a fresh checkout, install the test browser once:
+
+```bash
+npx playwright install chromium
+```
+
+Then run:
+
+```bash
+npm run test:ui
+```
+
+This builds the production app, starts a temporary server on `127.0.0.1:3035`, runs the Chromium checks, and stops that server. Keep that port free. Failure traces and screenshots are written to the ignored Playwright output directory.
+
+Passed locally:
+
+- All **14 UI tests**, including seven case disclosures, all six terminal website records, accessible image names, dialog focus and full-size access, keyboard shortcuts, command history and completion, help after long output, shared arcade controls, clipboard feedback, and a real résumé download.
+- Automated axe checks using WCAG 2 A/AA, 2.1 A/AA, 2.2 AA, and best-practice tags for the main page, expanded cases, mobile menu, image dialog, terminal help, arcade library, and Tetris controls: zero reported violations in the tested states.
+- Responsive navigation and overflow checks at 320, 390, 768, 1024, 1440, and 1920px; normal- and reduced-motion checks; and navigation, disclosures, image links, and résumé access with JavaScript disabled.
+- Visual inspection of desktop and mobile layouts, including the 320px contact section and expanded id8 case. Native Chrome checks at 200% and 400% browser zoom showed no horizontal overflow; zoom was restored afterward.
+- Manual Hanoi move/reset and Space Invaders keyboard/fire/pause checks. The automated suite also exercises Tic-Tac-Toe and Tetris keyboard controls. No browser page errors were recorded in the final manual session.
+- `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:dependencies` (9 tests), and `git diff --check`.
+
+Final review captures are in ignored `output/playwright/refinement/`, including `desktop-overview.png`, `mobile-overview.png`, `desktop-websites.png`, `mobile-320-contact.png`, `mobile-320-expanded-case.png`, `desktop-terminal-help.png`, and `desktop-arcade.png`.
+
+Existing résumé and local launch-configuration changes are outside the release scope.
+
+
+### Claude release review and fixes
+
+Claude Code 2.1.316 reviewed the implementation with `claude-opus-5-5`, retaining the configured `xhigh` effort. The review covered the source changes, connected callers, tests, and 13 rendered screenshots. It found no release-blocking issue and identified improvements to help visibility, keyboard focus, screenshot names, heading structure, copy, documentation, and regression coverage.
+
+The help-visibility and Escape-focus failures were reproduced against the previous build before applying the fixes. The resulting implementation:
+
+- Uses two columns for all 14 help commands, with a visible count, a bounded scroll area on shorter screens, and prompt focus restored when Escape dismisses help. Ctrl + backtick also closes the terminal from its prompt, and resizing keeps a focused prompt visible.
+- Names the Arizmi Labs and Rive & Limn screenshots distinctly, nests supporting project headings correctly, and keeps ASCII effects clear of every heading level.
+- Gives skills evidence links a focus outline around their content, shows the gallery as three featured out of six total websites, improves spoken punctuation, and removes obsolete selectors.
+- Checks all six terminal website records, actual keyboard typing during arcade use, visible Tetris movement and hard-drop scoring, unique screenshot captions, normal-motion canvas fading and smooth scrolling, help focus after animation, and the 1920px layout. Axe best-practice checks supplement the WCAG A/AA checks; caption uniqueness is tested separately because axe's identical-link-purpose rule belongs to its AAA tags.
+- Runs the browser suite in CI and synchronizes README, AGENTS, CLAUDE, and the shared verification skill. The Claude verification entry point now refers to the shared guide.
+
+After the fixes, all 14 UI tests, 9 dependency tests, lint, typecheck, and the production build passed. `npm audit --audit-level=moderate` reported zero vulnerabilities. Manual checks also verified help at 1024 × 600 and refreshed screenshots after the navigation indicator settled. Real screen-reader use and Safari/Firefox were not tested in this pass.
+
+The intended release target is the existing Vercel `personal-site` project serving `https://www.rafeed.dev`, using the repository's `main` branch. The ignored local Vercel project link was corrected after checking the current project and production deployment. `/belong`, the pre-existing résumé edits, and the local launch configuration remain outside this change.
+
+A focused Opus follow-up confirmed all 12 fixes and the resize handling, found no regression, and returned “Ship.” Its final focus-ring suggestion was applied by drawing help-button outlines inside their bounds so the scroll container cannot clip them. The CLI version, configured effort, and local Vercel-link correction above were verified directly by the implementing agent.

@@ -26,8 +26,15 @@ out/
 build/
 dist/
 coverage/
-.playwright-cli/
 /output/
+
+# Playwright outputs
+.playwright-cli/
+.playwright-mcp/
+playwright-report/
+blob-report/
+test-results/
+**/output/playwright/
 
 # env files
 .env*

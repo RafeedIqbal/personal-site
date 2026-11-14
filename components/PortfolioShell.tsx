@@ -46,7 +46,7 @@ export default function PortfolioShell({
       if (
         (event.key !== "`" && event.code !== "Backquote") ||
         event.metaKey ||
-        event.ctrlKey ||
+        !event.ctrlKey ||
         event.altKey ||
         event.shiftKey ||
         event.repeat ||
@@ -54,12 +54,7 @@ export default function PortfolioShell({
       )
         return;
       const target = event.target as HTMLElement | null;
-      if (
-        target?.closest(
-          "input, textarea, select, [contenteditable='true'], dialog[open]",
-        )
-      )
-        return;
+      if (target?.closest("dialog[open]")) return;
       event.preventDefault();
       if (!terminalOpen) triggerRef.current = target;
       setTerminalReady(true);
@@ -89,7 +84,7 @@ export default function PortfolioShell({
     <>
       {desktop && <BackgroundEffect />}
       <div
-        className="relative z-10 min-h-dvh lg:grid lg:grid-cols-[224px_minmax(0,1fr)]"
+        className="portfolio-shell relative z-10 min-h-dvh lg:grid lg:grid-cols-[224px_minmax(0,1fr)]"
         inert={terminalOpen}
       >
         <a href="#main-content" className="skip-link">

@@ -44,7 +44,7 @@ export default function TerminalGamesPanel({
 
   return (
     <div
-      className="rounded-md border border-white/10 bg-white/[0.02] text-xs"
+      className="terminal-arcade rounded-md border border-white/10 bg-white/[0.02] text-xs"
       onClick={(event) => {
         event.stopPropagation();
         onEnableHotkeys();
@@ -67,7 +67,7 @@ export default function TerminalGamesPanel({
               }}
               className="text-subtle transition-colors hover:text-white"
             >
-              [library]
+              Library
             </button>
           )}
           <button
@@ -77,7 +77,7 @@ export default function TerminalGamesPanel({
             }}
             className="text-subtle transition-colors hover:text-white"
           >
-            [close]
+            Close game
           </button>
         </div>
       </div>
@@ -97,9 +97,8 @@ export default function TerminalGamesPanel({
                     onEnableHotkeys(true);
                   }}
                   className={hotkeysEnabled ? "text-accent" : "text-subtle hover:text-white"}
-                  aria-label="Focus game keyboard controls"
                 >
-                  {hotkeysEnabled ? "[focus keyboard controls]" : "[resume keyboard controls]"}
+                  {hotkeysEnabled ? "Focus keyboard controls" : "Resume keyboard controls"}
                 </button>
               )}
             </div>

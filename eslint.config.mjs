@@ -18,6 +18,9 @@ const eslintConfig = defineConfig([
     "**/build/**",
     "next-env.d.ts",
     "id8-src/**",
+    // Agent skill bundles are tooling, not application source.
+    ".agents/skills/**",
+    ".claude/skills/**",
   ]),
 ]);
 
