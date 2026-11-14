@@ -1,9 +1,9 @@
-import { Manrope, Public_Sans } from "next/font/google";
+import { Archivo, Chivo_Mono } from "next/font/google";
 import "./publicus.css";
 
-const display = Manrope({ subsets: ["latin"], display: "swap", variable: "--font-publicus-display" });
-const body = Public_Sans({ subsets: ["latin"], display: "swap", variable: "--font-publicus-body" });
+const text = Archivo({ subsets: ["latin"], display: "swap", axes: ["wdth"], variable: "--font-publicus-text" });
+const data = Chivo_Mono({ subsets: ["latin"], display: "swap", variable: "--font-publicus-data" });
 
 export default function PublicusLayout({ children }: { children: React.ReactNode }) {
-  return <div className={`publicus ${display.variable} ${body.variable}`}>{children}</div>;
+  return <div className={`publicus ${text.variable} ${data.variable}`}>{children}</div>;
 }

@@ -1,67 +1,151 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { Metadata, Viewport } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import DemoLoader from "@/components/publicus/DemoLoader";
+import RecordSheet from "@/components/publicus/RecordSheet";
 
 const resume = "/publicus/Rafeed_Iqbal_Publicus_Resume.pdf";
-const title = "Rafeed × Publicus — From evidence to action";
-const description = "A personal application for Publicus. Recent work at Basenote and Icon, and a working exploration of procurement intelligence.";
-export const metadata: Metadata = { title, description, robots: { index: false, follow: false, nocache: true }, alternates: { canonical: "/publicus" }, openGraph: { title, description, url: "/publicus", type: "website" }, twitter: { card: "summary_large_image", title, description } };
-export const viewport: Viewport = { themeColor: "#15111d", colorScheme: "dark light" };
+const email = "rafeediqbal@gmail.com";
+const title = "Rafeed Iqbal’s application to Publicus";
+const description = "Rafeed Iqbal’s application for Founding Engineer, Product & AI at Publicus: work at BaseNote and Icon, and a procurement explorer built on CanadaBuys open data.";
+export const metadata: Metadata = { title: { absolute: title }, description, robots: { index: false, follow: false, nocache: true }, alternates: { canonical: "/publicus" }, openGraph: { title, description, url: "/publicus", type: "website" }, twitter: { card: "summary_large_image", title, description } };
+export const viewport: Viewport = { themeColor: "#fcfcfb", colorScheme: "light" };
 
-function Arrow() { return <span aria-hidden="true">↗</span>; }
-function EvidenceOrbit() {
-  return <div className="pu-orbit" aria-label="From scattered documents to evidence, then a decision" role="img">
-    <svg viewBox="0 0 620 460" fill="none" aria-hidden="true">
-      <defs><linearGradient id="pu-line"><stop stopColor="#7d5aa4" stopOpacity="0.1"/><stop offset=".55" stopColor="#bda0e1"/><stop offset="1" stopColor="#7d5aa4" stopOpacity=".1"/></linearGradient></defs>
-      <ellipse cx="310" cy="225" rx="245" ry="120" stroke="url(#pu-line)" transform="rotate(-27 310 225)"/>
-      <ellipse cx="310" cy="225" rx="245" ry="120" stroke="url(#pu-line)" transform="rotate(27 310 225)"/>
-      <ellipse cx="310" cy="225" rx="245" ry="120" stroke="#827095" strokeOpacity=".15"/>
-      <path d="M142 147L310 225 472 136M137 307L310 225 482 315" stroke="#b495d3" strokeOpacity=".35" strokeDasharray="3 5"/>
-      <circle cx="310" cy="225" r="58" fill="#261c34" stroke="#806496"/>
-      <path d="M291 225l13 13 27-28" stroke="#d3b5f7" strokeWidth="3"/>
-      {[[142,147],[472,136],[137,307],[482,315]].map(([x,y]) => <g key={x}><rect x={x-24} y={y-30} width="48" height="60" rx="6" fill="#21192b" stroke="#675275"/><path d={`M${x-12} ${y-12}h24m-24 10h24m-24 10h15`} stroke="#9c87ad"/></g>)}
-      <circle className="pu-orbit-point" cx="417" cy="355" r="4" fill="#c9a6ef"/>
-      <circle cx="75" cy="223" r="3" fill="#7b658d"/><circle cx="361" cy="89" r="3" fill="#7b658d"/>
-    </svg>
-    <span className="pu-orbit-label pu-orbit-label-one">Scattered records</span>
-    <span className="pu-orbit-label pu-orbit-label-two">Traceable decisions</span>
-    <span className="pu-orbit-caption">A useful answer starts with reliable evidence.</span>
-  </div>;
+function Arrow({ down = false }: { down?: boolean }) {
+  return <svg className="pu-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" aria-hidden="true">{down ? <path d="M7 2v10M3 8l4 4 4-4"/> : <path d="M4 10l6-6M5 4h5v5"/>}</svg>;
+}
+
+// A real product screenshot dropped into public/publicus/work/ replaces the public-site capture on the next build.
+function Shot({ work, capture, alt, href, site, product }: { work: string; capture: string; alt: string; href: string; site: string; product: string }) {
+  const own = `/publicus/work/${work}`;
+  const hasOwn = existsSync(join(process.cwd(), "public", own));
+  const src = hasOwn ? own : `/publicus/captures/${capture}`;
+  const label = hasOwn ? product : `Public site, ${site}, captured 15 Nov 2026`;
+  return <figure className="pu-shot">
+    <a href={href} target="_blank" rel="noopener noreferrer" tabIndex={-1} aria-hidden="true"><Image src={src} alt={alt} width={1440} height={836} sizes="(min-width: 1024px) 660px, 100vw"/></a>
+    <figcaption><a href={href} target="_blank" rel="noopener noreferrer">{label} <Arrow/></a></figcaption>
+  </figure>;
+}
+
+function Meta({ rows }: { rows: [string, string, boolean?][] }) {
+  return <dl className="pu-entry-meta">{rows.map(([term, value, figure]) => <div key={term}><dt>{term}</dt><dd className={figure ? "pu-data" : undefined}>{value}</dd></div>)}</dl>;
 }
 
 export default function PublicusPage() {
   return <>
-    <a className="pu-skip" href="#publicus-demo">Skip to the working demo</a>
-    <header className="pu-nav"><a className="pu-wordmark" href="#publicus-top">rafeed<span className="pu-cross">×</span><span>publicus</span><span className="pu-star" aria-hidden="true">✳</span></a><nav aria-label="Application navigation"><a href="#publicus-work">Selected work</a><a href="#publicus-demo">The demo</a><a href={resume} target="_blank" rel="noopener noreferrer">Résumé <Arrow/></a></nav></header>
-    <main id="publicus-top">
-      <section className="pu-hero pu-container">
-        <div className="pu-hero-copy"><p className="pu-eyebrow"><span className="pu-status-dot"/> A personal application · Founding Engineer, Product & AI</p>
-          <h1>From messy inputs.<br/>To products people<br/><span>can rely on.</span></h1>
-          <p className="pu-hero-intro">I’m Rafeed. At Basenote and Icon, I’ve built AI systems, shaped products, and owned the work that turns a promising idea into something useful.</p>
-          <p className="pu-hero-sub">Here’s why I’d like to do that at Publicus.</p>
-          <div className="pu-actions"><a className="pu-button pu-primary" href="#publicus-work">Explore my work <span aria-hidden="true">↓</span></a><a className="pu-text-link" href="#publicus-demo">Try the procurement demo <Arrow/></a></div>
-        </div><EvidenceOrbit/>
-        <div className="pu-hero-foot"><span>Built for a specific role.<br/><strong>And a problem I want to work on.</strong></span><span>01 — Experience<br/>02 — Product thinking<br/>03 — Working software</span><a href="https://publicus.ai/careers/founding-engineer" target="_blank" rel="noopener noreferrer">The role that prompted this <Arrow/></a></div>
+    <a className="pu-skip" href="#content">Skip to content</a>
+    <header className="pu-strip pu-container">
+      <p><Link href="/">rafeed.dev</Link><span aria-hidden="true"> / </span><span>publicus</span></p>
+      <nav aria-label="On this page"><a href="#work" className="pu-wide">Work</a><a href="#explorer" className="pu-wide">Explorer</a><a href={resume} target="_blank" rel="noopener noreferrer">Résumé (PDF)</a><a href={`mailto:${email}`}>Email</a></nav>
+    </header>
+
+    <main id="content" tabIndex={-1}>
+      <section className="pu-masthead" aria-labelledby="pu-title">
+        <div className="pu-container">
+          <h1 id="pu-title">I’m applying to be Publicus’s Founding Engineer, Product &amp; AI.</h1>
+          <dl className="pu-meta">
+            <div><dt>Publisher</dt><dd>Rafeed Iqbal</dd></div>
+            <div><dt>Modified</dt><dd className="pu-data">2026-11-15</dd></div>
+            <div><dt>Contents</dt><dd><a href="#work">2 roles</a>, <a href="#palette-knife">1 open-source project</a>, <a href="#records">10 CanadaBuys records</a>, <a href="#explorer">1 explorer</a></dd></div>
+            <div><dt>Format</dt><dd>HTML, PDF résumé (86 KB)</dd></div>
+          </dl>
+        </div>
       </section>
 
-      <section id="publicus-work" className="pu-work pu-container">
-        <div className="pu-section-heading"><p className="pu-eyebrow">01 / What I bring</p><h2>The product.<br/>The system.<br/><span>The follow-through.</span></h2><p>My recent work sits at the intersection Publicus is hiring for: customer problems, AI engineering, and ownership beyond the first release.</p></div>
-        <article className="pu-case">
-          <div className="pu-case-copy"><div className="pu-case-meta"><span>01 — Basenote</span><span>July 2026 → Present</span></div><h3>AI that has to work<br/>with the real inventory.</h3><p className="pu-case-lead">As Basenote’s sole engineer, I’m building the software behind a fragrance business—from an AI consultation to the formula, stock, and order.</p><dl className="pu-case-facts"><div><dt>The product</dt><dd>Blend, a tool-calling formulation agent, connected to a multi-tenant operations platform.</dd></div><div><dt>The engineering</dt><dd>LangGraph, PostgreSQL and pgvector. Retrieval over chemist data and live inventory, with formulation checks in code.</dd></div><div><dt>The ownership</dt><dd>ERP, storefront integrations, queues, recovery paths, and a licensed client pilot that is still in progress.</dd></div></dl><p className="pu-relevance"><span>Why it matters here</span>An answer only helps when it respects the underlying data and survives the next operational step.</p><a className="pu-text-link" href="https://www.basenotesolutions.com/private-label" target="_blank" rel="noopener noreferrer">Basenote <Arrow/></a></div>
-          <div className="pu-system-art"><div className="pu-art-top"><span className="pu-micro">BASENOTE / A CONNECTED SYSTEM</span><span className="pu-art-dot"/></div><div className="pu-art-request"><span className="pu-micro">01 / THE REQUEST</span><p>“Something woody.<br/>A little unexpected.”</p></div><div className="pu-flow-line"><span>Context → retrieval → tools</span></div><div className="pu-art-engine"><div><span className="pu-star">✳</span><strong>Blend</strong><small>Formulation agent</small></div><ul><li><span>Inventory</span><b>Live availability</b></li><li><span>Knowledge</span><b>Chemist data</b></li><li><span>Validation</span><b>Checked in code</b></li></ul></div><div className="pu-flow-line"><span>Validated output → operations</span></div><div className="pu-art-output"><span>Formula</span><span>Stock</span><span>Order</span></div><p className="pu-art-caption">Architecture illustration · no client data shown</p></div>
-        </article>
-        <article className="pu-case pu-case-icon"><div className="pu-case-copy"><div className="pu-case-meta"><span>02 — Icon</span><span>July 2025 → June 2026</span></div><h3>From product direction<br/>to a team that delivers.</h3><p className="pu-case-lead">As Head of Product & Engineering, I led an AI coaching product from MVP to a production-ready launch.</p><dl className="pu-case-facts"><div><dt>The product</dt><dd>AI coaching avatars of trainers and athletes, offered through paid subscriptions.</dd></div><div><dt>The work</dt><dd>Turn business goals into architecture, priorities and sprints, while contributing to AI features and the company website.</dd></div><div><dt>The team</dt><dd>Grew engineering from two to eight people and owned the coordination between product decisions and delivery.</dd></div></dl><p className="pu-relevance"><span>Why it matters here</span>A founding engineer needs to make the product clearer, bring people along, and close the loop after shipping.</p><a className="pu-text-link" href="https://icontraining.app" target="_blank" rel="noopener noreferrer">Icon <Arrow/></a></div>
-          <div className="pu-icon-art"><span className="pu-micro">ICON / PRODUCT & ENGINEERING</span><div className="pu-team-number"><span>2</span><i aria-hidden="true">→</i><strong>8</strong></div><p className="pu-team-caption">Engineers. One shared product direction.</p><div className="pu-delivery"><div><b>01</b><span>Understand the product</span><small>Users, goals, constraints</small></div><div><b>02</b><span>Make the decisions</span><small>Architecture, scope, priorities</small></div><div><b>03</b><span>Own the delivery</span><small>Hands-on work, team, launch</small></div></div><div className="pu-art-footer"><span>Product judgment</span><span>Engineering ownership</span></div></div>
-        </article>
-        <div className="pu-open-source"><span className="pu-micro">ANOTHER PIECE OF THE PUZZLE</span><p><strong>Palette Knife.</strong> An open-source Python toolkit for resumable public-data collection. Queues, provenance, and recoverable work are familiar territory.</p><a className="pu-text-link" href="https://github.com/RafeedIqbal/palette-knife" target="_blank" rel="noopener noreferrer">Read the code <Arrow/></a></div>
+      <div className="pu-intro pu-container">
+        <p>I’m Rafeed. I’m the only engineer at BaseNote, where I built Blend, an AI agent that writes perfume formulas using only the oils a studio has in stock. Before that I led product and engineering at Icon and grew the team from two to eight. This page has both jobs, ten real CanadaBuys records, and a procurement explorer I built on top of them.</p>
+        <ul className="pu-resources" aria-label="Resources">
+          <li><a className="pu-primary" href={`mailto:${email}`}><span>Email me</span><span className="pu-data">{email}</span></a></li>
+          <li><a href={resume} target="_blank" rel="noopener noreferrer"><span>Résumé</span><span className="pu-data">PDF, 86 KB <Arrow/></span></a></li>
+          <li><a href="#explorer"><span>Explorer</span><span>On this page <Arrow down/></span></a></li>
+        </ul>
+      </div>
+
+      <RecordSheet/>
+
+      <section id="work" className="pu-section pu-container" aria-labelledby="work-title">
+        <div className="pu-section-head">
+          <h2 id="work-title">Work</h2>
+          <p>Publicus wants an engineer who owns work from customer conversations through to production. I’ve done that in both of my last two jobs.</p>
+        </div>
+        <div className="pu-entries">
+          <article className="pu-entry" aria-labelledby="basenote-title">
+            <Meta rows={[["Company", "BaseNote"], ["Role", "Founding engineer, sole engineer"], ["Period", "Jul 2026 – present", true], ["Status", "Pilot in progress"]]}/>
+            <div className="pu-entry-body">
+              <h3 id="basenote-title">An agent that only suggests oils the studio has in stock</h3>
+              <p>BaseNote’s first licensed client, a custom-perfume retailer, wanted AI-guided consultations that end in a formula made from the studio’s own oils. A chat model on its own will happily suggest oils the studio doesn’t stock, and a perfumer can’t use a formula nobody has checked.</p>
+              <p>I built Blend in Python with LangGraph, Django and PostgreSQL. Its tools search live inventory and retrieve from a pgvector knowledge base of our chemists’ experimental data. The guardrails live in code: the agent only sees in-stock materials, and code validates every draft before anyone sees it.</p>
+              <p>To choose its model, I built an eval suite that scored flash-tier models on accuracy, tool calling, cost and latency. Gemini Flash and DeepSeek Flash led, and DeepSeek Flash won on cost.</p>
+              <p>I also run the rest of the platform: a multi-tenant ERP, storefront integrations, and a database-backed job queue with leases, bounded retries and recovery paths. The pilot with that first client is still in progress.</p>
+              <Shot work="blend.webp" capture="basenote-private-label.webp" alt="BaseNote’s private-label page: “Launch your own fragrance” over a lit perfume bottle." href="https://www.basenotesolutions.com/private-label" site="basenotesolutions.com/private-label" product="Blend at BaseNote"/>
+            </div>
+          </article>
+          <article className="pu-entry" aria-labelledby="icon-title">
+            <Meta rows={[["Company", "Icon"], ["Role", "Head of Product & Engineering"], ["Period", "Jul 2025 – Jun 2026", true], ["Engineers", "2 → 8", true]]}/>
+            <div className="pu-entry-body">
+              <h3 id="icon-title">An AI coaching product from MVP to launch, and a team from two to eight</h3>
+              <p>Icon sells AI coaching avatars of trainers and athletes through paid subscriptions. I led the product from MVP to a production-ready launch, turning business goals into architecture, priorities and sprints, and I kept writing code for the AI features and the company website.</p>
+              <p>I grew engineering from two people to eight and ran recruitment, sprint planning and day-to-day operations.</p>
+              <Shot work="icon.webp" capture="icon-training.webp" alt="Icon’s home page: “Download your favourite athlete’s brain” beside coaches from the app." href="https://icontraining.app" site="icontraining.app" product="The Icon app"/>
+            </div>
+          </article>
+          <article id="palette-knife" className="pu-entry pu-entry-short" aria-labelledby="palette-title">
+            <Meta rows={[["Project", "Palette Knife"], ["Type", "Open source"]]}/>
+            <div className="pu-entry-body">
+              <h3 id="palette-title" className="pu-sr">Palette Knife</h3>
+              <p>Palette Knife is my open-source Python toolkit for resumable web scraping. It keeps work in a durable SQLite queue and exports JSON, JSONL and CSV with source provenance on every record.</p>
+              <p><a className="pu-link" href="https://github.com/RafeedIqbal/palette-knife" target="_blank" rel="noopener noreferrer">github.com/RafeedIqbal/palette-knife <Arrow/></a></p>
+            </div>
+          </article>
+        </div>
       </section>
 
-      <section id="publicus-why" className="pu-why"><div className="pu-container"><p className="pu-eyebrow">02 / Why Publicus</p><div className="pu-why-intro"><h2>Public data.<br/><span>Private detective work.</span></h2><p>A tender, an addendum, an award and a renewal can describe the same relationship in four different ways. Publicus turns that fragmented record into something a buyer or vendor can act on.</p></div><div className="pu-perspectives"><article><span className="pu-micro">FOR THE VENDOR</span><h3>“Is this worth<br/>pursuing?”</h3><p>Bring opportunities to a company’s capabilities, geography and qualifications. Keep the reason for a match close to the decision.</p><a href="https://publicus.ai/docs/daily-recommended-opportunities" target="_blank" rel="noopener noreferrer">Opportunity recommendations <Arrow/></a></article><div className="pu-shared-evidence"><span aria-hidden="true">✳</span><p>One evidence base.<br/>Two useful perspectives.</p></div><article><span className="pu-micro">FOR THE PUBLIC BUYER</span><h3>“What needs<br/>our attention?”</h3><p>Connect suppliers, contract values, amendments and expiry dates. Make changes visible without losing the original records.</p><a href="https://publicus.ai/government" target="_blank" rel="noopener noreferrer">Government intelligence <Arrow/></a></article></div><div className="pu-research-note"><span>What caught my attention</span><p>Publicus’s published technical work describes an evidence ledger that keeps claims connected to their sources, transformations and conflicts. That is the part I wanted to make tangible here.</p><a href="https://www.torontomachinelearning.com/test/" target="_blank" rel="noopener noreferrer">Akash Shetty’s technical abstract <Arrow/></a></div></div></section>
+      <section id="why" className="pu-section pu-container" aria-labelledby="why-title">
+        <div className="pu-section-head">
+          <h2 id="why-title">Why Publicus</h2>
+          <p>A tender, its addenda, the award and a later amendment can describe one contract four different ways, and a single CSV row can disagree with itself (row 1 above). Publicus turns that record into something a vendor or a public buyer can act on, and that’s the problem I want to work on.</p>
+        </div>
+        <table className="pu-sides">
+          <thead><tr><th scope="col"><span className="pu-sr">Field</span></th><th scope="col">Vendors</th><th scope="col">Public buyers</th></tr></thead>
+          <tbody>
+            <tr className="pu-sides-question"><th scope="row">Question</th><td>Is this worth bidding on?</td><td>Which contracts need a look?</td></tr>
+            <tr><th scope="row">What helps</th><td>Match opportunities to a company’s capabilities, regions and qualifications, and keep the reason for each match next to it.</td><td>Follow suppliers, contract values, amendments and end dates, and keep the original records when values change.</td></tr>
+          </tbody>
+        </table>
+        <p className="pu-sides-note">The piece I read most closely was Akash Shetty’s Toronto Machine Learning Summit abstract. It describes an evidence ledger that ties each claim to its source, the transformations applied to it, and any conflicts. The explorer below is a small version of that idea.</p>
+      </section>
 
-      <section id="publicus-demo" className="pu-demo-section"><div className="pu-container"><p className="pu-eyebrow">03 / A working exploration</p><div className="pu-demo-heading"><h2>Follow the evidence.<br/><span>Then change it.</span></h2><p>Try the vendor’s workflow, switch to the buyer’s view, then introduce a late requirement or a conflicting value. The decision should change when the evidence does.</p></div><div className="pu-demo-caption"><span className="pu-status-dot"/> Independent application demo <span>Inspired by the problem Publicus solves. Built by Rafeed.</span></div></div><DemoLoader/><div className="pu-container pu-demo-footnote"><span>Sample organizations are fictional. Public records retain their source and capture date.</span><span>This prototype uses Supabase and Gemini when connected. It does not reproduce Publicus’s infrastructure or security certifications.</span></div></section>
+      <section id="explorer" className="pu-section pu-section-wide pu-container" aria-labelledby="explorer-title">
+        <div className="pu-section-head">
+          <h2 id="explorer-title">A procurement explorer I built for this application</h2>
+          <p>Start in the vendor view, then switch to the buyer view. The scenario menu at the bottom adds a late security requirement, two amendment values that disagree, or a missing source document, and the rankings, qualification checks and explanations change with it.</p>
+        </div>
+        <DemoLoader/>
+      </section>
 
-      <section className="pu-approach pu-container"><p className="pu-eyebrow">04 / How I would approach the work</p><div className="pu-approach-heading"><h2>Ship the useful thing.<br/><span>Keep it explainable.</span></h2><p>The interesting engineering lives between retrieval and a decision someone is willing to make.</p></div><div className="pu-principles"><article><span>01</span><h3>Start with a real decision.</h3><p>Watch a buyer review an amendment or a vendor decide whether to bid. Make that loop measurably easier before expanding the scope.</p></article><article><span>02</span><h3>Make uncertainty usable.</h3><p>Preserve the source. Separate reported values from inferred relationships. Give missing evidence and conflicting records a visible place in the product.</p></article><article><span>03</span><h3>Own what happens next.</h3><p>Evaluate extraction and grounding. Track latency, cost and review burden. Build retries and recovery into the workflow, then learn from actual use.</p></article></div><details className="pu-reading"><summary>Research & design references <span aria-hidden="true">+</span></summary><div><p>Company research: <a href="https://publicus.ai/about">About Publicus</a>, <a href="https://publicus.ai/how-it-works">how the product works</a>, <a href="https://publicus.ai/security">security approach</a>, <a href="https://publicus.ai/case-studies">case studies</a>, and the <a href="https://publicus.ai/careers/founding-engineer">role</a>. Reviewed 14 November 2026. The demo is my interpretation of these published materials.</p><p>Design studies: <a href="https://minimal.gallery/enode/">Enode via Minimal Gallery</a> for connected-system storytelling; <a href="https://onepagelove.com/reflect-v2">Reflect via One Page Love</a> for the transition from a violet narrative to a light product surface; <a href="https://www.siteinspire.com/website/9425-linear">Linear via SiteInspire</a> for restrained typography and detailed product views.</p><p>Public data: <a href="https://donnees-data.tpsgc-pwgsc.gc.ca/ba2/ac-cb/soutien-support-eng.html">CanadaBuys open-data documentation</a>. Canadian public procurement data is reused under the <a href="https://open.canada.ca/en/open-government-licence-canada">Open Government Licence – Canada</a>. No endorsement is implied.</p></div></details></section>
+      <section id="approach" className="pu-section pu-container" aria-labelledby="approach-title">
+        <div className="pu-section-head"><h2 id="approach-title">How I’d start</h2></div>
+        <ol className="pu-steps">
+          <li><h3>Start with one real decision.</h3><p>I’d watch a buyer review an amendment and a vendor decide whether to bid, then make that loop measurably easier before widening the scope.</p></li>
+          <li><h3>Keep uncertainty visible.</h3><p>Reported values stay separate from inferred relationships, and missing or conflicting records get their own place in the interface.</p></li>
+          <li><h3>Measure it after it ships.</h3><p>I’d evaluate extraction and grounding, track latency, cost and review burden, and build retries and recovery into the workflow, the same way I chose Blend’s model.</p></li>
+        </ol>
+      </section>
 
-      <section id="publicus-contact" className="pu-contact pu-container"><p className="pu-eyebrow">Let’s talk about the next useful thing.</p><h2>I’d like to help build<br/><span>what Publicus becomes.</span></h2><p>I’m comfortable with the in-person Toronto setup.<br/>I’d welcome a conversation about the product, the team, and where I could contribute first.</p><div className="pu-actions"><a className="pu-button pu-primary" href="mailto:rafeediqbal@gmail.com">Start a conversation <Arrow/></a><a className="pu-text-link" href={resume} target="_blank" rel="noopener noreferrer">Read my résumé <Arrow/></a></div></section>
-    </main><footer className="pu-footer pu-container"><span>Rafeed Iqbal <span className="pu-cross">×</span> Publicus</span><span>Made with care. And a working prototype.</span><div><a href="https://github.com/RafeedIqbal">GitHub <Arrow/></a><a href="https://www.linkedin.com/in/rafeediqbal/">LinkedIn <Arrow/></a></div></footer>
+      <section id="contact" className="pu-section pu-contact pu-container" aria-labelledby="contact-title">
+        <div className="pu-section-head"><h2 id="contact-title">Get in touch</h2></div>
+        <div>
+          <p>I can work full time in person at Publicus’s Toronto office. If this looks like a fit, email me and I’ll walk you through Blend or the explorer in more detail.</p>
+          <p className="pu-actions"><a className="pu-button" href={`mailto:${email}`}>Email {email}</a><a className="pu-link" href={resume} target="_blank" rel="noopener noreferrer">Résumé (PDF) <Arrow/></a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer className="pu-footer pu-container">
+      <p><Link href="/">Rafeed Iqbal</Link>. Written and built in November 2026.</p>
+      <p><a href="https://github.com/RafeedIqbal" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://www.linkedin.com/in/rafeediqbal/" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+    </footer>
   </>;
 }

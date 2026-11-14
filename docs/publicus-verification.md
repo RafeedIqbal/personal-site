@@ -62,3 +62,14 @@ Provisioned the dedicated `personal-site-publicus` project (`clfgowkxumajjjfxkfw
 - A browser regression check forced a job to complete before the very first status read. Its answer rendered after exactly one read, without relying on a later polling cycle. Both enqueue and retry now apply the complete workspace snapshot, while preserving current profile edits and notes.
 
 Vercel Production has the hosted Supabase URL and publishable key. Model and worker secrets are configured in Supabase and excluded from Git. Scanned/image-only PDFs still require OCR before upload; this prototype does not include an OCR service. No job application was submitted.
+
+## Redesign — 15 November 2026
+
+The page was rebuilt as an open-data record (see the "Design" section of `docs/publicus-research.md`). Explorer behaviour, data and backend are unchanged. Only the copy, icon markup and styles changed.
+
+- `npm run lint` (one warning, in the ignored local file `.supabase/fast-job-browser.js`), `npm run typecheck` and the production build passed.
+- `npm run test:publicus` 13/13, `npm run test:belong` 14/14, `npm run test:dependencies` 9/9 and `npm run test:ui` 14/14 passed.
+- Axe (WCAG 2.0/2.1 A and AA) on `/publicus` at 1440, 768 and 390px: no violations, no console errors and no horizontal overflow.
+- Driven in the browser: the raw-row panels switch through `#cb-NN` anchors and show only structured CanadaBuys fields, with no descriptions, contact emails, attachments or URLs. Also checked: vendor and government tabs, the conflict scenario, the source dialog closing on Escape, and the profile modal.
+- `impeccable detect` on `app/publicus` and `components/publicus` returned no findings.
+- Review captures are in the ignored `.impeccable/review/` directory.

@@ -27,17 +27,23 @@ Content was checked against the existing portfolio and the user's tailored Publi
 
 No private customer data or proprietary code is displayed. Toronto in-person comfort follows the user's application materials; no work-authorization or relocation claim is added.
 
-## Design studies
+## Design
 
-The actual galleries and selected sites were inspected during planning:
+Redesigned 15 November 2026 to read less like a generated page. The page is now laid out as an open-data record: a purple dataset masthead, ruled tables and raw CSV fields. Publicus's brand purple `#634086` is used only for header bands, and a highlighter yellow `#f5d547` marks only values that disagree. The type is Archivo, semi-condensed for headings, with Chivo Mono for field names and figures. The visual direction and its contract are in `.impeccable/surfaces/app-publicus-page-tsx.md`, and product facts are in `PRODUCT.md`.
 
-| Gallery reference | Component studied | Application here |
+The page itself has no disclaimers and no outbound research links, by the owner's choice. The one exception is the Open Government Licence – Canada attribution, which the licence requires.
+
+These references were reviewed on 15 November 2026 for discipline, not for their look:
+
+| Reference | Found via | Discipline borrowed |
 | --- | --- | --- |
-| [Enode — Minimal Gallery](https://minimal.gallery/enode/) / [platform](https://enode.com/platform/overview) | Connected-system diagrams and sequenced product explanation | Original Basenote flow diagram and evidence orbit |
-| [Reflect v2 — One Page Love](https://onepagelove.com/reflect-v2) | Restrained violet atmosphere transitioning to a light product surface | Dark narrative and light working explorer |
-| [Linear — SiteInspire](https://www.siteinspire.com/website/9425-linear) | Clear typography, precise borders and detailed product views | Quiet workspace, master/detail layout, compact source labels |
+| [Whole Earth Index](https://wholeearth.info) | SiteInspire | The real artifacts are the imagery: the CanadaBuys rows shown as published, numbered |
+| [On the Impulse to Notate](https://notations.xyz) | Minimal Gallery | Each excerpt carries its own source: each record opens its raw row |
+| [Overbrowsing](https://overbrowsing.com) | Minimal Gallery | Plain ruled boxes and honest missing values ("Not stated", "n/a") |
+| The New Industrials (Raw Materials) | One Page Love | A report masthead with metadata; one colour owns one field |
+| [Material-Archiv](https://materialarchiv.ch) | Minimal Gallery | Counts and a dense numbered index |
 
-Publicus's own dark violet visual language is the anchor. Illustrations are original CSS/SVG, not copied brand assets or fabricated product screenshots. Manrope and Public Sans distinguish the application from `/belong`.
+The visual assets are the ten real records (`components/publicus/RecordSheet.tsx`) and screenshots of the public BaseNote and Icon sites (`public/publicus/captures/`, each with an origin sidecar). A real product screenshot saved as `public/publicus/work/blend.webp` or `public/publicus/work/icon.webp` (1440 × 836) replaces the matching capture on the next build. No AI-generated imagery is used.
 
 ## Public data and limits
 

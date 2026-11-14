@@ -1,0 +1,594 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T21:24:12Z",
+  "title": "Design System: Publicus application (/publicus)",
+  "extensions": {
+    "colorMeta": {
+      "publicus-purple": {
+        "role": "primary",
+        "displayName": "Publicus Purple",
+        "canonical": "#634086",
+        "oklch": "oklch(44.4% 0.116 305.3)",
+        "purpose": "Header bands only: masthead, table header rows, explorer list and source-index headings, the stacked table's 6px band.",
+        "tonalRamp": [
+          "#10061a",
+          "#301547",
+          "#50306e",
+          "#704f92",
+          "#9074af",
+          "#b099cc",
+          "#d2c0ea",
+          "#f3eafe"
+        ]
+      },
+      "on-purple": {
+        "role": "primary",
+        "displayName": "Lavender Mist",
+        "canonical": "#e6ddf0",
+        "oklch": "oklch(91.0% 0.027 307.0)",
+        "purpose": "Secondary text on purple.",
+        "tonalRamp": [
+          "#0c0a0d",
+          "#27232a",
+          "#444049",
+          "#645f6a",
+          "#857f8c",
+          "#a9a1b1",
+          "#cdc5d7",
+          "#f1ecf7"
+        ]
+      },
+      "highlighter": {
+        "role": "secondary",
+        "displayName": "Reviewer's Highlighter",
+        "canonical": "#f5d547",
+        "oklch": "oklch(87.6% 0.157 96.1)",
+        "purpose": "Values that disagree, quoted source passages, review-issue markers, text selection.",
+        "tonalRamp": [
+          "#0f0b00",
+          "#2d2500",
+          "#4e4100",
+          "#726000",
+          "#98810a",
+          "#bfa427",
+          "#e7c83f",
+          "#ffefae"
+        ]
+      },
+      "highlighter-tint": {
+        "role": "secondary",
+        "displayName": "Highlighter Wash",
+        "canonical": "#fbf1c2",
+        "oklch": "oklch(95.4% 0.062 97.4)",
+        "purpose": "Needs-review badges and the quoted-passage block.",
+        "tonalRamp": [
+          "#0d0b05",
+          "#292514",
+          "#47422d",
+          "#676247",
+          "#8a8364",
+          "#aea681",
+          "#d3caa0",
+          "#f5efd4"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Record Paper",
+        "canonical": "#fcfcfb",
+        "oklch": "oklch(99.1% 0.001 106.4)",
+        "purpose": "Page ground and raw-row panel.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424241",
+          "#616161",
+          "#828282",
+          "#a5a5a4",
+          "#c9c9c8",
+          "#eeeeee"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1a1820",
+        "oklch": "oklch(21.5% 0.016 296.5)",
+        "purpose": "Text, section and frame rules, solid actions, focus rings.",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#26242c",
+          "#424149",
+          "#626068",
+          "#838188",
+          "#a5a4aa",
+          "#c9c8ce",
+          "#eeeef1"
+        ]
+      },
+      "ink-hover": {
+        "role": "neutral",
+        "displayName": "Ink Pressed",
+        "canonical": "#3b3644",
+        "oklch": "oklch(34.4% 0.025 301.4)",
+        "purpose": "Hover fill for ink actions.",
+        "tonalRamp": [
+          "#0c0a10",
+          "#27232f",
+          "#443f4d",
+          "#635f6c",
+          "#84808c",
+          "#a6a3ad",
+          "#cac7d0",
+          "#efeef2"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Graphite Violet",
+        "canonical": "#47434f",
+        "oklch": "oklch(39.1% 0.021 300.6)",
+        "purpose": "Secondary text.",
+        "tonalRamp": [
+          "#0c0a0e",
+          "#26232d",
+          "#44404b",
+          "#635f6a",
+          "#84808b",
+          "#a6a3ac",
+          "#cac8cf",
+          "#efeef1"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ash Violet",
+        "canonical": "#66616e",
+        "oklch": "oklch(50.2% 0.021 303.1)",
+        "purpose": "Tertiary text: field labels, row numbers, missing values.",
+        "tonalRamp": [
+          "#0c0a0e",
+          "#26232b",
+          "#44404a",
+          "#635f6b",
+          "#84808c",
+          "#a7a3ad",
+          "#cac7d0",
+          "#efeef1"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#d9d6de",
+        "oklch": "oklch(88.1% 0.011 303.1)",
+        "purpose": "Row and section dividers, image frames.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252427",
+          "#434145",
+          "#626065",
+          "#838187",
+          "#a6a4aa",
+          "#cac7cf",
+          "#efedf2"
+        ]
+      },
+      "band": {
+        "role": "neutral",
+        "displayName": "Band",
+        "canonical": "#f4f3f6",
+        "oklch": "oklch(96.6% 0.004 301.4)",
+        "purpose": "Even-row banding and explorer hover fills.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252526",
+          "#424243",
+          "#616162",
+          "#828284",
+          "#a5a4a7",
+          "#c9c8cb",
+          "#efeef0"
+        ]
+      },
+      "row-active": {
+        "role": "neutral",
+        "displayName": "Active Row",
+        "canonical": "#e9e7ee",
+        "oklch": "oklch(93.2% 0.010 299.2)",
+        "purpose": "The record whose raw row is open.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252527",
+          "#424145",
+          "#626064",
+          "#838186",
+          "#a5a4a9",
+          "#cac8ce",
+          "#efeef2"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Instrument White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "purpose": "Explorer surface; text on purple and ink.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "chip": {
+        "role": "neutral",
+        "displayName": "Chip Grey",
+        "canonical": "#ecebef",
+        "oklch": "oklch(94.2% 0.005 297.7)",
+        "purpose": "Neutral explorer badges.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252526",
+          "#424243",
+          "#616163",
+          "#828284",
+          "#a5a4a7",
+          "#c9c8cc",
+          "#efeef0"
+        ]
+      },
+      "control-rule": {
+        "role": "neutral",
+        "displayName": "Control Rule",
+        "canonical": "#cfcad6",
+        "oklch": "oklch(84.7% 0.017 304.8)",
+        "purpose": "Explorer input and secondary-button borders.",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#262428",
+          "#434147",
+          "#636067",
+          "#848089",
+          "#a7a3ad",
+          "#cbc7d2",
+          "#f0edf4"
+        ]
+      },
+      "instrument-rule": {
+        "role": "neutral",
+        "displayName": "Instrument Rule",
+        "canonical": "#c9c4d0",
+        "oklch": "oklch(82.8% 0.017 304.8)",
+        "purpose": "Explorer shell border and scrollbars.",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#262429",
+          "#434147",
+          "#636067",
+          "#848089",
+          "#a7a3ad",
+          "#cbc7d2",
+          "#f0edf4"
+        ]
+      },
+      "status-green": {
+        "role": "status",
+        "displayName": "Ledger Green",
+        "canonical": "#24573f",
+        "oklch": "oklch(41.4% 0.069 160.7)",
+        "purpose": "Explorer ok states: matches, public sources, verified claims.",
+        "tonalRamp": [
+          "#010f07",
+          "#022d1c",
+          "#1c4d36",
+          "#3f6c55",
+          "#668d78",
+          "#8dae9c",
+          "#b6d1c1",
+          "#e6f2eb"
+        ]
+      },
+      "status-green-tint": {
+        "role": "status",
+        "displayName": "Green Wash",
+        "canonical": "#e3f0e8",
+        "oklch": "oklch(94.3% 0.017 159.1)",
+        "purpose": "Background of ok badges.",
+        "tonalRamp": [
+          "#0a0c0a",
+          "#222624",
+          "#3e4440",
+          "#5c635f",
+          "#7c857f",
+          "#9ea8a2",
+          "#c1ccc5",
+          "#e9f1ec"
+        ]
+      },
+      "review-ink": {
+        "role": "status",
+        "displayName": "Review Ink",
+        "canonical": "#5c4a0c",
+        "oklch": "oklch(41.6% 0.079 91.3)",
+        "purpose": "Text on Highlighter Wash and review-issue lines.",
+        "tonalRamp": [
+          "#100a00",
+          "#2f2400",
+          "#514003",
+          "#70602d",
+          "#908157",
+          "#b1a480",
+          "#d3c9ab",
+          "#f3eee1"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Masthead title only; fluid clamp(2.25rem, 1.2rem + 3.5vw, 4.25rem)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings in the left column; fluid clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Work-entry headings; fluid clamp(1.375rem, 1.1rem + 0.8vw, 1.875rem)."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Introduction and contact paragraphs; fluid clamp(1.125rem, 1rem + 0.45vw, 1.3125rem)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text, 66ch max; 16px below 760px."
+      },
+      "table": {
+        "displayName": "Table",
+        "purpose": "Records table text with tabular numerals."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata terms, small print, licence line."
+      },
+      "band-label": {
+        "displayName": "Band Label",
+        "purpose": "Text on purple header bands."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Chivo Mono for field names, raw fields, IDs, dates, file sizes and figures."
+      },
+      "instrument": {
+        "displayName": "Instrument",
+        "purpose": "The procurement explorer's base size."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-record",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Exponential ease-out for the raw-row reveal and hover colour changes."
+      },
+      {
+        "name": "duration-record",
+        "value": "220ms",
+        "purpose": "The one duration on the route."
+      },
+      {
+        "name": "raw-row-reveal",
+        "value": "clip-path: inset(0 0 100% 0) to inset(0 0 0 0), 220ms, ease-record",
+        "purpose": "The only animation: a targeted raw row opens top to bottom."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition: none",
+        "purpose": "All animation and transitions removed under prefers-reduced-motion."
+      }
+    ],
+    "focus": [
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid #1a1820; outline-offset: 3px",
+        "purpose": "Every focusable element on the page; white outline on the purple masthead."
+      },
+      {
+        "name": "focus-ring-instrument",
+        "value": "outline: 2px solid #1a1820; outline-offset: 2px",
+        "purpose": "Explorer controls; the search field outlines its whole wrapper."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "759px",
+        "purpose": "max-width: body to 16px, 16px gutters, single-column raw fields, explorer list and detail one at a time."
+      },
+      {
+        "name": "stack",
+        "value": "1023px",
+        "purpose": "max-width: records table stacks, two-column layouts collapse, 24px gutters; at 1024px and up section headings stick."
+      },
+      {
+        "name": "explorer-compact",
+        "value": "1100px",
+        "purpose": "max-width: explorer split 43/57 and tighter detail padding."
+      }
+    ],
+    "scope": "Route-scoped: tokens live on the .publicus wrapper in app/publicus/publicus.css, not :root. Applies to app/publicus/ and components/publicus/ only."
+  },
+  "components": [
+    {
+      "name": "Masthead",
+      "kind": "custom",
+      "refersTo": "masthead",
+      "description": "Full-bleed purple header band with the display title and a dataset metadata row. Typeset only.",
+      "html": "<section class=\"ds-masthead\"><h1 class=\"ds-masthead-title\">I’m applying to be Publicus’s Founding Engineer, Product &amp; AI.</h1><dl class=\"ds-masthead-meta\"><div><dt>Publisher</dt><dd>Rafeed Iqbal</dd></div><div><dt>Modified</dt><dd class=\"ds-masthead-data\">2026-11-15</dd></div><div><dt>Format</dt><dd>HTML, PDF résumé (86 KB)</dd></div></dl></section>",
+      "css": ".ds-masthead { background: #634086; color: #ffffff; padding: clamp(36px, 4.5vw, 60px) 32px 24px; font-family: Archivo, system-ui, sans-serif; } .ds-masthead-title { margin: 0; max-width: 15em; font-size: clamp(2.25rem, 1.2rem + 3.5vw, 4.25rem); font-weight: 600; font-variation-settings: \"wdth\" 85; line-height: 1.02; letter-spacing: -0.025em; text-wrap: balance; } .ds-masthead-meta { display: flex; flex-wrap: wrap; gap: 8px 44px; margin: clamp(28px, 3.5vw, 44px) 0 0; padding-top: 14px; border-top: 1px solid rgb(255 255 255 / 0.32); } .ds-masthead-meta dt { font-size: 13px; color: #e6ddf0; } .ds-masthead-meta dd { margin: 2px 0 0; font-size: 15px; line-height: 1.4; } .ds-masthead-data { font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }"
+    },
+    {
+      "name": "Records Table",
+      "kind": "card",
+      "refersTo": "table-header",
+      "description": "Purple header row, ruled and banded rows, mono figures, the open record in Active Row, and the highlighter on values that disagree.",
+      "html": "<table class=\"ds-records\"><thead><tr><th class=\"ds-records-n\">#</th><th>Title</th><th>Buyer</th><th class=\"ds-records-num\">Contract amount</th><th class=\"ds-records-num\">Total contract value</th></tr></thead><tbody><tr class=\"is-active\"><td class=\"ds-records-n\">01</td><td><a href=\"#cb-01\">PRCP0003463 - Software Symantec DLP / CASB</a></td><td>Business Development Bank of Canada</td><td class=\"ds-records-num\"><mark>1,073,002.14</mark></td><td class=\"ds-records-num ds-records-loud\"><mark>0.00</mark></td></tr><tr><td class=\"ds-records-n\">02</td><td><a href=\"#cb-02\">Network Communication Win server and SPLA licenses</a></td><td>Business Development Bank of Canada</td><td class=\"ds-records-num\"><mark>500,000.00</mark></td><td class=\"ds-records-num ds-records-loud\"><mark>0.00</mark></td></tr><tr><td class=\"ds-records-n\">05</td><td><a href=\"#cb-05\">Canadian Business Data and Lead Intelligence Services</a></td><td>Business Development Bank of Canada</td><td class=\"ds-records-num\">n/a</td><td class=\"ds-records-num\">n/a</td></tr></tbody></table>",
+      "css": ".ds-records { width: 100%; border-collapse: collapse; font-family: Archivo, system-ui, sans-serif; font-size: 14px; line-height: 1.4; font-variant-numeric: tabular-nums; color: #1a1820; background: #fcfcfb; } .ds-records th { padding: 10px 12px; background: #634086; color: #ffffff; font-size: 13px; font-weight: 600; text-align: left; vertical-align: bottom; } .ds-records td { padding: 10px 12px; border-bottom: 1px solid #d9d6de; vertical-align: top; } .ds-records tbody tr:nth-child(even) td { background: #f4f3f6; } .ds-records tbody tr.is-active td { background: #e9e7ee; } .ds-records-n { width: 3rem; font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; } td.ds-records-n { color: #66616e; } .ds-records-num { text-align: right; white-space: nowrap; } td.ds-records-num { font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; } .ds-records-loud { font-size: 17px !important; font-weight: 600; } .ds-records a { color: inherit; font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: #b9b3c2; } .ds-records a:hover { text-decoration-color: #1a1820; } .ds-records a:focus-visible { outline: 2px solid #1a1820; outline-offset: 3px; } .ds-records mark { padding: 0 3px; background: #f5d547; color: #1a1820; }"
+    },
+    {
+      "name": "Raw Row Panel",
+      "kind": "card",
+      "refersTo": "raw-row-panel",
+      "description": "One record's CSV fields as published, in mono, framed in ink. Opens with the route's only animation: a 220ms top-down clip reveal.",
+      "html": "<section class=\"ds-raw\"><header><h3>Row 01, as published</h3><span>2026-2027-awardNotice-avisAttribution.csv, CSV row 29</span></header><dl><div><dt>publicationDate-datePublication</dt><dd>2026-05-05</dd></div><div><dt>contractAwardDate-dateAttributionContrat</dt><dd>2026-04-08</dd></div><div><dt>contractAmount-montantContrat</dt><dd><mark>1073002.14</mark></dd></div><div><dt>totalContractValue-valeurTotaleContrat</dt><dd><mark>0.00</mark></dd></div><div><dt>contractCurrency-contratMonnaie</dt><dd>CAD</dd></div><div><dt>contractingEntityName-nomEntitContractante-eng</dt><dd>Business Development Bank of Canada</dd></div></dl></section>",
+      "css": ".ds-raw { padding: 20px 24px 24px; border: 1px solid #1a1820; background: #fcfcfb; color: #1a1820; font-family: Archivo, system-ui, sans-serif; animation: ds-raw-open 220ms cubic-bezier(0.16, 1, 0.3, 1) both; } .ds-raw header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 20px; margin-bottom: 14px; } .ds-raw h3 { margin: 0; font-size: 19px; font-weight: 600; font-variation-settings: \"wdth\" 85; letter-spacing: -0.02em; } .ds-raw header span { font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; color: #66616e; } .ds-raw dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 0; font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.45; } .ds-raw dl > div { padding: 7px 0; border-top: 1px solid #d9d6de; } .ds-raw dt { color: #66616e; overflow-wrap: anywhere; } .ds-raw dd { margin: 0; overflow-wrap: anywhere; } .ds-raw mark { padding: 0 3px; background: #f5d547; color: #1a1820; } @keyframes ds-raw-open { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } } @media (prefers-reduced-motion: reduce) { .ds-raw { animation: none; } }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The page's solid ink action: square, white semibold text, 48px tall.",
+      "html": "<a class=\"ds-btn-primary\" href=\"mailto:rafeediqbal@gmail.com\">Email rafeediqbal@gmail.com</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; min-height: 48px; padding: 12px 20px; background: #1a1820; color: #ffffff; font-family: Archivo, system-ui, sans-serif; font-size: 17px; font-weight: 600; text-decoration: none; border-radius: 0; transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background: #3b3644; } .ds-btn-primary:focus-visible { outline: 2px solid #1a1820; outline-offset: 3px; }"
+    },
+    {
+      "name": "Resources List",
+      "kind": "nav",
+      "refersTo": "resource-row",
+      "description": "A ruled list of 48px link rows under an ink rule; the first row is the solid ink primary action.",
+      "html": "<ul class=\"ds-resources\"><li><a class=\"ds-resources-primary\" href=\"mailto:rafeediqbal@gmail.com\"><span>Email me</span><span class=\"ds-resources-data\">rafeediqbal@gmail.com</span></a></li><li><a href=\"#resume\"><span>Résumé</span><span class=\"ds-resources-data\">PDF, 86 KB <svg width=\"14\" height=\"14\" viewBox=\"0 0 14 14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" aria-hidden=\"true\"><path d=\"M4 10l6-6M5 4h5v5\"/></svg></span></a></li><li><a href=\"#explorer\"><span>Explorer</span><span>On this page <svg width=\"14\" height=\"14\" viewBox=\"0 0 14 14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" aria-hidden=\"true\"><path d=\"M7 2v10M3 8l4 4 4-4\"/></svg></span></a></li></ul>",
+      "css": ".ds-resources { max-width: 340px; margin: 0; padding: 0; list-style: none; border-top: 1px solid #1a1820; font-family: Archivo, system-ui, sans-serif; color: #1a1820; } .ds-resources a { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 48px; padding: 10px 0; border-bottom: 1px solid #d9d6de; color: inherit; font-size: 15px; font-weight: 500; text-decoration: none; transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-resources a:hover > span:first-child { text-decoration: underline; text-underline-offset: 3px; } .ds-resources a > span:last-child { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400; color: #47434f; } .ds-resources-data { font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace; } .ds-resources a.ds-resources-primary { padding-inline: 16px; background: #1a1820; color: #ffffff; border-bottom-color: #1a1820; } .ds-resources a.ds-resources-primary > span:last-child { color: #d9d5df; } .ds-resources a.ds-resources-primary:hover { background: #3b3644; } .ds-resources a:focus-visible { outline: 2px solid #1a1820; outline-offset: 3px; }"
+    },
+    {
+      "name": "Explorer Buttons",
+      "kind": "button",
+      "refersTo": "explorer-button",
+      "description": "Inside the explorer only: ink primary and white secondary, 13px, 2px corners.",
+      "html": "<div class=\"ds-px-buttons\"><button class=\"ds-px-btn\" type=\"button\">Reset workspace</button><button class=\"ds-px-btn ds-px-btn-secondary\" type=\"button\">Edit vendor profile</button><button class=\"ds-px-btn\" type=\"button\" disabled>Working…</button></div>",
+      "css": ".ds-px-buttons { display: flex; flex-wrap: wrap; gap: 10px; } .ds-px-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 9px 14px; border: 1px solid #1a1820; border-radius: 2px; background: #1a1820; color: #ffffff; font-family: Archivo, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.4; white-space: nowrap; cursor: pointer; transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-px-btn:hover { background: #3b3644; border-color: #3b3644; } .ds-px-btn-secondary { border-color: #cfcad6; background: #ffffff; color: #1a1820; } .ds-px-btn-secondary:hover { background: #f4f3f6; border-color: #cfcad6; } .ds-px-btn:focus-visible { outline: 2px solid #1a1820; outline-offset: 2px; } .ds-px-btn:disabled { opacity: 0.45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Explorer Search Field",
+      "kind": "input",
+      "refersTo": "explorer-input",
+      "description": "White field with a control-rule border and 2px corners; focus outlines the whole wrapper.",
+      "html": "<label class=\"ds-px-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 22 22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.5 16a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM14.5 14.5L19 19\"/></svg><input placeholder=\"Search opportunities or buyers…\" aria-label=\"Search records\"></label>",
+      "css": ".ds-px-search { display: flex; align-items: center; gap: 8px; max-width: 420px; padding-left: 10px; border: 1px solid #cfcad6; border-radius: 2px; background: #ffffff; color: #66616e; font-family: Archivo, system-ui, sans-serif; } .ds-px-search input { flex: 1; min-width: 0; padding: 8px 10px 8px 0; border: 0; background: transparent; color: #1a1820; font: inherit; font-size: 13px; caret-color: #1a1820; } .ds-px-search input::placeholder { color: #66616e; opacity: 1; } .ds-px-search input:focus-visible { outline: none; } .ds-px-search:focus-within { outline: 2px solid #1a1820; outline-offset: 2px; }"
+    },
+    {
+      "name": "Explorer Tabs",
+      "kind": "nav",
+      "refersTo": "explorer-shell",
+      "description": "13px Graphite Violet tab labels; the selected tab is ink, semibold, with a 2px ink underline.",
+      "html": "<div class=\"ds-px-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">For vendors</button><button role=\"tab\" aria-selected=\"false\">For government</button><button role=\"tab\" aria-selected=\"false\">Sources &amp; imports</button></div>",
+      "css": ".ds-px-tabs { display: flex; gap: 24px; padding: 0 24px; border-bottom: 1px solid #d9d6de; background: #ffffff; font-family: Archivo, system-ui, sans-serif; } .ds-px-tabs button { padding: 15px 0 13px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #47434f; font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; } .ds-px-tabs button:hover { color: #1a1820; } .ds-px-tabs button[aria-selected=\"true\"] { border-bottom-color: #1a1820; color: #1a1820; font-weight: 600; } .ds-px-tabs button:focus-visible { outline: 2px solid #1a1820; outline-offset: 2px; }"
+    },
+    {
+      "name": "Badges",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Explorer status badges: neutral grey, ok green, needs-review highlighter wash. 12px, 2px corners.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge\">Fictional example</span><span class=\"ds-badge ds-badge-ok\">Public data</span><span class=\"ds-badge ds-badge-review\">Needs review</span></div>",
+      "css": ".ds-badges { display: flex; flex-wrap: wrap; gap: 6px; } .ds-badge { display: inline-flex; align-items: center; padding: 3px 7px; border-radius: 2px; background: #ecebef; color: #47434f; font-family: Archivo, system-ui, sans-serif; font-size: 12px; line-height: 1.4; } .ds-badge-ok { background: #e3f0e8; color: #24573f; } .ds-badge-review { background: #fbf1c2; color: #5c4a0c; }"
+    },
+    {
+      "name": "Section Head",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Every narrative section: a 1px ink rule, the heading in the left quarter, lede and content in the right three quarters.",
+      "html": "<section class=\"ds-section\"><h2>Why Publicus</h2><p>A tender, its addenda, the award and a later amendment can describe one contract four different ways, and a single CSV row can disagree with itself.</p></section>",
+      "css": ".ds-section { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); gap: 20px 56px; padding-top: 22px; border-top: 1px solid #1a1820; color: #1a1820; font-family: Archivo, system-ui, sans-serif; } .ds-section h2 { margin: 0; font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem); font-weight: 600; font-variation-settings: \"wdth\" 85; line-height: 1.05; letter-spacing: -0.02em; text-wrap: balance; } .ds-section p { margin: 0; max-width: 62ch; font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); line-height: 1.55; color: #47434f; } @media (max-width: 1023px) { .ds-section { grid-template-columns: minmax(0, 1fr); } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Open-Data Record",
+    "overview": "The page is laid out like a dataset's landing page on an open-data portal. A purple band carries the title and a metadata row (publisher, modified date, contents, format). Under it sit a short introduction, a ruled list of resources, and the records themselves: ten CanadaBuys rows in a table with a purple header. Every row has its own address, and opening one shows that row's raw CSV fields under the table. The rest of the page (work, why Publicus, the explorer, approach, contact) follows as ruled two-column sections.\n\nThe material is paper and ink, and colour is rationed by job: purple for header bands, a yellow highlighter for values a reviewer should look at, ink for actions. There are no shadows, gradients or illustrations, and only one animation. Spacing is generous between sections and tight inside tables, with reading text at 17px and table text at 13 to 14px.\n\nThe embedded procurement explorer is working software placed on the record. It shares the palette, rules and type at a denser 13px base, on a white surface with 2px control corners and a 4px shell, so it reads as an instrument sitting on the page.",
+    "keyCharacteristics": [
+      "Paper ground and near-black violet ink, with hairline rules and banded rows.",
+      "Publicus purple on header bands only, always with white text.",
+      "A highlighter on values that disagree and on passages a reviewer has to check.",
+      "Archivo, semi-condensed for headings and normal width for reading; Chivo Mono for anything that is data.",
+      "Square and flat on the page; small corners only inside the explorer.",
+      "One motion: a 220ms top-down clip reveal of a raw row."
+    ],
+    "rules": [
+      {
+        "name": "The Header Band Rule",
+        "body": "Publicus purple fills header bands and nothing else. If an element is not the top of a dataset, a table or a list, it is not purple.",
+        "section": "colors"
+      },
+      {
+        "name": "The Highlighter Rule",
+        "body": "The highlighter means \"look here\": a value that disagrees, a quoted passage, a review issue. It is never emphasis, decoration, a brand fill or a call to action. A value that merely matters stays ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Action Rule",
+        "body": "Every action is solid ink with white text and hovers to Ink Pressed. Actions are never purple or yellow.",
+        "section": "colors"
+      },
+      {
+        "name": "The Data Voice Rule",
+        "body": "Chivo Mono marks material as data: field names, raw fields shown as published, IDs, dates, file sizes and figures. Headings, prose, labels, names and buttons stay in Archivo. A number inside a sentence may stay in Archivo; words a person wrote never go into mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Narrow Heading Rule",
+        "body": "Every heading is Archivo at wdth 85 and weight 600, with negative tracking (-0.015em to -0.025em) and balanced wrapping. Reading text is never condensed.",
+        "section": "typography"
+      },
+      {
+        "name": "The Significance Rule",
+        "body": "Size follows significance, not position. A total that disagrees with its own row steps up from 13px to 17px semibold (16px when stacked) as well as taking the highlighter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ruled Column Rule",
+        "body": "Every narrative section opens with a 1px ink rule and puts its heading in the left quarter. No section gets a background panel.",
+        "section": "layout"
+      },
+      {
+        "name": "The Stack Rule",
+        "body": "Records stack below 1024px. Nothing on the page scrolls sideways on a phone.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Record Rule",
+        "body": "When something needs to stand out, give it a rule, a band or the highlighter, never a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Record Rule",
+        "body": "Nothing on the page itself is rounded. A radius means you are inside the explorer.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** keep Publicus purple (#634086) on header bands, with white or Lavender Mist (#e6ddf0) text.",
+      "**Do** mark a value that disagrees with the highlighter (#f5d547) in both the table and its raw row, and keep the raw field visible.",
+      "**Do** set field names, raw fields, IDs, dates, file sizes and figures in Chivo Mono, with tabular numerals in tables.",
+      "**Do** open each narrative section with a 1px ink rule and a left-column heading.",
+      "**Do** divide rows with 1px Hairline (#d9d6de) and band even rows with Band (#f4f3f6).",
+      "**Do** give every record an address and open its raw row with the one 220ms clip reveal, removed under reduced motion.",
+      "**Do** make the primary page action solid Ink and at least 48px tall.",
+      "**Do** stack the records table below 1024px as label and value pairs under a 6px purple band."
+    ],
+    "donts": [
+      "**Don't** use purple for text, links, buttons, icons, borders or charts.",
+      "**Don't** use the highlighter for emphasis, decoration, brand fills or calls to action.",
+      "**Don't** add shadows, glows, gradients or blur; depth is rules, bands and tone.",
+      "**Don't** put kicker or eyebrow labels above headings, and don't number sections. Record numbers (01 to 10) and the explorer's provenance badge and reference ID are data, and they stay.",
+      "**Don't** round anything on the page; corners (2px controls, 4px shell) belong to the explorer.",
+      "**Don't** add imagery or illustration to the masthead.",
+      "**Don't** set prose, headings, names or buttons in Chivo Mono.",
+      "**Don't** use Publicus's logo or reproduce its marketing layout.",
+      "**Don't** add a second animation; hover states change colour only, on the same 220ms curve."
+    ]
+  }
+}
