@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.119.0",
+    "papaparse": "npm:papaparse@5.7.1",
+    "unpdf": "npm:unpdf@2.2.0"
+  },
+  "compilerOptions": { "strict": true, "lib": ["deno.ns", "dom", "esnext"] }
+}

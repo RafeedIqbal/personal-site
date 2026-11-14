@@ -15,6 +15,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
@@ -37,6 +38,11 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "supabase/functions/publicus-api",
+    "supabase/functions/publicus-worker",
+    "supabase/functions/tests",
+    "supabase/functions/_shared/server.ts",
+    "supabase/functions/_shared/gemini.ts"
   ]
 }

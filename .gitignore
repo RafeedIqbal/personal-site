@@ -50,3 +50,6 @@ yarn-error.log*
 # misc
 .DS_Store
 *.pem
+.supabase/
+supabase/.temp/
+supabase/.branches/

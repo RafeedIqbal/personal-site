@@ -56,3 +56,7 @@ The current résumé source is `Resume/Rafeed_Iqbal_Resume_2026.pdf`; the publis
 The downloadable résumé is a separate PDF. When changing roles, dates, or projects, update the source résumé and replace `public/Rafeed_Iqbal_Resume.pdf` together after confirming the facts.
 
 Security response headers are configured in `next.config.ts`. Hosting should serve HTTPS and preserve those headers. The policy prevents framing and plugin embeds; it deliberately does not restrict inline scripts/styles required by static Next.js rendering and animations.
+
+## Publicus application
+
+The unlisted `/publicus` route contains an experience-led application and procurement explorer. See [setup and verification](docs/publicus-setup.md) for the dedicated Supabase backend, and [research notes](docs/publicus-research.md) for company, data and design sources.
