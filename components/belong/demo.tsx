@@ -190,7 +190,8 @@ export interface View {
 const CLEAN = FILES[0];
 const CLEAN_RESULTS = evaluate(CLEAN);
 
-export function derive(state: State): View {
+// Reads only the run and the rulings, so opening or closing the panel does not re-derive.
+export function derive(state: Pick<State, "run" | "rulings">): View {
   const { run } = state;
   const scenario = run ? SCENARIOS.find((s) => s.id === run.scenarioId) ?? null : null;
   if (!run || !scenario) {
@@ -328,6 +329,9 @@ interface DemoContext {
 }
 
 const Context = createContext<DemoContext | null>(null);
+// Dispatch never changes, so components that only start runs subscribe to this
+// and skip the re-render on every step tick.
+const DispatchContext = createContext<Dispatch<Action> | null>(null);
 
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, {
@@ -340,9 +344,20 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     done: [],
     panel: null,
   });
-  const view = useMemo(() => derive(state), [state]);
+  const { run, rulings } = state;
+  const view = useMemo(() => derive({ run, rulings }), [run, rulings]);
   const value = useMemo(() => ({ state, dispatch, view }), [state, view]);
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return (
+    <DispatchContext.Provider value={dispatch}>
+      <Context.Provider value={value}>{children}</Context.Provider>
+    </DispatchContext.Provider>
+  );
+}
+
+export function useDemoDispatch() {
+  const dispatch = useContext(DispatchContext);
+  if (!dispatch) throw new Error("useDemoDispatch needs DemoProvider");
+  return dispatch;
 }
 
 export function useDemo() {

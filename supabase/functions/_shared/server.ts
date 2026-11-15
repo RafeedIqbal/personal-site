@@ -1,8 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Workspace } from "./domain.ts";
+import { HttpError } from "./errors.ts";
 
+export { HttpError, UserError } from "./errors.ts";
 export const admin = () => createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false, autoRefreshToken: false } });
-export class HttpError extends Error { constructor(public status: number, message: string) { super(message); } }
+// A daily cap read from the environment, clamped so a typo can't remove the ceiling.
+export const dailyLimit = (name: string, fallback: number, max: number) => Math.min(max, Math.max(1, Number(Deno.env.get(name)) || fallback));
 export function cors(request: Request) {
   const origin = request.headers.get("origin") || "";
   const allowed = (Deno.env.get("ALLOWED_ORIGINS") || "http://localhost:3001").split(",").map((s) => s.trim());

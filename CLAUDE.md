@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-A terminal-styled personal portfolio: Next.js 16 (App Router), React 19, Tailwind v4, and Framer Motion for terminal help. Content is server-rendered; interactive components enhance it after hydration. There is no application backend. Graphite (`#111315` background, `#191c1f` surface) with a green accent (`#8faf9b`); Space Grotesk for reading text and headings, JetBrains Mono for commands and metadata.
+A terminal-styled personal portfolio: Next.js 16 (App Router), React 19 and Tailwind v4, with no animation library (the terminal help fades in with CSS). Content is server-rendered; interactive components enhance it after hydration. There is no application backend. Graphite (`#111315` background, `#191c1f` surface) with a green accent (`#8faf9b`); Space Grotesk for reading text and headings, JetBrains Mono for commands and metadata.
 
 ## Commands
 
@@ -42,7 +42,7 @@ Run `npm run test:ui` for the production-build Playwright and axe suite. Install
 
 **Sections.** `components/SectionHeader.tsx` takes `{ id, command, title, description?, right? }` and renders a readable heading before its command label. Sections are immediately readable without reveal animations. Project outcomes precede native case disclosures. Supporting project headings are nested under “More projects.” `components/Nav.tsx` marks the last section whose top crosses 30% of the viewport, with Contact selected at the bottom. `components/BackgroundEffect.tsx` draws ASCII in empty space, excludes visible text and navigation, respects reduced motion, and stops animating when idle.
 
-**Mobile vs. desktop split** lives in `components/PortfolioShell.tsx`, using a 1024px breakpoint. Sections are always server-rendered. Desktop adds the 224px sidebar, optional terminal, keyboard games, and ASCII canvas. Mobile uses a native expandable section menu; its header becomes sticky after hydration and stays in normal flow without JavaScript. There is no boot sequence.
+**Mobile vs. desktop split** lives in `components/PortfolioShell.tsx`, using a 1024px breakpoint. Sections are always server-rendered. Desktop adds the 224px sidebar, optional terminal, keyboard games, and ASCII canvas. Mobile uses a native expandable section menu; its header is sticky whenever scripting is enabled (a CSS `scripting` media query) and stays in normal flow without JavaScript. There is no boot sequence.
 
 ## /belong proposal page
 
@@ -71,5 +71,6 @@ Run `npm run test:ui` for the production-build Playwright and axe suite. Install
 ## Notes
 
 - `AGENTS.md` and `README.md` cover the same ground at a higher level; keep this file in sync if those change.
+- Security headers live in `next.config.ts`. The production CSP allows only same-origin scripts, styles, images, fonts, media and connections (plus Supabase on `/publicus` and the Vercel toolbar on previews), so a new external origin must be added there or it is blocked in production. It keeps `'unsafe-inline'` because every page is prerendered; a nonce would force dynamic rendering.
 - `.gitignore` has an id8-managed block — leave the `# >>> id8-managed` markers intact.
 - `Resume/` and `public/` are static assets, not runtime code.

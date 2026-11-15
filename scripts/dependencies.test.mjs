@@ -195,5 +195,5 @@ test("the site's ESLint global ignores still apply", async () => {
   const eslint = new ESLint({ cwd: siteRoot });
   assert.equal(await eslint.isPathIgnored(path.join(siteRoot, ".next/server/app.js")), true);
   assert.equal(await eslint.isPathIgnored(path.join(siteRoot, "node_modules/x/index.js")), true);
-  assert.equal(await eslint.isPathIgnored(path.join(siteRoot, "app/page.tsx")), false);
+  assert.equal(await eslint.isPathIgnored(path.join(siteRoot, "app/(portfolio)/page.tsx")), false);
 });

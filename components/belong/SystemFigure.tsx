@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { LAYERS, applyPatch, settle } from "@/lib/belong/checks";
 import { FILES, SCENARIOS } from "@/lib/belong/data";
 import { Brace } from "./Doc";
-import { LAYER_INDEX, showDemo, useDemo } from "./demo";
+import { LAYER_INDEX, showDemo, useDemoDispatch } from "./demo";
 
 type LayerId = (typeof LAYERS)[number]["id"];
 type StoreId = "documents" | "ledger" | "rules" | "rulings" | "gold";
@@ -159,7 +159,7 @@ function LayerDetail({
 }
 
 export default function SystemFigure() {
-  const { dispatch } = useDemo();
+  const dispatch = useDemoDispatch();
   const [selected, setSelected] = useState<LayerId>("check");
   const index = LAYERS.findIndex((layer) => layer.id === selected);
   const detail = DETAIL[selected];

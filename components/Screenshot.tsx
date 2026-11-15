@@ -1,15 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { PortfolioImage } from "@/lib/content";
+import { closedByAny, lightDismissFallback } from "@/lib/dialog";
 
 export default function Screenshot({
   image,
   compact = false,
+  eager = false,
 }: {
   image: PortfolioImage;
   compact?: boolean;
+  // The first featured screenshot can be the LCP element on tall desktop windows.
+  eager?: boolean;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const linkRef = useRef<HTMLAnchorElement>(null);
@@ -17,15 +21,6 @@ export default function Screenshot({
   const [open, setOpen] = useState(false);
   const titleId = useId();
   const captionId = useId();
-
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = previous;
-    };
-  }, [open]);
 
   const close = () => dialogRef.current?.close();
 
@@ -53,9 +48,10 @@ export default function Screenshot({
           height={image.height}
           sizes={
             compact
-              ? "(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) 45vw, 30vw"
-              : "(max-width: 1023px) calc(100vw - 40px), 48vw"
+              ? "(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) 45vw, min(30vw, 360px)"
+              : "(max-width: 1023px) calc(100vw - 40px), min(48vw, 600px)"
           }
+          loading={eager ? "eager" : undefined}
           className="preview-image"
         />
         <span className="screenshot-expand" aria-hidden="true">
@@ -81,23 +77,8 @@ export default function Screenshot({
         ref={dialogRef}
         className="image-dialog"
         aria-labelledby={titleId}
-        onKeyDown={(event) => {
-          if (event.key !== "Tab") return;
-          const controls = Array.from(
-            event.currentTarget.querySelectorAll<HTMLElement>(
-              "a[href], button:not([disabled]), [tabindex='0']",
-            ),
-          );
-          const first = controls[0];
-          const last = controls[controls.length - 1];
-          if (document.activeElement === (event.shiftKey ? first : last)) {
-            event.preventDefault();
-            (event.shiftKey ? last : first)?.focus();
-          }
-        }}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) close();
-        }}
+        {...closedByAny}
+        onClick={lightDismissFallback}
         onClose={() => {
           setOpen(false);
           linkRef.current?.focus({ preventScroll: true });
@@ -121,7 +102,6 @@ export default function Screenshot({
                 type="button"
                 onClick={close}
                 className="min-h-11 shrink-0 px-2 text-muted hover:text-fg"
-                autoFocus
               >
                 Close <span aria-hidden="true">[esc]</span>
               </button>

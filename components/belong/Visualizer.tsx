@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { LAYERS, RULES, docById, logFor, nodeResults } from "@/lib/belong/checks";
 import { GATES, SCENARIOS } from "@/lib/belong/data";
 import type { Tiles } from "@/lib/belong/types";
@@ -9,19 +9,26 @@ import { destinationName, PacketPanel, RouteCard } from "./RouteCard";
 import { DocFacts, DocSheet, NodeChecks } from "./Sheet";
 import { StatusIcon, StatusTag, type Tone } from "./Status";
 import { FundTrail } from "./Trail";
-import { useFocusTrap } from "./useFocusTrap";
+import { closedByAny, lightDismissFallback } from "@/lib/dialog";
+
+// One MediaQueryList per query, so renders don't allocate a new list each time.
+const mediaLists = new Map<string, MediaQueryList>();
+function mediaList(query: string) {
+  let list = mediaLists.get(query);
+  if (!list) mediaLists.set(query, (list = window.matchMedia(query)));
+  return list;
+}
 
 function useMedia(query: string) {
-  return useSyncExternalStore(
-    (notify) => {
-      const list = window.matchMedia(query);
-      list.addEventListener("change", notify);
-      return () => list.removeEventListener("change", notify);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
-  );
+  const subscribe = useCallback((notify: () => void) => {
+    const list = mediaList(query);
+    list.addEventListener("change", notify);
+    return () => list.removeEventListener("change", notify);
+  }, [query]);
+  return useSyncExternalStore(subscribe, () => mediaList(query).matches, () => false);
 }
+
+const PHONE = "(max-width: 759px)";
 
 export const useReducedMotion = () => useMedia("(prefers-reduced-motion: reduce)");
 
@@ -340,8 +347,21 @@ function Drawer() {
   const heading = useRef<HTMLHeadingElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
   const nodeFor = useRef<string | null>(null);
-  const box = useRef<HTMLDivElement>(null);
-  useFocusTrap(box, Boolean(panel));
+  const box = useRef<HTMLDialogElement>(null);
+  const phone = useMedia(PHONE);
+  const open = Boolean(panel);
+
+  // Open before paint. On phones the drawer is a modal sheet: the page goes inert and
+  // the dialog brings the backdrop, Esc and light dismiss. On desktop it sits inside
+  // the app window next to the trail, so it opens non-modally.
+  useLayoutEffect(() => {
+    const dialog = box.current;
+    if (!open || !dialog || dialog.open) return;
+    // Record the opener first: opening moves focus into the dialog.
+    if (!returnTo.current && document.activeElement instanceof HTMLElement) returnTo.current = document.activeElement;
+    if (mediaList(PHONE).matches) dialog.showModal();
+    else dialog.show();
+  }, [open]);
 
   useEffect(() => {
     if (!panel) return;
@@ -417,7 +437,14 @@ function Drawer() {
   }
 
   return (
-    <div ref={box} className="bl-drawer" role="dialog" aria-modal="true" aria-labelledby="bl-drawer-title">
+    <dialog
+      ref={box}
+      className="bl-drawer"
+      aria-labelledby="bl-drawer-title"
+      {...(phone ? closedByAny : {})}
+      onClick={lightDismissFallback}
+      onClose={() => dispatch({ type: "panel", panel: null })}
+    >
       <div className="bl-drawer__head">
         <h3 id="bl-drawer-title" ref={heading} tabIndex={-1}>
           {title}
@@ -427,7 +454,7 @@ function Drawer() {
         </button>
       </div>
       <div className="bl-drawer__body">{body}</div>
-    </div>
+    </dialog>
   );
 }
 

@@ -17,7 +17,8 @@ const POINTER_ACTIVE_MS = 120;
 const POSITION_EASING = 0.18;
 const OPACITY_EASING = 0.22;
 const FRAME_MS = 1000 / 60;
-const MAX_DPR = 2;
+// Faint 12px glyphs look the same at 1.5x; 2x would quadruple a 4K backing store.
+const MAX_DPR = 1.5;
 const VISIBLE_EPSILON = 0.005;
 const EXCLUSION_PAD = 10;
 const EXCLUSION_VIEWPORT_MARGIN = 40;
@@ -113,6 +114,12 @@ export default function BackgroundEffect() {
 
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let disposed = false;
+    // Measuring ~360 elements is the expensive part, so scrolls, toggles and
+    // resizes only mark the boxes stale; the next drawn frame re-measures.
+    let exclusionsDirty = true;
+    const markExclusionsDirty = () => {
+      exclusionsDirty = true;
+    };
 
     const collectExclusionRects = () => {
       if (disposed || motionQuery.matches || document.hidden) return;
@@ -171,6 +178,10 @@ export default function BackgroundEffect() {
       let active = isPointerActive;
 
       viewport.lastFrameAt = timestamp;
+      if (exclusionsDirty) {
+        exclusionsDirty = false;
+        collectExclusionRects();
+      }
 
       ctx.clearRect(0, 0, viewport.width, viewport.height);
       ctx.fillStyle = "#E7E9E8";
@@ -296,7 +307,8 @@ export default function BackgroundEffect() {
       canvas.style.height = `${height}px`;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const monoFont = getComputedStyle(document.body)
+      // Read from the canvas: the font variable is set on the portfolio wrapper, not body.
+      const monoFont = getComputedStyle(canvas)
         .getPropertyValue("--font-jetbrains-mono")
         .trim();
       ctx.font = `${FONT_SIZE}px ${monoFont || "monospace"}`;
@@ -304,8 +316,16 @@ export default function BackgroundEffect() {
       ctx.textBaseline = "middle";
 
       particlesRef.current = createParticleGrid(width, height);
-      collectExclusionRects();
+      markExclusionsDirty();
       startLoop();
+    };
+    let resizeFrame = 0;
+    const scheduleResize = () => {
+      if (!resizeFrame)
+        resizeFrame = requestAnimationFrame(() => {
+          resizeFrame = 0;
+          resizeCanvas();
+        });
     };
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -326,19 +346,6 @@ export default function BackgroundEffect() {
       };
     };
 
-    // Keep exclusions aligned with scrolling and expanded case summaries.
-    let scrollRefreshFrame = 0;
-    let scrollSettleTimer = 0;
-    const handleScroll = () => {
-      if (motionQuery.matches || document.hidden) return;
-      window.clearTimeout(scrollSettleTimer);
-      scrollSettleTimer = window.setTimeout(collectExclusionRects, 700);
-      if (scrollRefreshFrame) return;
-      scrollRefreshFrame = requestAnimationFrame(() => {
-        scrollRefreshFrame = 0;
-        collectExclusionRects();
-      });
-    };
 
     const resetAnimation = () => {
       cancelAnimationFrame(rafRef.current);
@@ -357,35 +364,32 @@ export default function BackgroundEffect() {
     startLoop();
 
     // Font loading and native disclosures can change the reading layout.
-    document.fonts?.ready.then(collectExclusionRects).catch(() => {});
-    const settleTimer = window.setTimeout(collectExclusionRects, 600);
-    const resizeObserver = new ResizeObserver(collectExclusionRects);
+    document.fonts?.ready.then(markExclusionsDirty).catch(() => {});
+    const resizeObserver = new ResizeObserver(markExclusionsDirty);
     const main = document.querySelector("main");
     if (main) resizeObserver.observe(main);
 
-    window.addEventListener("resize", resizeCanvas);
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", scheduleResize);
+    window.addEventListener("scroll", markExclusionsDirty, { passive: true });
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
     document.addEventListener("visibilitychange", resetAnimation);
-    document.addEventListener("toggle", handleScroll, true);
+    document.addEventListener("toggle", markExclusionsDirty, true);
     motionQuery.addEventListener("change", resetAnimation);
 
     return () => {
       disposed = true;
       cancelAnimationFrame(rafRef.current);
-      cancelAnimationFrame(scrollRefreshFrame);
+      cancelAnimationFrame(resizeFrame);
       runningRef.current = false;
-      window.clearTimeout(settleTimer);
-      window.clearTimeout(scrollSettleTimer);
       resizeObserver.disconnect();
 
-      window.removeEventListener("resize", resizeCanvas);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", scheduleResize);
+      window.removeEventListener("scroll", markExclusionsDirty);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.removeEventListener("visibilitychange", resetAnimation);
-      document.removeEventListener("toggle", handleScroll, true);
+      document.removeEventListener("toggle", markExclusionsDirty, true);
       motionQuery.removeEventListener("change", resetAnimation);
     };
   }, []);

@@ -11,13 +11,12 @@
     "test:belong": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test scripts/belong-checks.test.mjs",
     "test:ui": "npm run build && playwright test",
     "typecheck": "next typegen && tsc --noEmit",
-    "test:publicus": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test scripts/publicus-domain.test.mjs scripts/publicus-assistant.test.mjs scripts/publicus-records.test.mjs",
+    "test:publicus": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test scripts/publicus-domain.test.mjs scripts/publicus-assistant.test.mjs scripts/publicus-records.test.mjs scripts/publicus-validate.test.mjs",
     "test:publicus:integration": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/publicus-integration.mjs",
     "eval:publicus": "deno run --config supabase/functions/deno.json --env-file=.env.local --allow-env --allow-net --allow-read --allow-write --allow-sys supabase/functions/evals/run.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
-    "framer-motion": "^12.35.2",
     "next": "16.4.3",
     "papaparse": "^5.7.1",
     "react": "19.2.8",

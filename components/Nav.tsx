@@ -1,19 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { NAV_ITEMS, PROFILE } from "@/lib/content";
+import { useEffect, useRef, useState } from "react";
+import { NAV_ITEMS, PROFILE } from "@/lib/profile";
 
 interface NavProps {
   onOpenTerminal: () => void;
-  terminalAvailable: boolean;
+  // Starts fetching the terminal chunk before the click lands.
+  onPrepareTerminal: () => void;
 }
 
-const subscribe = () => () => {};
-
-export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
+export default function Nav({ onOpenTerminal, onPrepareTerminal }: NavProps) {
   const [activeId, setActiveId] = useState("whoami");
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
-  const enhanced = useSyncExternalStore(subscribe, () => true, () => false);
 
   useEffect(() => {
     const sections = NAV_ITEMS.map(({ id }) =>
@@ -57,7 +55,7 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
 
   return (
     <>
-      <header className="mobile-header lg:hidden" data-enhanced={enhanced}>
+      <header className="mobile-header lg:hidden">
         <div className="flex min-h-16 items-center justify-between gap-3 px-5 sm:px-8">
           <a href="#whoami" onClick={closeMenu} className="inline-flex min-h-11 items-center font-mono text-xs">
             <span className="text-accent">~</span>/rafeed.dev
@@ -146,24 +144,27 @@ export default function Nav({ onOpenTerminal, terminalAvailable }: NavProps) {
           ))}
         </nav>
         <div className="space-y-4 border-t border-line p-5">
-          {terminalAvailable && (
-            <button
-              type="button"
-              onClick={onOpenTerminal}
-              aria-haspopup="dialog"
-              className="terminal-launcher"
-              title="Open terminal (Ctrl + backtick)"
-              aria-keyshortcuts="Control+`"
-            >
-              <span>
-                <span className="mr-2 text-accent" aria-hidden="true">
-                  &gt;_
-                </span>
-                Open terminal
+          {/* Server-rendered so the sidebar doesn't shift on hydration; the sidebar
+              only shows at the terminal's 1024px breakpoint, and CSS hides the
+              button when scripting is off. */}
+          <button
+            type="button"
+            onClick={onOpenTerminal}
+            onPointerEnter={onPrepareTerminal}
+            onFocus={onPrepareTerminal}
+            aria-haspopup="dialog"
+            className="terminal-launcher"
+            title="Open terminal (Ctrl + backtick)"
+            aria-keyshortcuts="Control+`"
+          >
+            <span>
+              <span className="mr-2 text-accent" aria-hidden="true">
+                &gt;_
               </span>
-              <kbd className="kbd">Ctrl + `</kbd>
-            </button>
-          )}
+              Open terminal
+            </span>
+            <kbd className="kbd">Ctrl + `</kbd>
+          </button>
           <a
             href={PROFILE.resumeUrl}
             download

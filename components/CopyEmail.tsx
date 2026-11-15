@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { PROFILE } from "@/lib/content";
+import { PROFILE } from "@/lib/profile";
 
 const subscribe = () => () => {};
 

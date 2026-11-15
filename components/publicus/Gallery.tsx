@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { GalleryItem } from "@/lib/publicus/work";
+import { closedByAny, lightDismissFallback } from "@/lib/dialog";
 
 // Thumbnails link to the full image, so the gallery works without JavaScript. With it, a thumbnail
 // opens one native dialog that steps through every screen.
@@ -14,13 +15,6 @@ export default function Gallery({ items, caption }: { items: GalleryItem[]; capt
   const titleId = useId();
   const captionId = useId();
   const item = index === null ? null : items[index];
-
-  useEffect(() => {
-    if (index === null) return;
-    const previous = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    return () => { document.documentElement.style.overflow = previous; };
-  }, [index]);
 
   const open = (i: number) => { last.current = i; setIndex(i); dialog.current?.showModal(); };
   const step = (by: number) => setIndex((current) => { const next = ((current ?? 0) + by + items.length) % items.length; last.current = next; return next; });
@@ -42,7 +36,8 @@ export default function Gallery({ items, caption }: { items: GalleryItem[]; capt
         ref={dialog}
         className="pu-lightbox"
         aria-labelledby={titleId}
-        onClick={(event) => { if (event.target === event.currentTarget) dialog.current?.close(); }}
+        {...closedByAny}
+        onClick={lightDismissFallback}
         onKeyDown={(event) => {
           if (event.key === "ArrowRight") { event.preventDefault(); step(1); }
           if (event.key === "ArrowLeft") { event.preventDefault(); step(-1); }

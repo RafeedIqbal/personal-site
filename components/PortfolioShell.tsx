@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Nav from "@/components/Nav";
-import BackgroundEffect from "@/components/BackgroundEffect";
 
-const InteractiveTerminal = dynamic(
-  () => import("@/components/InteractiveTerminal"),
-  { ssr: false },
-);
+const loadTerminal = () => import("@/components/InteractiveTerminal");
+const InteractiveTerminal = dynamic(loadTerminal, { ssr: false });
+// Desktop-only decoration: phones never download it.
+const BackgroundEffect = dynamic(() => import("@/components/BackgroundEffect"), { ssr: false });
 
 export default function PortfolioShell({
   children,
@@ -90,7 +89,7 @@ export default function PortfolioShell({
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
-        <Nav onOpenTerminal={openTerminal} terminalAvailable={desktop} />
+        <Nav onOpenTerminal={openTerminal} onPrepareTerminal={() => void loadTerminal()} />
         <div className="min-w-0">
           <header
             className="workspace-bar hidden lg:flex"

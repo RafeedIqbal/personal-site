@@ -91,7 +91,7 @@ export default function Projects() {
         right={`${featured.length} featured / ${SELECTED_WORK.length} projects`}
       />
       <div>
-        {featured.map((project) => (
+        {featured.map((project, index) => (
           <article
             key={project.slug}
             id={`work-${project.slug}`}
@@ -120,7 +120,7 @@ export default function Projects() {
               <CaseDetails project={project} />
             </div>
             <div className="project-image">
-              <Screenshot image={project.image} />
+              <Screenshot image={project.image} eager={index === 0} />
             </div>
           </article>
         ))}

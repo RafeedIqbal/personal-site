@@ -58,6 +58,8 @@ test("Icon links to both app stores, and Work ends with a link to the portfolio"
 
 test("the CanadaBuys rows open in a dialog from the explorer and from record links", async ({ page }) => {
   await page.goto("/publicus");
+  // The explorer mounts as it approaches the viewport.
+  await page.locator("#explorer").scrollIntoViewIfNeeded();
   const button = page.locator("#explorer").getByRole("button", { name: "CanadaBuys rows" });
   await button.click();
   const dialog = page.getByRole("dialog", { name: "CanadaBuys rows as published" });
@@ -83,6 +85,7 @@ test("the CanadaBuys rows open in a dialog from the explorer and from record lin
 
 test("the chat's record source opens the records dialog", async ({ page }) => {
   await page.goto("/publicus");
+  await page.locator("#explorer").scrollIntoViewIfNeeded();
   await expect(page.locator("#explorer").getByRole("button", { name: "CanadaBuys rows" })).toBeVisible();
   await page.getByRole("button", { name: "Ask a question" }).click();
   const chat = page.getByRole("dialog", { name: "Questions about this application" });

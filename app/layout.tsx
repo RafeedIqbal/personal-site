@@ -1,21 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { PROFILE } from "@/lib/content";
 import "./globals.css";
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-jetbrains-mono",
-  weight: ["400", "500", "700", "800"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-space-grotesk",
-  weight: ["400", "500", "600", "700"],
-});
 
 const title = `${PROFILE.name} — Portfolio`;
 const description = `${PROFILE.title}. ${PROFILE.tagline}`;
@@ -75,10 +60,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}
-    >
+    // Fonts are loaded per route: app/(portfolio)/layout.tsx, app/belong and app/publicus.
+    <html lang="en">
       <body>
         <script
           type="application/ld+json"

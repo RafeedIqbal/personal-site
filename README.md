@@ -1,6 +1,6 @@
 # personal-site
 
-Terminal-style personal portfolio built with Next.js 16, React 19, and Tailwind CSS v4. A graphite workspace pairs readable case summaries and real project previews with file-tree navigation. The optional desktop terminal (press Ctrl + backtick) and arcade load on demand; Framer Motion is confined to the terminal's help panel.
+Terminal-style personal portfolio built with Next.js 16, React 19, and Tailwind CSS v4. A graphite workspace pairs readable case summaries and real project previews with file-tree navigation. The optional desktop terminal (press Ctrl + backtick) and arcade load on demand. There is no animation library: the terminal help fades in with CSS `@starting-style`.
 
 The reading view, mobile section menu, and case disclosures work without JavaScript. Screenshot previews open in a full-color dialog with JavaScript or link directly to the image without it. Capture provenance and redesign verification are recorded in [docs/portfolio-redesign.md](docs/portfolio-redesign.md).
 
@@ -58,7 +58,7 @@ The current résumé source is `Resume/Rafeed_Iqbal_Resume_2026.pdf`; the publis
 
 The downloadable résumé is a separate PDF. When changing roles, dates, or projects, update the source résumé and replace `public/Rafeed_Iqbal_Resume.pdf` together after confirming the facts.
 
-Security response headers are configured in `next.config.ts`. Hosting should serve HTTPS and preserve those headers. The policy prevents framing and plugin embeds; it deliberately does not restrict inline scripts/styles required by static Next.js rendering and animations.
+Security response headers are configured in `next.config.ts`. Hosting should serve HTTPS and preserve those headers. In production the Content Security Policy limits scripts, styles, images, fonts, media and connections to the site's own origin (plus the Supabase project on `/publicus`, read from `NEXT_PUBLIC_SUPABASE_URL` at build time, and the Vercel toolbar on preview deployments), and blocks frames, plugins, `<base>` and foreign form targets. It still allows inline scripts and styles: every page is prerendered, and a nonce would force dynamic rendering. Trusted Types are not enforced because the Turbopack runtime assigns `script.src` without a policy. `Cross-Origin-Opener-Policy` and `Cross-Origin-Resource-Policy` are `same-origin`, except that social images and icons allow cross-origin embedding.
 
 ## Publicus application
 

@@ -4,6 +4,18 @@ Next.js and `eslint-config-next` are pinned together at 16.4.3, which includes t
 security fixes missing from earlier 16.3 releases. The lockfile also selects patched releases of
 `sharp`, `source-map-js`, and both installed `brace-expansion` release lines.
 
+## Version floors
+
+Two overrides only raise a transitive version:
+
+- `next` → `postcss: ^8.5.28`. Next pins its own `postcss` (8.4.31 before the override), so
+  the build would otherwise carry a second, older copy next to the one Tailwind uses. The
+  override keeps a single patched `postcss` (added in `4926fca`, raised in `7fa030e`).
+- `zod: ^4.6.6` raises the copy pulled in by `eslint-plugin-react-hooks` (development only),
+  added with the October 2026 security updates in `7fa030e`.
+
+Remove each once the upstream package's own range resolves to that version or later.
+
 ## ESLint glob replacement
 
 `braces` has no published fix for

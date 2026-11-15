@@ -48,10 +48,11 @@ test("image labels, full-size access, and dialog focus work together", async ({ 
   const dialog = page.getByRole("dialog", { name: "Private-label fragrance website" });
   const close = dialog.getByRole("button", { name: "Close", exact: true });
   await expect(close).toBeFocused();
-  await page.keyboard.press("Tab");
+  // The native modal keeps the page inert; no script wraps Tab around inside it.
+  await page.keyboard.press("Shift+Tab");
   const fullSize = dialog.getByRole("link", { name: /Open full-size image/ });
   await expect(fullSize).toBeFocused();
-  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
   await expect(close).toBeFocused();
   await checkAccessibility(page);
   const popupPromise = page.waitForEvent("popup");

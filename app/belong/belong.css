@@ -147,6 +147,10 @@ body:has(.belong) {
   line-height: 0.92;
   letter-spacing: -0.045em;
 }
+/* Italic Newsreader is its own font (see layout.tsx), so italic text asks for it first. */
+.belong :is(.bl-title__num, .bl-figure__n, .bl-question, .bl-hero__by, .bl-toa i) {
+  font-family: var(--font-newsreader-italic), var(--font-newsreader), Georgia, serif;
+}
 .bl-title__num {
   display: block;
   margin-bottom: 14px;
@@ -2358,19 +2362,30 @@ body:has(.belong) {
 
 /* drawer */
 
+/* A native <dialog>: these reset its UA box (inset, margin, padding, border, sizing). */
 .bl-drawer {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
+  left: auto;
   z-index: 20;
-  display: flex;
   flex-direction: column;
   width: min(420px, 100%);
+  max-width: none;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   border-left: 1px solid var(--rule-2);
   background: var(--surface);
+  color: inherit;
   box-shadow: -16px 0 32px -16px rgb(16 30 46 / 0.25);
   animation: bl-slide 300ms var(--ease);
+}
+.bl-drawer[open] {
+  display: flex;
 }
 @keyframes bl-slide {
   from {
@@ -2410,7 +2425,10 @@ body:has(.belong) {
     border-top: 1px solid var(--rule-2);
     border-left: 0;
     border-radius: 12px 12px 0 0;
-    box-shadow: 0 0 0 100vmax rgb(16 30 46 / 0.45);
+    box-shadow: none;
+  }
+  .bl-drawer::backdrop {
+    background: rgb(16 30 46 / 0.45);
   }
   .bl-drawer__body {
     padding-bottom: calc(16px + env(safe-area-inset-bottom));

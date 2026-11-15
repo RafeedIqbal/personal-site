@@ -28,9 +28,14 @@ html {
 body {
   background: var(--color-bg);
   color: var(--color-fg);
-  font-family: var(--font-space-grotesk), sans-serif;
+  /* Each route sets its own fonts on a wrapper; this is only the fallback. */
+  font-family: var(--font-space-grotesk, ui-sans-serif), system-ui, sans-serif;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+}
+.portfolio-fonts {
+  display: contents;
+  font-family: var(--font-space-grotesk), sans-serif;
 }
 button,
 summary,
@@ -163,8 +168,21 @@ main:focus {
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-line);
 }
-.mobile-header[data-enhanced="true"] {
-  position: sticky;
+/* Sticky only when scripts run, decided by CSS so it holds from first paint
+   instead of switching on after hydration. Without scripts it stays in flow. */
+@media (scripting: enabled) {
+  .mobile-header {
+    position: sticky;
+  }
+  .mobile-header .mobile-menu nav {
+    max-height: calc(100dvh - 110px);
+    overflow-y: auto;
+  }
+}
+@media (scripting: none) {
+  .terminal-launcher {
+    display: none;
+  }
 }
 .mobile-menu {
   border-top: 1px solid var(--color-line);
@@ -177,10 +195,6 @@ main:focus {
 }
 .mobile-menu[open] .menu-indicator {
   transform: rotate(45deg);
-}
-.mobile-header[data-enhanced="true"] .mobile-menu nav {
-  max-height: calc(100dvh - 110px);
-  overflow-y: auto;
 }
 .mobile-nav-link {
   display: flex;
@@ -337,6 +351,15 @@ main:focus {
   color: var(--color-fg);
   overflow: auto;
 }
+/* Every native modal: keep scroll gestures over the backdrop or inside the dialog from
+   reaching the page, without locking the root scrollbar (prevent-page-scroll-under-modal-dialog). */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
 .image-dialog::backdrop {
   background: rgb(0 0 0 / 85%);
 }
@@ -458,6 +481,20 @@ main:focus {
 }
 .terminal-dialog {
   scrollbar-color: var(--color-muted) var(--color-surface);
+}
+/* Help card fades in on mount; the reduced-motion block above removes the transition. */
+.terminal-help {
+  transition: opacity 150ms ease-out;
+}
+@starting-style {
+  .terminal-help {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .terminal-body {
+    scroll-behavior: smooth;
+  }
 }
 .terminal-dialog [aria-label="Command help"] button:focus-visible {
   outline-offset: -2px;

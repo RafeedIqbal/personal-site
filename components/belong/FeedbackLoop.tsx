@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { RULES, applyPatch, settle } from "@/lib/belong/checks";
 import { SCENARIOS, fileById } from "@/lib/belong/data";
 import { showDemo, useDemo } from "./demo";
@@ -14,12 +15,13 @@ export default function FeedbackLoop() {
   const ruling = state.rulings[0];
   const option = ERROR_SIX.ruling?.options.find((o) => o.id === ruling?.treatment);
 
-  let passes = false;
-  if (ruling && ERROR_SIX.replay) {
+  // The replay clones and settles a whole case file, so it runs only when the ruling changes.
+  const passes = useMemo(() => {
+    if (!ruling || !ERROR_SIX.replay) return false;
     const second = applyPatch(fileById(ERROR_SIX.replay.file), ERROR_SIX.replay.patch);
     const hop = settle(second, ERROR_SIX, { rulings: [ruling] }).hops[0];
-    passes = hop?.to === "attorney" && hop.ruling?.id === ruling.id;
-  }
+    return hop?.to === "attorney" && hop.ruling?.id === ruling.id;
+  }, [ruling]);
 
   const go = (replay: boolean) => {
     dispatch({ type: "start", scenarioId: ERROR_SIX.id, replay });

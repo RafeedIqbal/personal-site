@@ -8,6 +8,7 @@
 # local tooling
 .id8/
 .vercel/
+.claude/settings.local.json
 
 # dependencies
 node_modules/

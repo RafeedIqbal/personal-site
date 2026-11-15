@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import Papa from "papaparse";
 import { CAPABILITIES, CSV_FIELDS, LIMITS, QUALIFICATIONS, REGIONS, contracts, dateLabel, exportBrief, fingerprint, inferMapping, matchRecord, mergeRecords, money, normalize, normalizeCsvRow, safeUrl, validateClaims } from "@/supabase/functions/_shared/domain";
 import type { Answer, Citation, ColumnMapping, ProcurementRecord, Profile, Run, Source, Stage, Workspace as WorkspaceData } from "@/supabase/functions/_shared/domain";
 import { applyScenario, initialWorkspace, preparedAnswer, PUBLIC_SNAPSHOT, SCENARIOS } from "@/lib/publicus/seed";
-import { api, backendConfigured, connectWorkspace, downloadText, readWorkspace, upload, type Session } from "@/lib/publicus/client";
+import { api, backendConfigured, backendUrl, connectWorkspace, downloadText, readRuns, readWorkspace, upload, type Session } from "@/lib/publicus/client";
 import { setExplorerContext } from "@/lib/publicus/explorer-context";
+import { closedByAny, lightDismissFallback } from "@/lib/dialog";
 import { rowFromHash } from "@/lib/publicus/records";
 import RecordSheet from "./RecordSheet";
 
@@ -31,8 +31,9 @@ function Icon({ type, size = 18 }: { type: IconType; size?: number }) {
 function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "green" | "amber" | "violet" }) { return <span className={`px-badge px-badge-${tone}`}>{children}</span>; }
 function Modal({ title, children, close, size }: { title: string; children: ReactNode; close: () => void; size?: "wide" | "records" }) {
   const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => { const node = ref.current; const previous = document.activeElement as HTMLElement | null; node?.showModal(); const overflow = document.body.style.overflow; document.body.style.overflow = "hidden"; return () => { node?.close(); document.body.style.overflow = overflow; previous?.focus(); }; }, []);
-  return <dialog ref={ref} className={`px-modal${size ? ` px-modal-${size}` : ""}`} aria-label={title} onCancel={close} onClick={(event) => { if (event.target === event.currentTarget) close(); }}><div className="px-modal-head"><h3>{title}</h3><button type="button" className="px-icon-button" aria-label="Close dialog" onClick={close}><Icon type="close"/></button></div>{children}</dialog>;
+  // React removes this dialog rather than closing it, so focus is returned by hand.
+  useEffect(() => { const node = ref.current; const previous = document.activeElement as HTMLElement | null; node?.showModal(); return () => { node?.close(); previous?.focus(); }; }, []);
+  return <dialog ref={ref} className={`px-modal${size ? ` px-modal-${size}` : ""}`} aria-label={title} {...closedByAny} onClose={close} onClick={lightDismissFallback}><div className="px-modal-head"><h3>{title}</h3><button type="button" className="px-icon-button" aria-label="Close dialog" onClick={close}><Icon type="close"/></button></div>{children}</dialog>;
 }
 
 export default function Workspace() {
@@ -84,9 +85,15 @@ export default function Workspace() {
   useEffect(() => {
     if (!remote || !runs.some((run) => run.status === "queued" || run.status === "processing")) return;
     let stopped = false;
+    // Poll job status only; fetch the whole workspace once a job finishes.
     const timer = setInterval(async () => {
-      try { const next = await readWorkspace(); if (!stopped) applyJobSnapshot(next); }
-      catch (e) { if (!stopped) setError(e instanceof Error ? e.message : "Could not refresh the job."); }
+      try {
+        const { runs: latest } = await readRuns();
+        if (stopped) return;
+        const finished = latest.some((run) => (run.status === "complete" || run.status === "failed") && runs.some((before) => before.id === run.id && before.status !== run.status));
+        if (!finished) { setRuns(latest); return; }
+        const next = await readWorkspace(); if (!stopped) applyJobSnapshot(next);
+      } catch (e) { if (!stopped) setError(e instanceof Error ? e.message : "Could not refresh the job."); }
     }, 2500);
     return () => { stopped = true; clearInterval(timer); };
   }, [remote, runs, applyJobSnapshot]);
@@ -227,7 +234,7 @@ function SourceViewer({ source, citation, remote }: { source: Source; citation: 
   const [error, setError] = useState("");
   const text = citation.page ? source.pages?.[citation.page - 1] || source.text : source.text;
   const index = citation.quote ? text.toLowerCase().indexOf(citation.quote.toLowerCase()) : -1;
-  async function original() { const tab = window.open("about:blank", "_blank"); if (tab) tab.opener = null; try { const result = await api<{ url: string }>("source", { sourceId: source.id }); if (tab) tab.location.href = result.url; else setError("Allow pop-ups to open the original document."); } catch (e) { tab?.close(); setError(e instanceof Error ? e.message : "Original unavailable."); } }
+  async function original() { const tab = window.open("about:blank", "_blank"); if (tab) tab.opener = null; try { const result = await api<{ url: string }>("source", { sourceId: source.id }); const target = backendUrl(result.url); if (!target) throw new Error("The original document link was not valid."); if (tab) tab.location.href = target; else setError("Allow pop-ups to open the original document."); } catch (e) { tab?.close(); setError(e instanceof Error ? e.message : "Original unavailable."); } }
   return <div className="px-modal-body px-evidence"><div className="px-evidence-meta"><Badge tone={source.origin === "sample" ? "violet" : "green"}>{source.origin === "sample" ? "Fictional sample" : source.origin === "public" ? "Public data" : "Private upload"}</Badge><span>Captured {dateLabel(source.capturedAt)}{source.row ? ` · CSV row ${source.row}` : ""}{citation.page ? ` · Page ${citation.page}` : ""}</span></div><h4>{source.name}</h4>{citation.quote && <blockquote>{citation.quote}</blockquote>}{safeUrl(source.noticeUrl) && <a className="px-source-link" href={safeUrl(source.noticeUrl)} target="_blank" rel="noopener noreferrer">Open procurement notice <Icon type="external" size={12}/></a>}{safeUrl(source.url) && <a className="px-source-link" href={safeUrl(source.url)} target="_blank" rel="noopener noreferrer">Open official source <Icon type="external" size={12}/></a>}{remote && source.storagePath && <button className="px-button px-button-white" onClick={original}>Open original upload <Icon type="external" size={14}/></button>}{error && <p role="alert">{error}</p>}<p className="px-small-note">{source.format === "pdf" ? "Extracted PDF text. Check the original document for layout and context." : source.format === "csv" ? "Original field names and retained values from this CSV row." : "Source document text."}</p><pre>{index >= 0 && citation.quote ? <>{text.slice(0, index)}<mark>{text.slice(index, index + citation.quote.length)}</mark>{text.slice(index + citation.quote.length)}</> : text}</pre></div>;
 }
 
@@ -241,7 +248,7 @@ function Sources({ workspace, remote, ai, busy, runs, connect, loadSnapshot, sho
     setFile(null); setHeaders([]); setMapping({}); if (!next) return;
     await task(async () => {
       if (next.size > LIMITS.fileBytes || next.size === 0 || !/\.(csv|pdf|txt)$/i.test(next.name)) throw new Error("Choose a PDF, CSV or TXT file under 10 MB.");
-      if (next.name.toLowerCase().endsWith(".csv")) { const parsed = Papa.parse<Record<string, string>>(await next.text(), { header: true, preview: 1, skipEmptyLines: true }); const fields = parsed.meta.fields || []; if (!fields.length) throw new Error("No CSV columns found."); setHeaders(fields); setMapping(inferMapping(fields)); }
+      if (next.name.toLowerCase().endsWith(".csv")) { const { default: Papa } = await import("papaparse"); const parsed = Papa.parse<Record<string, string>>(await next.slice(0, 256 * 1024).text(), { header: true, preview: 1, skipEmptyLines: true }); const fields = parsed.meta.fields || []; if (!fields.length) throw new Error("No CSV columns found."); setHeaders(fields); setMapping(inferMapping(fields)); }
       setFile(next);
     });
   }
@@ -251,6 +258,7 @@ function Sources({ workspace, remote, ai, busy, runs, connect, loadSnapshot, sho
       if (remote) { if (!file.name.toLowerCase().endsWith(".csv") && !ai) throw new Error("Gemini is not connected yet. Your document has not been uploaded."); const path = await upload(file); await enqueue("file", { path, name: file.name, mapping: headers.length ? mapping : undefined, recordKind }); }
       else {
         if (!file.name.toLowerCase().endsWith(".csv")) throw new Error("PDF and TXT extraction need a private workspace and Gemini. CSV files can be explored locally.");
+        const { default: Papa } = await import("papaparse");
         const parsed = Papa.parse<Record<string, string>>(await file.text(), { header: true, preview: 120, skipEmptyLines: true });
         if (!mapping.title) throw new Error("Map the title column first.");
         if (parsed.errors.some((e) => e.code === "MissingQuotes" || e.code === "UndetectableDelimiter")) throw new Error("This CSV has invalid quotes or delimiters.");

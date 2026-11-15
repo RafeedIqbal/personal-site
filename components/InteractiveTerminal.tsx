@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, useEffectEvent, useMemo, KeyboardEvent } from "react";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   runCommand,
   AVAILABLE_COMMANDS,
@@ -35,7 +34,6 @@ interface TerminalProps {
 }
 
 export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
-  const reduceMotion = useReducedMotion();
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
@@ -51,12 +49,10 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const gamePanelRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to keep prompt visible
+  // Auto-scroll to keep prompt visible. Smoothness comes from .terminal-body's
+  // scroll-behavior, which respects reduced motion.
   useEffect(() => {
-    bodyRef.current?.scrollTo({
-      top: bodyRef.current.scrollHeight,
-      behavior: reduceMotion ? "instant" : "smooth",
-    });
+    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
     const onResize = () => {
       const body = bodyRef.current;
       if (body && document.activeElement === inputRef.current) {
@@ -65,7 +61,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [history, showHelp, reduceMotion]);
+  }, [history, showHelp]);
 
   // Opening a game grows the panel; align the arcade heading with the top of
   // the body so the game title and controls stay visible.
@@ -75,12 +71,9 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     if (!gamePanelOpen || !body || !panel) return;
     const delta =
       panel.getBoundingClientRect().top - body.getBoundingClientRect().top;
-    body.scrollTo({
-      top: body.scrollTop + delta - 4,
-      behavior: reduceMotion ? "instant" : "smooth",
-    });
+    body.scrollTo({ top: body.scrollTop + delta - 4 });
     panel.focus({ preventScroll: true });
-  }, [gamePanelOpen, activeGameId, reduceMotion]);
+  }, [gamePanelOpen, activeGameId]);
 
   // The page restores launcher focus after closing. Reopening always starts
   // with the prompt live, which also pauses game keyboard controls.
@@ -125,25 +118,26 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
   };
 
   // Escape cascade lives on window because the input is blurred while a game
-  // is armed: help card → games panel → overlay.
+  // is armed: help card → games panel → overlay. The effect event reads the
+  // latest state, so the listener is attached once per open.
+  const onEscape = useEffectEvent((e: globalThis.KeyboardEvent) => {
+    if (e.key !== "Escape") return;
+    if (e.isComposing) return;
+    e.preventDefault();
+    if (showHelp) {
+      setShowHelp(false);
+      focusPrompt();
+    } else if (gamePanelOpen) {
+      closeGames();
+    } else {
+      onClose();
+    }
+  });
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      if (e.isComposing) return;
-      e.preventDefault();
-      if (showHelp) {
-        setShowHelp(false);
-        focusPrompt();
-      } else if (gamePanelOpen) {
-        closeGames();
-      } else {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, [open]);
 
   // Disarm game hotkeys whenever focus lands outside the games panel (e.g.
   // tabbing to the [esc] button) so Space/arrows activate the focused control
@@ -247,10 +241,8 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     }
 
     if (result?.scrollTarget) {
-      document.getElementById(result.scrollTarget)?.scrollIntoView({
-        behavior: reduceMotion ? "instant" : "smooth",
-        block: "start",
-      });
+      // html's scroll-behavior already switches off smooth scrolling for reduced motion.
+      document.getElementById(result.scrollTarget)?.scrollIntoView({ block: "start" });
     }
 
     setHistory((prev) => [
@@ -348,7 +340,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
         {/* Terminal body — single scrollable area, input is part of the flow */}
         <div
           ref={bodyRef}
-          className="flex min-h-0 flex-1 flex-col space-y-3 overflow-y-auto overscroll-contain px-4 py-3"
+          className="terminal-body flex min-h-0 flex-1 flex-col space-y-3 overflow-y-auto overscroll-contain px-4 py-3"
         >
           {/* Welcome */}
           <div className="space-y-0.5 text-xs text-subtle">
@@ -413,58 +405,50 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
           </p>
 
           {/* Help card */}
-          <AnimatePresence>
-            {showHelp && (
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: reduceMotion ? 0 : 0.15 }}
-                className="shrink-0 overflow-hidden"
-              >
-                <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs" role="region" aria-label="Command help">
-                  <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
-                    <span className="font-bold text-fg">
-                      available commands
-                      <span className="ml-2 font-normal text-subtle">({HELP_COMMANDS.length})</span>
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowHelp(false);
-                        focusPrompt();
-                      }}
-                      className="min-h-11 px-2 text-subtle transition-colors hover:text-white"
-                    >
-                      Close help <span aria-hidden="true">[esc]</span>
-                    </button>
-                  </div>
-                  <div className="grid max-h-[min(32dvh,320px)] grid-cols-2 gap-x-3 overflow-y-auto overscroll-contain px-2 py-1">
-                    {HELP_COMMANDS.map(
-                      ({ command: cmd, description: desc }) => (
-                        <button
-                          key={cmd}
-                          className="flex min-h-11 w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded px-2 py-2 text-left text-fg hover:bg-surface"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (cmd) {
-                              setInput(cmd.replace(/<[^>]+>/g, ""));
-                              setHistoryIndex(-1);
-                              setShowHelp(false);
-                              inputRef.current?.focus();
-                            }
-                          }}
-                        >
-                          <span>{cmd}</span>
-                          <span className="text-subtle">{desc}</span>
-                        </button>
-                      ),
-                    )}
-                  </div>
+          {showHelp && (
+            <div className="terminal-help shrink-0 overflow-hidden">
+              <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs" role="region" aria-label="Command help">
+                <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
+                  <span className="font-bold text-fg">
+                    available commands
+                    <span className="ml-2 font-normal text-subtle">({HELP_COMMANDS.length})</span>
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowHelp(false);
+                      focusPrompt();
+                    }}
+                    className="min-h-11 px-2 text-subtle transition-colors hover:text-white"
+                  >
+                    Close help <span aria-hidden="true">[esc]</span>
+                  </button>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <div className="grid max-h-[min(32dvh,320px)] grid-cols-2 gap-x-3 overflow-y-auto overscroll-contain px-2 py-1">
+                  {HELP_COMMANDS.map(
+                    ({ command: cmd, description: desc }) => (
+                      <button
+                        key={cmd}
+                        className="flex min-h-11 w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded px-2 py-2 text-left text-fg hover:bg-surface"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (cmd) {
+                            setInput(cmd.replace(/<[^>]+>/g, ""));
+                            setHistoryIndex(-1);
+                            setShowHelp(false);
+                            inputRef.current?.focus();
+                          }
+                        }}
+                      >
+                        <span>{cmd}</span>
+                        <span className="text-subtle">{desc}</span>
+                      </button>
+                    ),
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Active input prompt — part of the content flow */}
           <div className="flex items-start gap-2 text-xs">

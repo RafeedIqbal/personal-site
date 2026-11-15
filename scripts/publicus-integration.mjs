@@ -3,7 +3,6 @@ import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { createClient } from "@supabase/supabase-js";
-import { initialWorkspace } from "../supabase/functions/_shared/fixtures.ts";
 
 const config = JSON.parse(execFileSync("supabase", ["status", "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
 assert.match(config.API_URL, /^http:\/\/127\.0\.0\.1:/);
@@ -24,8 +23,13 @@ async function waitForJob(user, id) {
 }
 try {
   const a = await session(), b = await session();
-  const first = await api(a, "bootstrap", { seed: initialWorkspace() });
-  const second = await api(b, "bootstrap", { seed: initialWorkspace() });
+  // A browser-supplied seed is ignored: the server builds the sample itself.
+  const planted = { schema: 1, records: [], sources: [], answers: [{ question: "planted", recordIds: [], claims: [], mode: "live", generatedAt: "2026-01-01", fingerprint: "x" }] };
+  const first = await api(a, "bootstrap", { seed: planted });
+  assert.equal(first.workspace.answers.length, 0, "bootstrap must not store a client seed");
+  assert.ok(first.workspace.records.length > 0);
+  const second = await api(b, "bootstrap");
+  assert.equal((await api(a, "runs")).runs.length, 0, "the runs poll returns only job status");
   assert.notEqual(first.workspace.id, second.workspace.id);
   assert.equal(first.aiEnabled, false, "run this check without a Gemini key");
   assert.equal((await b.client.from("publicus_workspaces").select("id").eq("id", first.workspace.id)).data.length, 0);
@@ -71,7 +75,7 @@ try {
   await db.from("publicus_runs").delete().eq("id", leaseJob.data.id);
   console.log("PASS: concurrent quota cap, worker leases, stale-worker rejection and interrupted-job recovery");
   await api(a, "reset"); assert.equal((await db.storage.from("publicus-documents").list(`${a.id}/${first.workspace.id}`)).data.length, 0);
-  const expiring = await api(a, "bootstrap", { seed: initialWorkspace() });
+  const expiring = await api(a, "bootstrap");
   await db.from("publicus_workspaces").update({ expires_at: "2020-01-01" }).eq("id", expiring.workspace.id);
   await api(a, "reset");
   assert.equal((await db.from("publicus_workspaces").select("id").eq("id", expiring.workspace.id)).data.length, 0, "an expired workspace can still be explicitly reset");
