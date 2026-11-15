@@ -60,7 +60,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Fonts are loaded per route: app/(portfolio)/layout.tsx, app/belong and app/publicus.
+    // Fonts are loaded per route: app/(portfolio)/layout.tsx, plus app/_belong and app/_publicus (offline).
     <html lang="en">
       <body>
         <script

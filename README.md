@@ -62,4 +62,4 @@ Security response headers are configured in `next.config.ts`. Hosting should ser
 
 ## Publicus application
 
-The unlisted `/publicus` route contains an experience-led application and procurement explorer. See [setup and verification](docs/publicus-setup.md) for the dedicated Supabase backend, and [research notes](docs/publicus-research.md) for company, data and design sources.
+The `/publicus` and `/belong` pages are offline: their code is kept in `app/_publicus` and `app/_belong`, private folders that Next does not route. `/publicus` contains an experience-led application and procurement explorer. See [setup and verification](docs/publicus-setup.md) for the dedicated Supabase backend, and [research notes](docs/publicus-research.md) for company, data and design sources.

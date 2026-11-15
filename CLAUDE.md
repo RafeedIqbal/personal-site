@@ -44,6 +44,10 @@ Run `npm run test:ui` for the production-build Playwright and axe suite. Install
 
 **Mobile vs. desktop split** lives in `components/PortfolioShell.tsx`, using a 1024px breakpoint. Sections are always server-rendered. Desktop adds the 224px sidebar, optional terminal, keyboard games, and ASCII canvas. Mobile uses a native expandable section menu; its header is sticky whenever scripting is enabled (a CSS `scripting` media query) and stays in normal flow without JavaScript. There is no boot sequence.
 
+## Offline routes: /belong and /publicus
+
+Both pages are taken down but their code is kept. The routes live in private folders, `app/_belong/` and `app/_publicus/`, so Next builds no route for them and both paths 404; the files /publicus served from `public/publicus/` are in `app/_publicus/assets/`. Their Playwright tests are skipped, and `sections/Security.test.ts` checks that the paths stay 404. To bring one back, rename its folder without the underscore (and move `app/_publicus/assets` back to `public/publicus`), then un-skip its tests. The descriptions below use the live paths.
+
 ## /belong proposal page
 
 `app/belong/` is a separate, unlisted page (noindex via metadata and an `X-Robots-Tag` header in `next.config.ts`; not in the sitemap, robots.txt or homepage). It uses a single light theme on Belong's own palette, defined in `app/belong/belong.css` (classes prefixed `bl-`, tokens scoped to `.belong`), and its layout loads Newsreader, Schibsted Grotesk, IBM Plex Sans and IBM Plex Mono only for that route.

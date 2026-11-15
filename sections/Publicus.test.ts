@@ -8,6 +8,9 @@ async function checkAccessibility(page: Page) {
   expect(violations).toEqual([]);
 }
 
+// /publicus is offline (the route lives in app/_publicus, which Next does not build).
+test.skip(() => true, "/publicus is offline");
+
 test("the top of the page is the title and a mission statement, without a metadata row or records", async ({ page }) => {
   await page.goto("/publicus");
   await expect(page.locator(".pu-masthead dl")).toHaveCount(0);

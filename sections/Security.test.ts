@@ -17,7 +17,7 @@ async function watchViolations(page: Page) {
 }
 
 test("every route sends the security headers and the production CSP", async ({ request }) => {
-  for (const path of ["/", "/belong", "/publicus", "/belong/opengraph-image", "/publicus/twitter-image"]) {
+  for (const path of ["/"]) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(200);
     const headers = response.headers();
@@ -35,8 +35,13 @@ test("every route sends the security headers and the production CSP", async ({ r
   expect(home["cross-origin-resource-policy"]).toBe("same-origin");
   expect(home["x-robots-tag"]).toBeUndefined();
   expect((await request.get("/opengraph-image")).headers()["cross-origin-resource-policy"]).toBe("cross-origin");
-  for (const path of ["/belong", "/belong/opengraph-image", "/belong/twitter-image", "/publicus", "/publicus/opengraph-image"]) {
-    expect((await request.get(path)).headers()["x-robots-tag"], path).toBe("noindex, nofollow, noarchive");
+});
+
+// /belong and /publicus are offline: their code lives in app/_belong and app/_publicus
+// (private folders, so Next builds no route) and the /publicus files in app/_publicus/assets.
+test("the offline /belong and /publicus routes and their files are not served", async ({ request }) => {
+  for (const path of ["/belong", "/belong/opengraph-image", "/belong/twitter-image", "/publicus", "/publicus/opengraph-image", "/publicus/twitter-image", "/publicus/work/blend-alchemy-demo.mp4", "/publicus/Rafeed_Iqbal_Publicus_Resume.pdf"]) {
+    expect((await request.get(path)).status(), path).toBe(404);
   }
 });
 
@@ -60,7 +65,7 @@ test("the portfolio's terminal, help and image dialog run without CSP violations
   expect(violations).toEqual([]);
 });
 
-test("the /belong demo and its drawer run without CSP violations", async ({ page }) => {
+test.skip("the /belong demo and its drawer run without CSP violations", async ({ page }) => {
   const violations = await watchViolations(page);
   await page.goto("/belong");
   await page.locator("#chip-1").click();
@@ -76,7 +81,7 @@ test("the /belong demo and its drawer run without CSP violations", async ({ page
   expect(violations).toEqual([]);
 });
 
-test("on phones the /belong drawer is a modal sheet that returns focus", async ({ page }) => {
+test.skip("on phones the /belong drawer is a modal sheet that returns focus", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/belong");
   await page.locator("#instrument").scrollIntoViewIfNeeded();
@@ -93,7 +98,7 @@ test("on phones the /belong drawer is a modal sheet that returns focus", async (
   await expect(gate).toBeFocused();
 });
 
-test("/publicus loads the explorer near the viewport and runs without CSP violations", async ({ page }) => {
+test.skip("/publicus loads the explorer near the viewport and runs without CSP violations", async ({ page }) => {
   const violations = await watchViolations(page);
   await page.goto("/publicus");
   // The explorer's code loads only as the reader approaches it.

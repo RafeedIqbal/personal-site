@@ -5,7 +5,8 @@ import { CHAT_LIMITS, CONTACT_EMAIL, KNOWLEDGE, PREPARED, RESUME_HREF, chatSchem
 import { EDUCATION, EXPERIENCE, PROFILE } from "../lib/content.ts";
 import { rowFromHash } from "../lib/publicus/records.ts";
 
-const page = readFileSync(new URL("../app/publicus/page.tsx", import.meta.url), "utf8");
+// /publicus is offline: the route is in app/_publicus and its public files in app/_publicus/assets.
+const page = readFileSync(new URL("../app/_publicus/page.tsx", import.meta.url), "utf8");
 const workspace = readFileSync(new URL("../components/publicus/Workspace.tsx", import.meta.url), "utf8");
 const evalsFigure = readFileSync(new URL("../components/publicus/ModelEvals.tsx", import.meta.url), "utf8");
 const MONTHS = { Jan: "January", Feb: "February", Mar: "March", Apr: "April", May: "May", Jun: "June", Jul: "July", Aug: "August", Sep: "September", Oct: "October", Nov: "November", Dec: "December" };
@@ -20,7 +21,7 @@ test("every fact points at a real place on the page or the résumé", () => {
     const id = fact.href.slice(1);
     assert.ok([page, evalsFigure].some((file) => file.includes(`id="${id}"`)), `${fact.id} points at missing #${id}`);
   }
-  assert.ok(existsSync(new URL(`../public${RESUME_HREF}`, import.meta.url)), "the résumé PDF must exist");
+  assert.ok(existsSync(new URL(`../app/_publicus/assets${RESUME_HREF.replace(/^\/publicus/, "")}`, import.meta.url)), "the résumé PDF must exist");
   assert.equal(CONTACT_EMAIL, PROFILE.email);
 });
 
