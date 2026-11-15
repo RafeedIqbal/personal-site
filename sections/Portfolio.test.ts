@@ -155,6 +155,44 @@ test("arcade labels and focus controls stay usable without capturing prompt inpu
   await expect(page.getByRole("button", { name: /^Open terminal/ })).toBeFocused();
 });
 
+test("Escape steps back through help and the arcade, and the backdrop closes the whole terminal", async ({ page }) => {
+  await page.goto("/");
+  await openTerminal(page);
+  const terminal = page.getByRole("dialog", { name: "Terminal", exact: true });
+  await runCommand(page, "games");
+  const arcade = page.getByRole("group", { name: "Terminal arcade", exact: true });
+  await expect(arcade).toBeVisible();
+  await runCommand(page, "help");
+  const help = page.getByRole("region", { name: "Command help" });
+  await expect(help).toBeVisible();
+  // Back-to-back presses with no input between them each step back one layer.
+  // (Desktop Chrome stops honouring a prevented `cancel` on the second press; this
+  // test browser does not reproduce that, so check it by hand after changing Esc.)
+  await page.keyboard.press("Escape");
+  await expect(help).toHaveCount(0);
+  await expect(arcade).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(arcade).toHaveCount(0);
+  await expect(terminal).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(terminal).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Open terminal/ })).toBeFocused();
+
+  await openTerminal(page);
+  await runCommand(page, "help");
+  await expect(help).toBeVisible();
+  const box = (await terminal.boundingBox())!;
+  // A text selection dragged out of the panel leaves it open.
+  await page.mouse.move(box.x + 40, box.y + 60);
+  await page.mouse.down();
+  await page.mouse.move(1420, 20, { steps: 4 });
+  await page.mouse.up();
+  await expect(terminal).toBeVisible();
+  await page.mouse.click(1420, 20);
+  await expect(terminal).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Open terminal/ })).toBeFocused();
+});
+
 for (const width of [320, 390, 768, 1024, 1440, 1920]) {
   test(`navigation and content fit at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });

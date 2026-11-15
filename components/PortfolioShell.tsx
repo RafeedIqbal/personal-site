@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Nav from "@/components/Nav";
 
@@ -17,7 +17,6 @@ export default function PortfolioShell({
   const [desktop, setDesktop] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalReady, setTerminalReady] = useState(false);
-  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const query = window.matchMedia("(min-width: 1024px)");
@@ -31,10 +30,6 @@ export default function PortfolioShell({
   }, []);
 
   const openTerminal = () => {
-    triggerRef.current =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
     setTerminalReady(true);
     setTerminalOpen(true);
   };
@@ -52,40 +47,22 @@ export default function PortfolioShell({
         event.isComposing
       )
         return;
+      // Leave other open dialogs (image viewers) alone; the terminal is itself a
+      // dialog, so the shortcut still closes it from inside.
       const target = event.target as HTMLElement | null;
-      if (target?.closest("dialog[open]")) return;
+      if (target?.closest("dialog[open]:not(.terminal-dialog)")) return;
       event.preventDefault();
-      if (!terminalOpen) triggerRef.current = target;
       setTerminalReady(true);
       setTerminalOpen((value) => !value);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [desktop, terminalOpen]);
-
-  useEffect(() => {
-    if (terminalOpen || !triggerRef.current) return;
-    const trigger = triggerRef.current;
-    triggerRef.current = null;
-    const frame = requestAnimationFrame(() => {
-      const fallback = document.getElementById("main-content");
-      (trigger.isConnected &&
-      trigger.getClientRects().length > 0 &&
-      trigger !== document.body
-        ? trigger
-        : fallback
-      )?.focus({ preventScroll: true });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [terminalOpen]);
+  }, [desktop]);
 
   return (
     <>
       {desktop && <BackgroundEffect />}
-      <div
-        className="portfolio-shell relative z-10 min-h-dvh lg:grid lg:grid-cols-[224px_minmax(0,1fr)]"
-        inert={terminalOpen}
-      >
+      <div className="portfolio-shell relative z-10 min-h-dvh lg:grid lg:grid-cols-[224px_minmax(0,1fr)]">
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
@@ -115,6 +92,8 @@ export default function PortfolioShell({
           </main>
         </div>
       </div>
+      {/* The terminal is a native modal dialog: showModal() makes this shell inert and
+          returns focus to the launcher or shortcut target when it closes. */}
       {desktop && terminalReady && (
         <InteractiveTerminal
           open={terminalOpen}

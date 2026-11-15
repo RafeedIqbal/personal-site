@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect, useEffectEvent, useMemo, KeyboardEvent } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  KeyboardEvent,
+  SyntheticEvent,
+} from "react";
 import dynamic from "next/dynamic";
 import {
   runCommand,
@@ -8,6 +16,7 @@ import {
   HELP_COMMANDS,
 } from "../lib/terminal-commands";
 import type { TerminalGameId } from "../lib/terminal-games";
+import { clickedBackdrop } from "../lib/dialog";
 
 // The games only load when the panel first opens, keeping them out of the
 // terminal's initial chunk.
@@ -43,10 +52,16 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
   const [activeGameId, setActiveGameId] = useState<TerminalGameId | null>(null);
   const [gameHotkeysEnabled, setGameHotkeysEnabled] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  // Contents render from the moment the terminal opens until the native dialog has closed,
+  // so the browser can hand focus back to the launcher before the prompt unmounts. Closed
+  // contents unmount, which resets the games while history and help state survive here.
+  const [shown, setShown] = useState(open);
+  if (open && !shown) setShown(true);
   const draftInputRef = useRef("");
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const pressedBackdropRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
   const gamePanelRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to keep prompt visible. Smoothness comes from .terminal-body's
@@ -75,10 +90,18 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     panel.focus({ preventScroll: true });
   }, [gamePanelOpen, activeGameId]);
 
-  // The page restores launcher focus after closing. Reopening always starts
-  // with the prompt live, which also pauses game keyboard controls.
-  useEffect(() => {
-    if (open) inputRef.current?.focus();
+  // showModal() makes the page inert, contains focus and remembers the launcher, which
+  // the browser refocuses on close. Reopening always starts with the prompt live, which
+  // also pauses game keyboard controls. A layout effect closes the dialog before paint.
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) {
+      dialog.showModal();
+      inputRef.current?.focus();
+    } else if (!open && dialog.open) {
+      dialog.close();
+    }
   }, [open]);
 
   // Inline ghost suggestion (fish-shell style)
@@ -117,27 +140,43 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     inputRef.current?.focus();
   };
 
-  // Escape cascade lives on window because the input is blurred while a game
-  // is armed: help card → games panel → overlay. The effect event reads the
-  // latest state, so the listener is attached once per open.
-  const onEscape = useEffectEvent((e: globalThis.KeyboardEvent) => {
-    if (e.key !== "Escape") return;
-    if (e.isComposing) return;
-    e.preventDefault();
+  // Esc steps back one layer: help card → games panel → terminal. Closes the
+  // innermost open layer and reports whether there was one.
+  const stepBack = () => {
     if (showHelp) {
       setShowHelp(false);
       focusPrompt();
-    } else if (gamePanelOpen) {
-      closeGames();
-    } else {
-      onClose();
+      return true;
     }
-  });
-  useEffect(() => {
-    if (!open) return;
-    window.addEventListener("keydown", onEscape);
-    return () => window.removeEventListener("keydown", onEscape);
-  }, [open]);
+    if (gamePanelOpen) {
+      closeGames();
+      return true;
+    }
+    return false;
+  };
+
+  // Esc pressed inside the panel: cancelling the keydown stops the close request
+  // before it starts. Preventing `cancel` alone is not enough here, because browsers
+  // stop honouring it after repeated close requests with no user activation between
+  // them, so a second quick Esc would close the terminal instead of the arcade.
+  const handleEscapeKey = (e: KeyboardEvent<HTMLDialogElement>) => {
+    if (e.key !== "Escape" || e.nativeEvent.isComposing) return;
+    if (stepBack()) e.preventDefault();
+  };
+
+  // Close requests the keydown above didn't stop (Esc while focus sits on the page
+  // body, for example) still step back when the browser lets them be cancelled.
+  const handleCancel = (e: SyntheticEvent<HTMLDialogElement>) => {
+    if (e.cancelable && stepBack()) e.preventDefault();
+  };
+
+  // Esc, a backdrop click, the close button and Ctrl + backtick all end here.
+  const handleClose = () => {
+    // Ignore a close event queued before a quick reopen.
+    if (dialogRef.current?.open) return;
+    setShown(false);
+    onClose();
+  };
 
   // Disarm game hotkeys whenever focus lands outside the games panel (e.g.
   // tabbing to the [esc] button) so Space/arrows activate the focused control
@@ -157,40 +196,6 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
       window.removeEventListener("blur", onWindowBlur);
     };
   }, [open, gameHotkeysEnabled]);
-
-  // Keep Tab cycling inside the dialog (it's aria-modal) — including while a
-  // game has the input blurred — without stealing Tab from autocomplete.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key !== "Tab" || e.defaultPrevented) return;
-      const panel = panelRef.current;
-      if (!panel) return;
-      const focusables = Array.from(
-        panel.querySelectorAll<HTMLElement>(
-          "button, input, a[href], [tabindex='0']",
-        ),
-      ).filter(
-        (el) => !el.hasAttribute("disabled") && el.getClientRects().length > 0,
-      );
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const active = document.activeElement;
-      if (!(active instanceof HTMLElement) || !panel.contains(active)) {
-        e.preventDefault();
-        (e.shiftKey ? last : first).focus();
-      } else if (e.shiftKey && active === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && active === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
 
   const handleSubmit = () => {
     const trimmed = input.trim();
@@ -241,6 +246,7 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     }
 
     if (result?.scrollTarget) {
+      // The modal makes the page inert, not unscrollable: script can still move it.
       // html's scroll-behavior already switches off smooth scrolling for reduced motion.
       document.getElementById(result.scrollTarget)?.scrollIntoView({ block: "start" });
     }
@@ -302,191 +308,197 @@ export default function InteractiveTerminal({ open, onClose }: TerminalProps) {
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div
-      className="terminal-dialog fixed inset-0 z-[60] font-mono"
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      ref={dialogRef}
       aria-label="Terminal"
+      onKeyDown={handleEscapeKey}
+      onCancel={handleCancel}
+      onClose={handleClose}
+      // Light dismiss is handled here rather than with closedby="any": that would route
+      // backdrop clicks through `cancel`, where the Esc cascade would only close help or
+      // the arcade. A press and release on the dim backdrop closes the whole terminal (a
+      // text selection dragged out of the panel does not); any other click in the panel
+      // hands the keyboard back to the prompt.
+      onPointerDown={(e) => {
+        pressedBackdropRef.current = clickedBackdrop(e);
+      }}
+      onClick={(e) => {
+        if (!clickedBackdrop(e)) focusPrompt();
+        else if (pressedBackdropRef.current) e.currentTarget.close();
+      }}
+      className="terminal-dialog inset-x-0 top-auto bottom-4 mx-auto my-0 max-h-[calc(100dvh-32px)] w-[min(880px,calc(100vw-32px))] max-w-none flex-col overflow-hidden rounded-lg border border-line bg-surface p-0 font-mono text-fg shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop:bg-black/45 open:flex sm:bottom-11 sm:max-h-[calc(100dvh-60px)]"
+      style={{ height: gamePanelOpen || showHelp ? "min(78dvh, 700px)" : 440 }}
     >
-      {/* Dim backdrop — click to close. Page keeps scrolling behind it so
-          scrollTarget commands stay visible. */}
-      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
-
-      <div
-        ref={panelRef}
-        className="absolute bottom-4 left-1/2 flex max-h-[calc(100dvh-32px)] w-[min(880px,calc(100vw-32px))] -translate-x-1/2 flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.4)] sm:bottom-11 sm:max-h-[calc(100dvh-60px)]"
-        style={{ height: gamePanelOpen || showHelp ? "min(78dvh, 700px)" : 440 }}
-        onClick={focusPrompt}
-      >
-        {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-white/[0.08] px-4 py-2.5">
-          <span className="text-xs text-subtle">
-            <span className="text-accent">●</span> visitor@rafeed.dev
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="min-h-11 px-2 text-xs text-subtle transition-colors hover:text-white"
-          >
-            Close terminal <span aria-hidden="true">[esc]</span>
-          </button>
-        </div>
-
-        {/* Terminal body — single scrollable area, input is part of the flow */}
-        <div
-          ref={bodyRef}
-          className="terminal-body flex min-h-0 flex-1 flex-col space-y-3 overflow-y-auto overscroll-contain px-4 py-3"
-        >
-          {/* Welcome */}
-          <div className="space-y-0.5 text-xs text-subtle">
-            <p>Welcome to rafeed.dev — you found the terminal.</p>
-            <p id="terminal-instructions">
-              Type <span className="text-fg">help</span> for commands. Tab to
-              autocomplete; Shift+Tab to move focus.
-            </p>
-            <p>
-              Type <span className="text-fg">games</span> if bored.
-            </p>
-          </div>
-
-          {gamePanelOpen && (
-            <div
-              ref={gamePanelRef}
-              tabIndex={-1}
-              role="group"
-              aria-label="Terminal arcade"
+      {shown && (
+        <>
+          {/* Header */}
+          <div className="flex shrink-0 items-center justify-between border-b border-white/[0.08] px-4 py-2.5">
+            <span className="text-xs text-subtle">
+              <span className="text-accent">●</span> visitor@rafeed.dev
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="min-h-11 px-2 text-xs text-subtle transition-colors hover:text-white"
             >
-              <TerminalGamesPanel
-                activeGameId={activeGameId}
-                hotkeysEnabled={gameHotkeysEnabled}
-                onSelectGame={launchGame}
-                onClose={closeGames}
-                onBackToLibrary={openGameLibrary}
-                onEnableHotkeys={(focusControls = false) => {
-                  if (!activeGameId) return;
-                  setGameHotkeysEnabled(true);
-                  if (focusControls)
-                    gamePanelRef.current?.focus({ preventScroll: true });
-                  else inputRef.current?.blur();
-                }}
-              />
-            </div>
-          )}
-
-          {/* Past commands + output */}
-          <div
-            role="log"
-            aria-label="Terminal history"
-            aria-live="polite"
-            aria-relevant="additions"
-            className="space-y-3"
-          >
-            {history.map((entry, i) => (
-              <div key={i} className="space-y-1">
-                <div className="flex items-start gap-2 text-xs">
-                  <span className="shrink-0 select-none text-accent">$</span>
-                  <span className="min-w-0 break-words text-fg">
-                    {entry.command}
-                  </span>
-                </div>
-                <pre className="whitespace-pre-wrap break-words pl-5 text-xs leading-relaxed text-muted">
-                  {entry.output}
-                </pre>
-              </div>
-            ))}
+              Close terminal <span aria-hidden="true">[esc]</span>
+            </button>
           </div>
-          <p role="status" className="sr-only">
-            {announcement}
-          </p>
 
-          {/* Help card */}
-          {showHelp && (
-            <div className="terminal-help shrink-0 overflow-hidden">
-              <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs" role="region" aria-label="Command help">
-                <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
-                  <span className="font-bold text-fg">
-                    available commands
-                    <span className="ml-2 font-normal text-subtle">({HELP_COMMANDS.length})</span>
-                  </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowHelp(false);
-                      focusPrompt();
-                    }}
-                    className="min-h-11 px-2 text-subtle transition-colors hover:text-white"
-                  >
-                    Close help <span aria-hidden="true">[esc]</span>
-                  </button>
+          {/* Terminal body — single scrollable area, input is part of the flow */}
+          <div
+            ref={bodyRef}
+            className="terminal-body flex min-h-0 flex-1 flex-col space-y-3 overflow-y-auto overscroll-contain px-4 py-3"
+          >
+            {/* Welcome */}
+            <div className="space-y-0.5 text-xs text-subtle">
+              <p>Welcome to rafeed.dev — you found the terminal.</p>
+              <p id="terminal-instructions">
+                Type <span className="text-fg">help</span> for commands. Tab to
+                autocomplete; Shift+Tab to move focus.
+              </p>
+              <p>
+                Type <span className="text-fg">games</span> if bored.
+              </p>
+            </div>
+
+            {gamePanelOpen && (
+              <div
+                ref={gamePanelRef}
+                tabIndex={-1}
+                role="group"
+                aria-label="Terminal arcade"
+              >
+                <TerminalGamesPanel
+                  activeGameId={activeGameId}
+                  hotkeysEnabled={gameHotkeysEnabled}
+                  onSelectGame={launchGame}
+                  onClose={closeGames}
+                  onBackToLibrary={openGameLibrary}
+                  onEnableHotkeys={(focusControls = false) => {
+                    if (!activeGameId) return;
+                    setGameHotkeysEnabled(true);
+                    if (focusControls)
+                      gamePanelRef.current?.focus({ preventScroll: true });
+                    else inputRef.current?.blur();
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Past commands + output */}
+            <div
+              role="log"
+              aria-label="Terminal history"
+              aria-live="polite"
+              aria-relevant="additions"
+              className="space-y-3"
+            >
+              {history.map((entry, i) => (
+                <div key={i} className="space-y-1">
+                  <div className="flex items-start gap-2 text-xs">
+                    <span className="shrink-0 select-none text-accent">$</span>
+                    <span className="min-w-0 break-words text-fg">
+                      {entry.command}
+                    </span>
+                  </div>
+                  <pre className="whitespace-pre-wrap break-words pl-5 text-xs leading-relaxed text-muted">
+                    {entry.output}
+                  </pre>
                 </div>
-                <div className="grid max-h-[min(32dvh,320px)] grid-cols-2 gap-x-3 overflow-y-auto overscroll-contain px-2 py-1">
-                  {HELP_COMMANDS.map(
-                    ({ command: cmd, description: desc }) => (
-                      <button
-                        key={cmd}
-                        className="flex min-h-11 w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded px-2 py-2 text-left text-fg hover:bg-surface"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (cmd) {
-                            setInput(cmd.replace(/<[^>]+>/g, ""));
-                            setHistoryIndex(-1);
-                            setShowHelp(false);
-                            inputRef.current?.focus();
-                          }
-                        }}
-                      >
-                        <span>{cmd}</span>
-                        <span className="text-subtle">{desc}</span>
-                      </button>
-                    ),
+              ))}
+            </div>
+            <p role="status" className="sr-only">
+              {announcement}
+            </p>
+
+            {/* Help card */}
+            {showHelp && (
+              <div className="terminal-help shrink-0 overflow-hidden">
+                <div className="my-1 rounded-md border border-white/10 bg-white/[0.02] text-xs" role="region" aria-label="Command help">
+                  <div className="flex items-center justify-between border-b border-white/[0.07] px-3 py-2">
+                    <span className="font-bold text-fg">
+                      available commands
+                      <span className="ml-2 font-normal text-subtle">({HELP_COMMANDS.length})</span>
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowHelp(false);
+                        focusPrompt();
+                      }}
+                      className="min-h-11 px-2 text-subtle transition-colors hover:text-white"
+                    >
+                      Close help <span aria-hidden="true">[esc]</span>
+                    </button>
+                  </div>
+                  <div className="grid max-h-[min(32dvh,320px)] grid-cols-2 gap-x-3 overflow-y-auto overscroll-contain px-2 py-1">
+                    {HELP_COMMANDS.map(
+                      ({ command: cmd, description: desc }) => (
+                        <button
+                          key={cmd}
+                          className="flex min-h-11 w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded px-2 py-2 text-left text-fg hover:bg-surface"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (cmd) {
+                              setInput(cmd.replace(/<[^>]+>/g, ""));
+                              setHistoryIndex(-1);
+                              setShowHelp(false);
+                              inputRef.current?.focus();
+                            }
+                          }}
+                        >
+                          <span>{cmd}</span>
+                          <span className="text-subtle">{desc}</span>
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Active input prompt — part of the content flow */}
+            <div className="flex items-start gap-2 text-xs">
+              <span className="shrink-0 select-none pt-px text-accent">$</span>
+              <div className="relative min-w-0 flex-1 overflow-hidden rounded-sm focus-within:ring-1 focus-within:ring-accent/70">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    setHistoryIndex(-1);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  onFocus={() => setGameHotkeysEnabled(false)}
+                  className="relative z-10 block min-h-5 w-full bg-transparent text-xs text-fg caret-accent outline-none placeholder:text-subtle"
+                  aria-label="Terminal command input"
+                  aria-describedby="terminal-instructions"
+                  aria-autocomplete="inline"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  placeholder="type a command..."
+                  spellCheck={false}
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 flex min-h-5 items-center whitespace-pre text-xs"
+                >
+                  <span className="invisible">{input}</span>
+                  {ghostSuggestion && (
+                    <span className="text-subtle">{ghostSuggestion}</span>
                   )}
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Active input prompt — part of the content flow */}
-          <div className="flex items-start gap-2 text-xs">
-            <span className="shrink-0 select-none pt-px text-accent">$</span>
-            <div className="relative min-w-0 flex-1 overflow-hidden rounded-sm focus-within:ring-1 focus-within:ring-accent/70">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  setHistoryIndex(-1);
-                }}
-                onKeyDown={handleKeyDown}
-                onFocus={() => setGameHotkeysEnabled(false)}
-                className="relative z-10 block min-h-5 w-full bg-transparent text-xs text-fg caret-accent outline-none placeholder:text-subtle"
-                aria-label="Terminal command input"
-                aria-describedby="terminal-instructions"
-                aria-autocomplete="inline"
-                autoComplete="off"
-                autoCapitalize="none"
-                autoCorrect="off"
-                placeholder="type a command..."
-                spellCheck={false}
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 flex min-h-5 items-center whitespace-pre text-xs"
-              >
-                <span className="invisible">{input}</span>
-                {ghostSuggestion && (
-                  <span className="text-subtle">{ghostSuggestion}</span>
-                )}
-              </div>
-            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </>
+      )}
+    </dialog>
   );
 }
