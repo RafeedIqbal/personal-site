@@ -53,15 +53,9 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .pu-strip a:hover { text-decoration: underline; }
 
 /* Dataset masthead: the one full-width purple field */
-.pu-masthead { background: var(--purple); color: #fff; padding: clamp(36px, 4.5vw, 60px) 0 24px; }
+.pu-masthead { background: var(--purple); color: #fff; padding: clamp(36px, 4.5vw, 60px) 0; }
 .pu-masthead :focus-visible { outline-color: #fff; }
 .pu-masthead h1 { font-size: clamp(2.25rem, 1.2rem + 3.5vw, 4.25rem); line-height: 1.02; letter-spacing: -0.025em; max-width: 15em; }
-.pu-meta { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 8px 44px; margin-top: clamp(28px, 3.5vw, 44px); padding-top: 14px; border-top: 1px solid rgb(255 255 255 / 0.32); }
-.pu-meta dt { font-size: 13px; color: var(--on-purple); }
-.pu-meta dd { margin: 2px 0 0; font-size: 15px; line-height: 1.4; }
-.pu-meta dd.pu-data { font-size: 14px; }
-.pu-meta a { color: #fff; text-decoration-color: rgb(255 255 255 / 0.55); }
-.pu-meta a:hover { text-decoration-color: #fff; }
 
 /* Intro and resources */
 .pu-intro { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 32px 72px; align-items: start; padding: 40px 0 44px; }
@@ -85,29 +79,19 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .pu-records .pu-num { text-align: right; white-space: nowrap; }
 .pu-records td.pu-num, .pu-records td.pu-date { font-family: var(--data); font-size: 13px; }
 .pu-records td.pu-date { white-space: nowrap; }
-.pu-records .pu-col-title a { font-weight: 600; text-decoration-color: #b9b3c2; }
-.pu-records .pu-col-title a:hover { text-decoration-color: var(--ink); }
+.pu-records .pu-col-title button { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; text-align: left; text-decoration: underline; text-decoration-color: #b9b3c2; text-underline-offset: 3px; cursor: pointer; }
+.pu-records .pu-col-title button:hover, .pu-records .pu-col-title button[aria-pressed="true"] { text-decoration-color: var(--ink); }
 .pu-records .pu-missing { color: var(--ink-3); font-style: italic; }
 .pu-records td.pu-loud { font-size: 17px; font-weight: 600; }
 .publicus mark { padding: 0 3px; background: var(--mark); color: var(--ink); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.pu-records:has(#cb-01:target) tr[data-row="01"] > *,
-.pu-records:has(#cb-02:target) tr[data-row="02"] > *,
-.pu-records:has(#cb-03:target) tr[data-row="03"] > *,
-.pu-records:has(#cb-04:target) tr[data-row="04"] > *,
-.pu-records:has(#cb-05:target) tr[data-row="05"] > *,
-.pu-records:has(#cb-06:target) tr[data-row="06"] > *,
-.pu-records:has(#cb-07:target) tr[data-row="07"] > *,
-.pu-records:has(#cb-08:target) tr[data-row="08"] > *,
-.pu-records:has(#cb-09:target) tr[data-row="09"] > *,
-.pu-records:has(#cb-10:target) tr[data-row="10"] > *,
-.pu-records:not(:has(.pu-raw:target)) tr[data-row="01"] > * { background: var(--row-active); }
+.pu-records tbody tr.is-active > td { background: var(--row-active); }
 
 /* Raw row panel: one record's CSV fields, overlapping the table's last rule */
-.pu-raw { display: none; position: relative; margin-top: -1px; padding: 20px 24px 24px; border: 1px solid var(--ink); background: var(--paper); scroll-margin-top: 24px; }
-.pu-raw:target, .pu-raw-list:not(:has(.pu-raw:target)) .pu-raw[data-default] { display: block; }
-.pu-raw:target { animation: pu-open var(--dur) var(--ease) both; }
+.pu-raw { position: relative; margin-top: -1px; padding: 20px 24px 24px; border: 1px solid var(--ink); background: var(--paper); animation: pu-open var(--dur) var(--ease) both; }
+/* Clears the records dialog's sticky title bar when the panel scrolls into view. */
+.publicus section.pu-raw { scroll-margin-top: 80px; }
 .pu-raw header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 20px; margin-bottom: 14px; }
-.pu-raw h2 { font-size: 19px; }
+.pu-raw h4 { font-size: 19px; font-variation-settings: "wdth" 85; font-weight: 600; letter-spacing: -0.02em; }
 .pu-raw header span { font-family: var(--data); font-size: 13px; color: var(--ink-3); overflow-wrap: anywhere; }
 .pu-raw dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; font-family: var(--data); font-size: 13px; line-height: 1.45; }
 .pu-raw dl > div { padding: 7px 0; border-top: 1px solid var(--rule); }
@@ -139,6 +123,40 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .pu-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
 .pu-shot figcaption { margin-top: 8px; font-size: 14px; color: var(--ink-2); }
 .pu-shot figcaption a { display: inline-flex; align-items: center; gap: 6px; }
+.pu-stores { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; margin-top: 14px; font-size: 15px; }
+.pu-stores > span { color: var(--ink-3); font-size: 13px; }
+.pu-stores a { min-height: 44px; }
+
+/* BaseNote demo video and transcript */
+.pu-video { margin-top: 28px; }
+.pu-video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 1px solid var(--ink); background: #050505; }
+.pu-video figcaption { margin-top: 8px; font-size: 14px; color: var(--ink-2); }
+.pu-transcript { margin-top: 8px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.pu-transcript summary { display: flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 500; color: var(--ink); cursor: pointer; }
+.pu-transcript summary:hover { text-decoration: underline; }
+.pu-transcript section { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 4px 24px; padding: 12px 0 14px; border-top: 1px solid var(--rule); }
+.pu-transcript h4 { font-size: 13px; font-weight: 400; color: var(--ink-3); }
+.pu-transcript p { max-width: 66ch; font-size: 15px; color: var(--ink); }
+
+/* BaseNote screens: thumbnails that open one dialog */
+.pu-gallery { margin-top: 28px; }
+.pu-gallery ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; list-style: none; padding: 0; }
+.pu-gallery li a { display: grid; gap: 8px; text-decoration: none; }
+.pu-gallery img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); transition: border-color var(--dur) var(--ease); }
+.pu-gallery a:hover img { border-color: var(--ink); }
+.pu-gallery li span { font-size: 14px; overflow-wrap: anywhere; line-height: 1.35; color: var(--ink-2); }
+.pu-gallery li strong { font-weight: 600; color: var(--ink); }
+.pu-gallery a:hover span { text-decoration: underline; }
+.pu-gallery figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-2); }
+.pu-lightbox { width: min(1200px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: auto; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.pu-lightbox::backdrop { background: rgb(26 24 32 / 0.5); }
+.pu-lightbox-head, .pu-lightbox-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; padding: 8px 16px; }
+.pu-lightbox-head { border-bottom: 1px solid var(--rule); font-size: 15px; }
+.pu-lightbox-foot { border-top: 1px solid var(--rule); font-size: 14px; }
+.pu-lightbox-foot > div { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; }
+.pu-lightbox button { min-height: 44px; padding: 0 2px; border: 0; background: none; color: var(--ink); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.pu-lightbox-foot a { display: inline-flex; align-items: center; min-height: 44px; }
+.pu-lightbox img { display: block; width: 100%; height: auto; max-height: calc(100dvh - 160px); object-fit: contain; background: var(--band); }
 
 .pu-sides { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 16px; line-height: 1.5; }
 .pu-sides th, .pu-sides td { padding: 12px 16px 14px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
@@ -311,6 +329,8 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .px-modal { position: fixed; inset: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); margin: auto; padding: 0; overflow: auto; border: 1px solid var(--ink); border-radius: 4px; background: #fff; color: var(--ink); font-family: var(--font-publicus-text), system-ui, sans-serif; }
 .px-modal::backdrop { background: rgb(26 24 32 / 0.5); }
 .px-modal-wide { width: min(800px, calc(100vw - 32px)); }
+.px-modal-records { width: min(1180px, calc(100vw - 32px)); }
+.px-modal-records .pu-records figcaption { padding-bottom: 2px; }
 .px-modal-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--rule); background: #fff; }
 .px-modal-head h3 { font-size: 18px; font-weight: 600; font-variation-settings: "wdth" 85; }
 .px-modal-body { padding: 22px; }
@@ -334,6 +354,9 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .px-source-cards p { margin-bottom: 18px; font-size: 13px; line-height: 1.75; color: var(--ink-2); }
 .px-source-cards .px-badge { margin-top: auto; }
 .px-source-cards .px-button { margin-top: 18px; }
+.px-source-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 18px; }
+.px-source-cards .px-source-actions .px-button { margin-top: 0; }
+.px-text-button { padding: 0; border: 0; background: none; color: var(--ink); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
 .px-import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; padding: 28px; }
 .px-import-panel { padding: 16px 0; }
 .px-import-panel h4 { font-size: 17px; font-weight: 600; font-variation-settings: "wdth" 85; }
@@ -469,12 +492,12 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 
 @media (max-width: 1023px) {
   .pu-container { width: calc(100% - 48px); }
-  .pu-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pu-intro { grid-template-columns: minmax(0, 1fr); }
   .pu-resources { max-width: 520px; }
   .pu-section { grid-template-columns: minmax(0, 1fr); }
   .pu-section > *, .pu-section-head > *, .pu-section h2 { grid-column: 1; grid-row: auto; }
   .pu-steps li { grid-template-columns: minmax(0, 1fr); }
+  .pu-gallery ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* Below 1024px the records table stacks: eight columns no longer fit beside each other. */
@@ -491,17 +514,7 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
   .pu-records td[data-label]::before { content: attr(data-label); color: var(--ink-3); font-family: var(--font-publicus-text), system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; }
   .pu-records .pu-loud { font-size: 16px; }
   .pu-records td[data-label] > mark { justify-self: start; }
-  .pu-records:has(#cb-01:target) tr[data-row="01"],
-  .pu-records:has(#cb-02:target) tr[data-row="02"],
-  .pu-records:has(#cb-03:target) tr[data-row="03"],
-  .pu-records:has(#cb-04:target) tr[data-row="04"],
-  .pu-records:has(#cb-05:target) tr[data-row="05"],
-  .pu-records:has(#cb-06:target) tr[data-row="06"],
-  .pu-records:has(#cb-07:target) tr[data-row="07"],
-  .pu-records:has(#cb-08:target) tr[data-row="08"],
-  .pu-records:has(#cb-09:target) tr[data-row="09"],
-  .pu-records:has(#cb-10:target) tr[data-row="10"],
-  .pu-records:not(:has(.pu-raw:target)) tr[data-row="01"] { background: var(--row-active); }
+  .pu-records tr.is-active { background: var(--row-active); }
 }
 
 @media (max-width: 759px) {
@@ -511,8 +524,6 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
   .pu-strip { font-size: 14px; }
   .pu-strip nav { gap: 4px 16px; }
   .pu-wide { display: none; }
-  .pu-meta { gap: 10px 24px; }
-  .pu-meta > div:nth-child(3) { grid-column: 1 / -1; grid-row: 2; }
   .pu-intro { padding: 28px 0 32px; }
   .pu-raw { padding: 16px; }
   .pu-raw dl { grid-template-columns: minmax(0, 1fr); }
@@ -520,6 +531,7 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
   .pu-records .pu-hint { justify-self: start; }
   .pu-entry { grid-template-columns: minmax(0, 1fr); padding: 22px 0 26px; }
   .pu-entry-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pu-transcript section { grid-template-columns: minmax(0, 1fr); }
   .pu-sides th, .pu-sides td { padding-inline: 10px; }
   .pu-sides tbody th, .pu-sides thead th:first-child { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .pu-sides td { font-size: 15px; }

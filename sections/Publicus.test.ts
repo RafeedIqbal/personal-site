@@ -8,6 +8,89 @@ async function checkAccessibility(page: Page) {
   expect(violations).toEqual([]);
 }
 
+test("the top of the page is the title and a mission statement, without a metadata row or records", async ({ page }) => {
+  await page.goto("/publicus");
+  await expect(page.locator(".pu-masthead dl")).toHaveCount(0);
+  const intro = page.locator(".pu-intro > p");
+  await expect(intro).toContainText("every claim points back to the record");
+  await expect(intro).not.toContainText("CanadaBuys");
+  await expect(page.locator("main > .pu-records, #records")).toHaveCount(0);
+});
+
+test("the BaseNote entry covers Alchemy, with the demo video, its transcript and a screen gallery", async ({ page }) => {
+  await page.goto("/publicus");
+  const entry = page.locator("#basenote");
+  await expect(entry.getByRole("heading", { level: 3 })).toHaveText("Bespoke fragrances, made fast, with no minimum order");
+  await expect(entry).toContainText("Alchemy does the same job for manufacturers");
+  const video = entry.locator("video");
+  await expect(video).toHaveAttribute("poster", "/publicus/work/blend-alchemy-demo-poster.webp");
+  await expect(video).toHaveAttribute("preload", "none");
+  await expect(video.locator("source")).toHaveAttribute("src", "/publicus/work/blend-alchemy-demo.mp4");
+  expect((await page.request.head("/publicus/work/blend-alchemy-demo.mp4")).status()).toBe(200);
+  await entry.getByText("Transcript", { exact: true }).click();
+  await expect(entry.locator(".pu-transcript h4")).toHaveText(["Blend · Customer", "Blend · Store staff", "Alchemy · Research", "Alchemy · Formulation", "Alchemy · Formula draft"]);
+
+  const thumbs = entry.locator(".pu-gallery li a");
+  await expect(thumbs).toHaveCount(6);
+  await thumbs.first().click();
+  await expect(page.getByRole("dialog", { name: /storefront/ })).toBeVisible();
+  // The dialog's name follows the screen it shows, so step through it by its class.
+  const lightbox = page.locator("dialog.pu-lightbox");
+  await expect(lightbox.getByText("1 of 6")).toBeVisible();
+  await checkAccessibility(page);
+  await lightbox.getByRole("button", { name: "Next" }).click();
+  await expect(lightbox.getByText("2 of 6")).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await expect(lightbox.getByText("3 of 6")).toBeVisible();
+  await expect(lightbox).toHaveAccessibleName(/Stock the agent draws from/);
+  await page.keyboard.press("Escape");
+  await expect(lightbox).toBeHidden();
+  await expect(thumbs.nth(2)).toBeFocused();
+});
+
+test("Icon links to both app stores, and Work ends with a link to the portfolio", async ({ page }) => {
+  await page.goto("/publicus");
+  const icon = page.locator("#icon");
+  await expect(icon.getByRole("link", { name: "Icon on the App Store" })).toHaveAttribute("href", "https://apps.apple.com/app/icon-training/id6755780488");
+  await expect(icon.getByRole("link", { name: "Icon on Google Play" })).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=app.icontraining.icon");
+  await expect(page.locator("#work").getByRole("link", { name: "See more of my work on rafeed.dev" })).toHaveAttribute("href", "/");
+});
+
+test("the CanadaBuys rows open in a dialog from the explorer and from record links", async ({ page }) => {
+  await page.goto("/publicus");
+  const button = page.locator("#explorer").getByRole("button", { name: "CanadaBuys rows" });
+  await button.click();
+  const dialog = page.getByRole("dialog", { name: "CanadaBuys rows as published" });
+  await expect(dialog.locator("tbody tr")).toHaveCount(10);
+  await expect(dialog.getByRole("heading", { name: "Row 01, as published" })).toBeVisible();
+  await expect(dialog.locator(".pu-raw mark")).toHaveCount(2);
+  await checkAccessibility(page);
+  await dialog.locator('tr[data-row="05"] button').click();
+  await expect(dialog.getByRole("heading", { name: "Row 05, as published" })).toBeVisible();
+  await expect(dialog.locator('tr[data-row="05"]')).toHaveClass(/is-active/);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(button).toBeFocused();
+
+  await page.locator("#why").getByRole("link", { name: "this CanadaBuys award" }).click();
+  await expect(dialog.getByRole("heading", { name: "Row 01, as published" })).toBeVisible();
+  expect(new URL(page.url()).hash).toBe("");
+  await page.keyboard.press("Escape");
+
+  await page.goto("/publicus#cb-03");
+  await expect(page.getByRole("dialog", { name: "CanadaBuys rows as published" }).getByRole("heading", { name: "Row 03, as published" })).toBeInViewport();
+});
+
+test("the chat's record source opens the records dialog", async ({ page }) => {
+  await page.goto("/publicus");
+  await expect(page.locator("#explorer").getByRole("button", { name: "CanadaBuys rows" })).toBeVisible();
+  await page.getByRole("button", { name: "Ask a question" }).click();
+  const chat = page.getByRole("dialog", { name: "Questions about this application" });
+  await chat.getByRole("button", { name: "Why does row 1 show a $0.00 total?" }).click();
+  await chat.getByRole("link", { name: "Record 01" }).click();
+  await expect(page.getByRole("dialog", { name: "CanadaBuys rows as published" }).getByRole("heading", { name: "Row 01, as published" })).toBeVisible();
+});
+
 test("the explorer blurb covers how it works, the architecture and the stack", async ({ page }) => {
   await page.goto("/publicus");
   const build = page.locator("#explorer .pu-build");

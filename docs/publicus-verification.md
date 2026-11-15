@@ -134,3 +134,41 @@ After the chat went live, `gemini-4-hydrogen` took 40–70 seconds per chat answ
 - Cost per 1,000 answers: $3.22 against $3.16 for the chat, and $1.26 against $1.40 for the explorer.
 
 `CHOICE` in `_shared/models.ts` records the override. The eval's own picks stay in `EVAL_CHAT` and `EVAL_DEMO`. The page marks 3.8 Flash "In use" and 3.6 Flash "Eval pick". The hosted `GEMINI_MODEL` secret was removed, so the code's choice applies.
+
+## Work section, demo video and records dialog — 15 November 2026
+
+The masthead no longer has a metadata row, and the introduction is now a short statement of what Rafeed builds and what he would bring to Publicus. The ten CanadaBuys records moved from the top of the page into a dialog inside the explorer, because they are the explorer's Public records dataset. "CanadaBuys rows" in the explorer's bottom bar opens it, as does "See the rows as published" under Sources & imports and any link to `#records` or `#cb-NN`, including the help chat's record sources and the link in Why Publicus.
+
+The BaseNote entry now has these additions:
+- A new headline, "Bespoke fragrances, made fast, with no minimum order".
+- A paragraph on Alchemy.
+- The founder demo of Blend and Alchemy, re-encoded from 85 MB to 9.3 MB (H.264 1080p, CRF 28, AAC 96k, faststart), with a transcript.
+- Six product screens taken from each product's own guide captures. The Blend screens use seed data and the Alchemy screens use synthetic data.
+
+The Icon entry links to the App Store and Google Play, and Work ends with a button to rafeed.dev. The help chat's fact sheet gained an `alchemy` fact, and the records facts describe the dialog.
+
+- `npm run lint`, `npm run typecheck` and the production build passed. Deno checks of all three functions passed.
+- Test results:
+
+  | Suite | Result |
+  |---|---|
+  | `npm run test:publicus`, including 3 new record tests and 1 new fact-sheet test | 25/25 |
+  | `npm run test:belong` | 14/14 |
+  | `npm run test:dependencies` | 9/9 |
+  | `npm run test:ui`, including 5 new `/publicus` tests | 25/25 |
+  | Deno tests | 3/3 |
+
+- The new UI tests cover:
+  - The masthead and introduction.
+  - The video's source and poster, and the transcript chapters.
+  - The gallery dialog: Next, the arrow keys, Escape and focus return.
+  - Both store links and the rafeed.dev button.
+  - The records dialog from the button, from the Why Publicus link, from `/publicus#cb-03` and from the chat's "Record 01" source.
+  - Axe with each dialog open.
+- Checked in the browser at 1440, 768 and 375px:
+  - No horizontal overflow and no console errors.
+  - The video plays at 1920×1080.
+  - Both store links return 200.
+  - On a phone, choosing a record scrolls the dialog to its raw row.
+- `impeccable detect` reported only advisory type-ramp notes.
+- `publicus-chat` must be redeployed for the chat to use the new facts.

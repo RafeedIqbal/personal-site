@@ -4,10 +4,11 @@ import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import DemoLoader from "@/components/publicus/DemoLoader";
+import Gallery from "@/components/publicus/Gallery";
 import HelpChat from "@/components/publicus/HelpChat";
 import ModelEvals from "@/components/publicus/ModelEvals";
 import { CHAT, DEMO, modelLabel } from "@/supabase/functions/_shared/models";
-import RecordSheet from "@/components/publicus/RecordSheet";
+import { DEMO_TRANSCRIPT, DEMO_VIDEO, GALLERY, ICON_STORES } from "@/lib/publicus/work";
 
 const resume = "/publicus/Rafeed_Iqbal_Publicus_Resume.pdf";
 const email = "rafeediqbal@gmail.com";
@@ -48,17 +49,11 @@ export default function PublicusPage() {
       <section className="pu-masthead" aria-labelledby="pu-title">
         <div className="pu-container">
           <h1 id="pu-title">I’m applying to be Publicus’s Founding Engineer, Product &amp; AI.</h1>
-          <dl className="pu-meta">
-            <div><dt>Publisher</dt><dd>Rafeed Iqbal</dd></div>
-            <div><dt>Modified</dt><dd className="pu-data">2026-11-15</dd></div>
-            <div><dt>Contents</dt><dd><a href="#work">2 roles</a>, <a href="#palette-knife">1 open-source project</a>, <a href="#records">10 CanadaBuys records</a>, <a href="#explorer">1 explorer</a></dd></div>
-            <div><dt>Format</dt><dd>HTML, PDF résumé (86 KB)</dd></div>
-          </dl>
         </div>
       </section>
 
       <div className="pu-intro pu-container">
-        <p>I’m Rafeed. I’m the only engineer at BaseNote, where I built Blend, an AI agent that writes perfume formulas using only the oils a studio has in stock. Before that I led product and engineering at Icon and grew the team from two to eight. This page has both jobs, ten real CanadaBuys records, and a procurement explorer I built on top of them.</p>
+        <p>I’m Rafeed. I build AI products that people rely on for real decisions, and I make sure every answer can be traced back to the data behind it. I’ve taken products from first customer conversations to production, as a founding engineer and as a head of product and engineering, and I’ve grown an engineering team from two people to eight. At Publicus I’d own that same path for procurement, from sitting with vendors and buyers to shipping software whose every claim points back to the record.</p>
         <ul className="pu-resources" aria-label="Resources">
           <li><a className="pu-primary" href={`mailto:${email}`}><span>Email me</span><span className="pu-data">{email}</span></a></li>
           <li><a href={resume} target="_blank" rel="noopener noreferrer"><span>Résumé</span><span className="pu-data">PDF, 86 KB <Arrow/></span></a></li>
@@ -66,32 +61,45 @@ export default function PublicusPage() {
         </ul>
       </div>
 
-      <RecordSheet/>
-
       <section id="work" className="pu-section pu-container" aria-labelledby="work-title">
         <div className="pu-section-head">
           <h2 id="work-title">Work</h2>
           <p>Publicus wants an engineer who owns work from customer conversations through to production. I’ve done that in both of my last two jobs.</p>
         </div>
         <div className="pu-entries">
-          <article className="pu-entry" aria-labelledby="basenote-title">
-            <Meta rows={[["Company", "BaseNote"], ["Role", "Founding engineer, sole engineer"], ["Period", "Jul 2026 – present", true], ["Status", "Pilot in progress"]]}/>
+          <article id="basenote" className="pu-entry" aria-labelledby="basenote-title">
+            <Meta rows={[["Company", "BaseNote"], ["Role", "Founding engineer, sole engineer"], ["Period", "Jul 2026 – present", true], ["Products", "Blend, Alchemy"], ["Status", "Pilot in progress"]]}/>
             <div className="pu-entry-body">
-              <h3 id="basenote-title">An agent that only suggests oils the studio has in stock</h3>
+              <h3 id="basenote-title">Bespoke fragrances, made fast, with no minimum order</h3>
+              <p>BaseNote helps perfume studios and manufacturers make bespoke fragrances quickly. I built both of its products: Blend for retail studios and Alchemy for manufacturers.</p>
               <p>BaseNote’s first licensed client, a custom-perfume retailer, wanted AI-guided consultations that end in a formula made from the studio’s own oils. A chat model on its own will happily suggest oils the studio doesn’t stock, and a perfumer can’t use a formula nobody has checked.</p>
               <p>I built Blend in Python with LangGraph, Django and PostgreSQL. Its tools search live inventory and retrieve from a pgvector knowledge base of our chemists’ experimental data. The guardrails live in code: the agent only sees in-stock materials, and code validates every draft before anyone sees it.</p>
+              <p>Alchemy does the same job for manufacturers. A chemist writes a brief, and Alchemy drafts a formula from the materials in the catalogue, brings it to exactly 100%, costs it, and screens it against IFRA Category 4 and allergen rules for the EU, Northern Ireland, Great Britain, the UAE and the US. Plain code does the screening, not the model, and every draft waits for a chemist’s approval. Alchemy also suggests substitutions and scales a formula up against stock.</p>
               <p>To choose its model, I built an eval suite that scored flash-tier models on accuracy, tool calling, cost and latency. Gemini Flash and DeepSeek Flash led, and DeepSeek Flash won on cost.</p>
               <p>I also run the rest of the platform: a multi-tenant ERP, storefront integrations, and a database-backed job queue with leases, bounded retries and recovery paths. The pilot with that first client is still in progress.</p>
-              <Shot work="blend.webp" capture="basenote-private-label.webp" alt="BaseNote’s private-label page: “Launch your own fragrance” over a lit perfume bottle." href="https://www.basenotesolutions.com/private-label" site="basenotesolutions.com/private-label" product="Blend at BaseNote"/>
+              <figure className="pu-video">
+                <video controls preload="none" playsInline poster={DEMO_VIDEO.poster} width={1920} height={1080} aria-labelledby="demo-title">
+                  <source src={DEMO_VIDEO.src} type="video/mp4"/>
+                </video>
+                <figcaption>
+                  <p id="demo-title">Blend and Alchemy, a three-minute walkthrough I recorded on {DEMO_VIDEO.recorded}. Captions are part of the video.</p>
+                  <details className="pu-transcript">
+                    <summary>Transcript</summary>
+                    {DEMO_TRANSCRIPT.map(({ chapter, text }) => <section key={chapter}><h4>{chapter}</h4><p>{text}</p></section>)}
+                  </details>
+                </figcaption>
+              </figure>
+              <Gallery items={GALLERY} caption="Screens from Blend, on the studio’s seed data, and Alchemy, on synthetic test data. Select one to enlarge it."/>
             </div>
           </article>
-          <article className="pu-entry" aria-labelledby="icon-title">
+          <article id="icon" className="pu-entry" aria-labelledby="icon-title">
             <Meta rows={[["Company", "Icon"], ["Role", "Head of Product & Engineering"], ["Period", "Jul 2025 – Jun 2026", true], ["Engineers", "2 → 8", true]]}/>
             <div className="pu-entry-body">
               <h3 id="icon-title">An AI coaching product from MVP to launch, and a team from two to eight</h3>
               <p>Icon sells AI coaching avatars of trainers and athletes through paid subscriptions. I led the product from MVP to a production-ready launch, turning business goals into architecture, priorities and sprints, and I kept writing code for the AI features and the company website.</p>
               <p>I grew engineering from two people to eight and ran recruitment, sprint planning and day-to-day operations.</p>
               <Shot work="icon.webp" capture="icon-training.webp" alt="Icon’s home page: “Download your favourite athlete’s brain” beside coaches from the app." href="https://icontraining.app" site="icontraining.app" product="The Icon app"/>
+              <p className="pu-stores"><span>Get the app</span>{ICON_STORES.map(({ store, href }) => <a key={store} className="pu-link" href={href} target="_blank" rel="noopener noreferrer" aria-label={`Icon on ${store === "App Store" ? "the App Store" : "Google Play"}`}>{store} <Arrow/></a>)}</p>
             </div>
           </article>
           <article id="palette-knife" className="pu-entry pu-entry-short" aria-labelledby="palette-title">
@@ -103,12 +111,13 @@ export default function PublicusPage() {
             </div>
           </article>
         </div>
+        <p className="pu-actions pu-more"><Link className="pu-button" href="/">See more of my work on rafeed.dev</Link></p>
       </section>
 
       <section id="why" className="pu-section pu-container" aria-labelledby="why-title">
         <div className="pu-section-head">
           <h2 id="why-title">Why Publicus</h2>
-          <p>A tender, its addenda, the award and a later amendment can describe one contract four different ways, and a single CSV row can disagree with itself (row 1 above). Publicus turns that record into something a vendor or a public buyer can act on, and that’s the problem I want to work on.</p>
+          <p>A tender, its addenda, the award and a later amendment can describe one contract four different ways, and a single CSV row can disagree with itself, like <a href="#cb-01">this CanadaBuys award</a>. Publicus turns that record into something a vendor or a public buyer can act on, and that’s the problem I want to work on.</p>
         </div>
         <table className="pu-sides">
           <thead><tr><th scope="col"><span className="pu-sr">Field</span></th><th scope="col">Vendors</th><th scope="col">Public buyers</th></tr></thead>

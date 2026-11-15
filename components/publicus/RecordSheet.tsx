@@ -1,48 +1,32 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { PUBLIC_SNAPSHOT } from "@/lib/publicus/seed";
-import type { ProcurementRecord, Source } from "@/supabase/functions/_shared/domain";
+import { contradicts, figure, rawFields, recordRows } from "@/lib/publicus/records";
 
-// CanadaBuys keys are camelCase bilingual pairs (plus a bare "unspsc"). Lines such as "E-Mail:" inside a
-// free-text description are not keys, so they stay with the description, which the panel never shows.
-const FIELD = /^(unspsc|[a-z][A-Za-z]*(?:-[A-Za-z]+)+):\s?([\s\S]*)$/;
-// Descriptions name contact people; notice URLs, attachments and commodity codes are long and add nothing here.
-const OMITTED = /description|noticeURL|attachment|^unspsc/i;
-const DEFAULT_ROW = "01";
+const rows = recordRows(PUBLIC_SNAPSHOT);
 
-function rawFields(text: string) {
-  const fields: { key: string; value: string }[] = [];
-  for (const line of text.replaceAll("\r", "").split("\n")) {
-    const match = FIELD.exec(line);
-    if (match) fields.push({ key: match[1], value: match[2] });
-    else if (fields.length) fields[fields.length - 1].value += `\n${line}`;
-  }
-  return fields.filter((field) => !OMITTED.test(field.key));
+function fileName(url?: string) {
+  return url?.split("/").pop() ?? "CanadaBuys open data";
 }
 
-function figure(value: number | null) {
-  return value === null ? "n/a" : value.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-// An award whose total contract value is zero while its contract amount is not: the row disagrees with itself.
-function contradicts(record: ProcurementRecord) {
-  return record.kind === "award" && record.totalValue === 0 && (record.amount ?? 0) > 0;
-}
-
-function fileName(source?: Source) {
-  return source?.url?.split("/").pop() ?? "CanadaBuys open data";
-}
-
-export default function RecordSheet() {
-  // Awards first: their contract amounts and totals are where the rows disagree with themselves.
-  const ordered = [...PUBLIC_SNAPSHOT.records.filter((record) => record.kind === "award"), ...PUBLIC_SNAPSHOT.records.filter((record) => record.kind !== "award")];
-  const rows = ordered.map((record, index) => ({
-    record,
-    n: String(index + 1).padStart(2, "0"),
-    source: PUBLIC_SNAPSHOT.sources.find((source) => source.id === record.sourceId),
-  }));
+// The ten CanadaBuys rows as published, shown inside the explorer's records dialog.
+export default function RecordSheet({ initialRow = "01" }: { initialRow?: string }) {
+  const [active, setActive] = useState(initialRow);
+  const raw = useRef<HTMLElement>(null);
+  const chosen = useRef(initialRow !== "01");
+  // Show the chosen row's fields: on a phone they sit below all ten stacked records. The timeout lets the
+  // dialog open first when a link chose the row.
+  useEffect(() => {
+    if (!chosen.current) return;
+    const timer = setTimeout(() => raw.current?.scrollIntoView({ block: "start" }), 0);
+    return () => clearTimeout(timer);
+  }, [active]);
+  const open = rows.find((row) => row.n === active) ?? rows[0];
   const captured = new Date(PUBLIC_SNAPSHOT.capturedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "America/Toronto" });
 
   return (
-    <figure className="pu-records pu-container" id="records" aria-labelledby="records-caption">
+    <figure className="pu-records" aria-labelledby="records-caption">
       <div className="pu-table">
         <table role="table" aria-labelledby="records-caption">
           <thead role="rowgroup">
@@ -61,9 +45,9 @@ export default function RecordSheet() {
             {rows.map(({ record, n }) => {
               const flagged = contradicts(record);
               return (
-                <tr role="row" key={record.id} data-row={n}>
+                <tr role="row" key={record.id} data-row={n} className={n === open.n ? "is-active" : undefined}>
                   <td role="cell" className="pu-col-n">{n}</td>
-                  <td role="cell" className="pu-col-title"><a href={`#cb-${n}`}>{record.title}</a></td>
+                  <td role="cell" className="pu-col-title"><button type="button" aria-pressed={n === open.n} aria-controls="pu-raw" onClick={() => { chosen.current = true; setActive(n); }}>{record.title}</button></td>
                   <td role="cell" data-label="Buyer">{record.buyer}</td>
                   <td role="cell" data-label="Region" className={record.region === "Not stated" ? "pu-missing" : undefined}>{record.region.replaceAll("\n", " ")}</td>
                   <td role="cell" data-label="Notice">{record.kind === "award" ? "Award" : "Tender"}</td>
@@ -77,27 +61,23 @@ export default function RecordSheet() {
         </table>
       </div>
 
-      <div className="pu-raw-list">
-        {rows.map(({ record, n, source }) => (
-          <section key={record.id} id={`cb-${n}`} className="pu-raw" data-default={n === DEFAULT_ROW || undefined} aria-label={`Raw CSV row for record ${n}`}>
-            <header>
-              <h2>Row {n}, as published</h2>
-              <span>{fileName(source)}{source?.row ? `, CSV row ${source.row}` : ""}</span>
-            </header>
-            <dl>
-              {source ? rawFields(source.text).map(({ key, value }) => {
-                const loud = contradicts(record) && /^(contractAmount|totalContractValue)-/.test(key);
-                return (
-                  <div key={key}>
-                    <dt>{key}</dt>
-                    <dd>{loud ? <mark>{value}</mark> : value}</dd>
-                  </div>
-                );
-              }) : null}
-            </dl>
-          </section>
-        ))}
-      </div>
+      <section ref={raw} key={open.n} id="pu-raw" className="pu-raw" aria-label={`Raw CSV row for record ${open.n}`}>
+        <header>
+          <h4>Row {open.n}, as published</h4>
+          <span>{fileName(open.source?.url)}{open.source?.row ? `, CSV row ${open.source.row}` : ""}</span>
+        </header>
+        <dl>
+          {open.source ? rawFields(open.source.text).map(({ key, value }) => {
+            const loud = contradicts(open.record) && /^(contractAmount|totalContractValue)-/.test(key);
+            return (
+              <div key={key}>
+                <dt>{key}</dt>
+                <dd>{loud ? <mark>{value}</mark> : value}</dd>
+              </div>
+            );
+          }) : null}
+        </dl>
+      </section>
 
       <figcaption id="records-caption">
         <p>Ten records from the CanadaBuys open-data files, captured {captured} and shown as published. Row 1, a Business Development Bank of Canada award, lists a contract amount of $1,073,002.14 and a total contract value of $0.00 in the same CSV row. Rows 2 to 4 do the same.</p>

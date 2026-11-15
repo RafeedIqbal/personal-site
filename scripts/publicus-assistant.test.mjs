@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { CHAT_LIMITS, CONTACT_EMAIL, KNOWLEDGE, PREPARED, RESUME_HREF, chatSchema, parseReply, readChatRequest, sanitizeContext } from "../supabase/functions/_shared/assistant.ts";
 import { EDUCATION, EXPERIENCE, PROFILE } from "../lib/content.ts";
+import { rowFromHash } from "../lib/publicus/records.ts";
 
 const page = readFileSync(new URL("../app/publicus/page.tsx", import.meta.url), "utf8");
-const sheet = readFileSync(new URL("../components/publicus/RecordSheet.tsx", import.meta.url), "utf8");
+const workspace = readFileSync(new URL("../components/publicus/Workspace.tsx", import.meta.url), "utf8");
 const evalsFigure = readFileSync(new URL("../components/publicus/ModelEvals.tsx", import.meta.url), "utf8");
 const MONTHS = { Jan: "January", Feb: "February", Mar: "March", Apr: "April", May: "May", Jun: "June", Jul: "July", Aug: "August", Sep: "September", Oct: "October", Nov: "November", Dec: "December" };
 
@@ -14,12 +15,23 @@ test("every fact points at a real place on the page or the résumé", () => {
   assert.deepEqual(chatSchema.properties.sources.items.enum, KNOWLEDGE.map((f) => f.id));
   for (const fact of KNOWLEDGE) {
     if (fact.href === RESUME_HREF) continue;
+    // #records and #cb-NN open the explorer's records dialog instead of scrolling to an element.
+    if (rowFromHash(fact.href)) { assert.match(workspace, /rowFromHash\(window\.location\.hash\)/, `${fact.id} needs the explorer to follow record links`); continue; }
     const id = fact.href.slice(1);
-    if (/^cb-\d\d$/.test(id)) assert.match(sheet, /id=\{`cb-\$\{n\}`\}/, `${fact.id} needs the record anchors`);
-    else assert.ok([page, sheet, evalsFigure].some((file) => file.includes(`id="${id}"`)), `${fact.id} points at missing #${id}`);
+    assert.ok([page, evalsFigure].some((file) => file.includes(`id="${id}"`)), `${fact.id} points at missing #${id}`);
   }
   assert.ok(existsSync(new URL(`../public${RESUME_HREF}`, import.meta.url)), "the résumé PDF must exist");
   assert.equal(CONTACT_EMAIL, PROFILE.email);
+});
+
+test("the fact sheet covers Alchemy and no longer describes records on the page itself", () => {
+  const byId = Object.fromEntries(KNOWLEDGE.map((f) => [f.id, f]));
+  assert.match(byId.alchemy?.text ?? "", /IFRA Category 4/);
+  assert.match(byId.basenote.text, /Bespoke fragrances, made fast, with no minimum order/);
+  assert.match(byId.icon.text, /App Store and Google Play/);
+  assert.doesNotMatch(byId.summary.text, /CanadaBuys records/);
+  assert.doesNotMatch(byId.records.text, /near the top of the page/);
+  assert.ok(PREPARED.find((item) => item.question.startsWith("Why does row 1")).answer.includes("CanadaBuys rows"));
 });
 
 test("roles, employers and dates agree with lib/content.ts", () => {

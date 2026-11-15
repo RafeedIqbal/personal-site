@@ -190,7 +190,7 @@ This file covers the `/publicus` route only: `app/publicus/` and `components/pub
 
 **Creative North Star: "The Open-Data Record"**
 
-The page is laid out like a dataset's landing page on an open-data portal. A purple band carries the title and a metadata row (publisher, modified date, contents, format). Under it sit a short introduction, a ruled list of resources, and the records themselves: ten CanadaBuys rows in a table with a purple header. Every row has its own address, and opening one shows that row's raw CSV fields under the table. The rest of the page (work, why Publicus, the explorer, approach, contact) follows as ruled two-column sections.
+The page is laid out like a dataset's landing page on an open-data portal. A purple band carries the title. Under it sit a short introduction and a ruled list of resources, then ruled two-column sections: work, why Publicus, the explorer, approach and contact. The records themselves, ten CanadaBuys rows in a table with a purple header, open in a dialog from the explorer. Every row has its own address (`#cb-01` to `#cb-10`), and choosing one shows that row's raw CSV fields under the table.
 
 The material is paper and ink, and colour is rationed by job: purple for header bands, a yellow highlighter for values a reviewer should look at, ink for actions. There are no shadows, gradients or illustrations, and only one animation. Spacing is generous between sections and tight inside tables, with reading text at 17px and table text at 13 to 14px.
 
@@ -210,10 +210,10 @@ One brand colour with one job, one reviewer's highlighter, and a family of cool 
 
 ### Primary
 - **Publicus Purple** (#634086): header bands only. It fills the masthead, every table header row (the records table, the vendors and buyers table, the explorer's results heading and source index), the 6px band that takes the header row's place when the records table stacks, and the title band of the help chat, which heads its conversation. It is the route's one nod to Publicus's brand. The share image uses Publicus's deeper purple (#2e1e44) for its record band; the page never does.
-- **Lavender Mist** (#e6ddf0): secondary text on purple, such as the metadata terms in the masthead and the counts in explorer headings.
+- **Lavender Mist** (#e6ddf0): secondary text on purple, such as the counts in explorer headings.
 
 ### Secondary
-- **Reviewer's Highlighter** (#f5d547): marks what a reviewer has to look at. On the record sheet that means values that disagree, and nothing else: the contract amount and total contract value of an award whose total reads 0.00 while its amount doesn't, in the table and again in the raw row. In the explorer it also marks the exact passage a citation quotes inside the source text and fills the square markers beside review issues. It is the text-selection colour too, so a reader's own selection looks like the same pen.
+- **Reviewer's Highlighter** (#f5d547): marks what a reviewer has to look at. In the records dialog that means values that disagree, and nothing else: the contract amount and total contract value of an award whose total reads 0.00 while its amount doesn't, in the table and again in the raw row. In the explorer it also marks the exact passage a citation quotes inside the source text and fills the square markers beside review issues. It is the text-selection colour too, so a reader's own selection looks like the same pen.
 - **Highlighter Wash** (#fbf1c2): the pale version, for "needs review" badges and the quoted-passage block in the source viewer. Text on it is Review Ink.
 
 ### Neutral
@@ -271,15 +271,15 @@ One brand colour with one job, one reviewer's highlighter, and a family of cool 
 
 One centred container, 1240px at most with 32px gutters a side, 24px below 1024px and 16px below 760px. The masthead band runs full bleed with the container inside it.
 
-The first screen stacks a thin link strip (site and route on the left, page links on the right, 15px), the purple masthead with a four-column metadata row under a 1px white rule at 32% opacity, a two-column introduction (paragraph beside a 340px resources list, 72px apart), then the records table.
+The first screen stacks a thin link strip (site and route on the left, page links on the right, 15px), the purple masthead, and a two-column introduction (paragraph beside a 340px resources list, 72px apart).
 
-Every section after the records shares one grid: a 1px ink rule on top, 22px to the content, then a heading column and a content column at 1:3 with a 56px gap. From 1024px up the heading sticks 24px from the top while its section scrolls past. The explorer section is the exception: its heading spans the first row and the explorer takes the full width. Sections sit 64 to 112px apart, fluid.
+Every section after the introduction shares one grid: a 1px ink rule on top, 22px to the content, then a heading column and a content column at 1:3 with a 56px gap. From 1024px up the heading sticks 24px from the top while its section scrolls past. The explorer section is the exception: its heading spans the first row and the explorer takes the full width. Sections sit 64 to 112px apart, fluid.
 
-Work entries nest a second grid, a 200px metadata column (company, role, period, status) beside the entry, divided by hairlines. Screenshots fill the entry column inside a 1px hairline frame, with a caption underneath.
+Work entries nest a second grid, a 200px metadata column (company, role, period, products, status) beside the entry, divided by hairlines. Screenshots and the demo video fill the entry column inside a 1px frame, with a caption underneath. The Work section ends with a solid ink button to the rest of the portfolio.
 
 Tables run the full container width with 10px by 12px cells. Below 1024px the records table stacks: the header row is hidden visually but kept for screen readers, a 6px purple band takes its place, and each record becomes a block with its row number in a 2.25rem gutter and label and value pairs beside it (9.5rem labels, 7.5rem below 760px).
 
-Below 1024px every two-column arrangement collapses to one, and the masthead metadata drops to two columns. Below 760px the strip keeps only the résumé and email links, entries put their metadata above the prose in two columns, the raw row's fields go to one column, and the vendors and buyers table hides its row headers.
+Below 1024px every two-column arrangement collapses to one. Below 760px the strip keeps only the résumé and email links, entries put their metadata above the prose in two columns, the raw row's fields go to one column, and the vendors and buyers table hides its row headers.
 
 The explorer insets its content 28px (12px on phones) and splits results and detail 42 to 58 (43 to 57 below 1100px). On phones it shows the list and the detail one at a time, with a back button.
 
@@ -290,7 +290,7 @@ The explorer insets its content 28px (12px on phones) and splits results and det
 
 ## Elevation & Depth
 
-Flat. There are no box shadows, text shadows, glows, gradients or blurs anywhere on the route, the explorer included. Depth comes from tone (paper, band, active row, the white instrument), from rules (hairlines between rows, ink rules at section tops and around the raw row) and from one overlap: the raw-row panel moves up 1px to sit on the table's last rule. The only scrim is the explorer dialog's backdrop, ink at 50%.
+Flat. There are no box shadows, text shadows, glows, gradients or blurs anywhere on the route, the explorer included. Depth comes from tone (paper, band, active row, the white instrument), from rules (hairlines between rows, ink rules at section tops and around the raw row) and from one overlap: the raw-row panel moves up 1px to sit on the table's last rule. The only scrim is ink at 50%, behind the explorer's dialogs, the gallery dialog and the help chat's phone sheet.
 
 ### Named Rules
 **The Flat Record Rule.** When something needs to stand out, give it a rule, a band or the highlighter, never a shadow.
@@ -335,11 +335,11 @@ Rules are 1px. The heavier strokes are the explorer's 2px selected-tab underline
 - **Explorer tabs:** 13px Graphite Violet labels 24px apart. The selected tab is Ink at 600 with a 2px ink underline.
 - **Skip link:** a solid ink block that slides in on focus.
 
-### Records Table
-The signature component. A purple header row with 13px semibold white labels; a 14px body with tabular numerals; mono row numbers, dates and figures, with figures right-aligned; a hairline under every row and Band on even rows; "Not stated" regions in italic Ash Violet. Each title links to that record's address (`#cb-01` to `#cb-10`). The record whose raw row is open takes Active Row, and with nothing chosen row 01 is active and its raw row shows. Values that disagree carry the highlighter, and the disagreeing total also steps up to 17px semibold. The caption sits below the raw rows: a 64ch note, a right-aligned hint, and the licence line in 13px Ash Violet.
+### Records Dialog
+The signature component, opened from the explorer's bottom bar ("CanadaBuys rows"), its Sources tab, or any link to `#records` or `#cb-NN`, which the explorer clears once the dialog opens. It is 1180px wide at most. A purple header row with 13px semibold white labels; a 14px body with tabular numerals; mono row numbers, dates and figures, with figures right-aligned; a hairline under every row and Band on even rows; "Not stated" regions in italic Ash Violet. Each title is a button that shows that record's raw row. The record whose raw row is open takes Active Row; row 01 is open unless a link named another. Values that disagree carry the highlighter, and the disagreeing total also steps up to 17px semibold. The caption sits below the raw rows: a 64ch note, a right-aligned hint, and the licence line in 13px Ash Violet.
 
 ### Raw Row Panel
-One record's CSV fields as published. A heading ("Row NN, as published") with the source file and CSV row in mono on the right, then a two-column grid of mono field and value pairs separated by hairlines, inside a 1px ink frame. Only one is open at a time. Choosing a record opens its panel with the route's only animation: a clip reveal from top to bottom over 220ms on an exponential ease-out (cubic-bezier(0.16, 1, 0.3, 1)). Colour changes on hover share that duration and curve. With reduced motion requested, every animation and transition is removed.
+One record's CSV fields as published, under the table in the records dialog. A heading ("Row NN, as published") with the source file and CSV row in mono on the right, then a two-column grid of mono field and value pairs separated by hairlines, inside a 1px ink frame. Only one is shown at a time. Choosing a record shows its panel with the route's only animation: a clip reveal from top to bottom over 220ms on an exponential ease-out (cubic-bezier(0.16, 1, 0.3, 1)). Colour changes on hover share that duration and curve. With reduced motion requested, every animation and transition is removed.
 
 ### Build Notes
 A ruled definition list under the explorer's section lede, saying how the explorer works, its architecture and its stack. Terms sit in a 9rem column in 13px Ash Violet, values in 15px ink up to 66ch, with a Hairline above and between rows; below 760px each term stacks over its value. The architecture row opens with the request path as an ordered list in Chivo Mono (each step is an identifier), joined by Ash Violet arrows that screen readers skip.
@@ -362,7 +362,13 @@ A fixed ink launcher, "Ask a question", 48px tall (44px on phones), at the botto
 - **States:** "Checking the record…" as static Ash Violet text while waiting; a Band notice with the email address when the chat is offline, over its daily limit or failed. When typed questions are unavailable, the textarea is removed and the suggested questions still work.
 
 ### Masthead
-A full-bleed purple band holding the display title and a metadata row (Publisher, Modified, Contents, Format): 13px Lavender Mist terms over 15px white values, with the date in 14px mono, under a 1px white rule at 32% opacity. Top padding runs 36 to 60px, fluid, with 24px below. It is typeset only.
+A full-bleed purple band holding the display title alone, with 36 to 60px of fluid padding above and below. It is typeset only.
+
+### Demo Video
+The BaseNote entry's walkthrough of Blend and Alchemy: a native `<video>` with controls, 16:9, in a 1px Ink frame on near-black, loading nothing until played (`preload="none"`, the film's end card as poster). The caption sits under it in 14px Graphite Violet, followed by a ruled "Transcript" disclosure whose chapters use the film's own labels in a 13px Ash Violet column beside 15px text.
+
+### Screen Gallery
+Six product screens under the video, three columns (two below 1024px) with 20px rows. Each thumbnail sits in a 1px Hairline frame that darkens to Ink on hover, over a 14px label: the product in Ink 600, then what the screen shows. Every thumbnail links to its full image, and with JavaScript it opens one square dialog on Record Paper with a 1px Ink border and the 50% scrim: a title bar, the image on Band, then a mono "n of 6" counter with underlined Previous, Next and Full size controls. Arrow keys step through the screens, and closing returns focus to the thumbnail.
 
 ## Do's and Don'ts
 
@@ -372,7 +378,7 @@ A full-bleed purple band holding the display title and a metadata row (Publisher
 - **Do** set field names, raw fields, IDs, dates, file sizes and figures in Chivo Mono, with tabular numerals in tables.
 - **Do** open each narrative section with a 1px ink rule and a left-column heading.
 - **Do** divide rows with 1px Hairline (#d9d6de) and band even rows with Band (#f4f3f6).
-- **Do** give every record an address and open its raw row with the one 220ms clip reveal, removed under reduced motion.
+- **Do** give every record an address and show its raw row with the one 220ms clip reveal, removed under reduced motion.
 - **Do** make the primary page action solid Ink and at least 48px tall.
 - **Do** stack the records table below 1024px as label and value pairs under a 6px purple band.
 
