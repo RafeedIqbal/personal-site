@@ -132,7 +132,7 @@ export default function PublicusPage() {
       <section id="explorer" className="pu-section pu-section-wide pu-container" aria-labelledby="explorer-title">
         <div className="pu-section-head">
           <h2 id="explorer-title">A procurement explorer I built for this application</h2>
-          <p>Start in the vendor view, then switch to the buyer view. The scenario menu at the bottom adds a late security requirement, two amendment values that disagree, or a missing source document, and the qualification checks, flags and explanations change with it.</p>
+          <p>Choose a side first: a vendor looking for work or a public buyer reviewing contracts. Set up your company or organisation, or skip and use the sample, and a short tour shows each part. The data-problem menu at the bottom adds a late security requirement, two amendment values that disagree, or a missing source document, and the qualification checks, flags and explanations change with it.</p>
         </div>
         <dl className="pu-build">
           <div><dt>How it works</dt><dd><p>Everything you click runs in your browser. Ranking, qualification checks, contract grouping and the prepared explanations come from plain rules in one TypeScript file, with no model involved, and the same file runs in the Node tests and on the server. If you start a private workspace, your copy moves to Supabase, where the live CanadaBuys feed, PDF uploads and open questions run as background jobs.</p></dd></div>

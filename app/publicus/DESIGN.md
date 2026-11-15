@@ -202,7 +202,7 @@ The embedded procurement explorer is working software placed on the record. It s
 - A highlighter on values that disagree and on passages a reviewer has to check.
 - Archivo, semi-condensed for headings and normal width for reading; Chivo Mono for anything that is data.
 - Square and flat on the page; small corners only inside the explorer.
-- One motion: a 220ms top-down clip reveal, used when a raw row opens and when the help chat opens.
+- One motion: a 220ms top-down clip reveal, used when a raw row opens, when the help chat opens and when a tour card appears.
 
 ## Colors
 
@@ -290,7 +290,7 @@ The explorer insets its content 28px (12px on phones) and splits results and det
 
 ## Elevation & Depth
 
-Flat. There are no box shadows, text shadows, glows, gradients or blurs anywhere on the route, the explorer included. Depth comes from tone (paper, band, active row, the white instrument), from rules (hairlines between rows, ink rules at section tops and around the raw row) and from one overlap: the raw-row panel moves up 1px to sit on the table's last rule. The only scrim is ink at 50%, behind the explorer's dialogs, the gallery dialog and the help chat's phone sheet.
+Flat. There are no box shadows, text shadows, glows, gradients or blurs anywhere on the route, the explorer included. Depth comes from tone (paper, band, active row, the white instrument), from rules (hairlines between rows, ink rules at section tops and around the raw row) and from one overlap: the raw-row panel moves up 1px to sit on the table's last rule. The only scrim is ink at 50%, behind the explorer's dialogs, the gallery dialog and the help chat's phone sheet, and over the explorer (never the page) during its tour, with a cut-out around the control being explained.
 
 ### Named Rules
 **The Flat Record Rule.** When something needs to stand out, give it a rule, a band or the highlighter, never a shadow.
@@ -351,6 +351,17 @@ A figure under the explorer, `#models`, with a 1.375–1.875rem semi-condensed h
 - **Cost per 1,000 answers:** right-aligned mono dollars, or "Not published" in Ash Violet.
 - **In use and Eval pick:** the setting the site runs gets the Active Row tint and a solid ink "In use" label beside the model name. When that differs from the eval's winner, the winner gets an outlined ink "Eval pick" label, and a second lede paragraph gives the reason with both models' numbers. No purple or highlighter in the data.
 - **Phones:** the tables stack like the records table, under a 6px purple band, as label and value pairs; the time track is dropped and the figures stay.
+
+### Explorer Setup
+The explorer's first screen, until a visitor finishes or skips it, in place of its tabs and panel. The top bar stays, and the bottom bar keeps *CanadaBuys rows* and *Reset workspace*. Two columns at 1.3 to 1, stacked below 900px: questions on white, and a Band-tinted side column for what they change.
+- **First step:** a semi-condensed 26px heading, a 14px Graphite Violet lede, and two side cards ("I sell to government", "I buy for a public body"): white buttons with a Control Rule border, an 18px semi-condensed title and an ink arrow. Hover goes to an ink border on Band. Under them, an underlined text button skips setup. The side column lists everything the explorer does under a 1px ink rule, one ruled row per feature with its explorer icon.
+- **Questions:** a mono "Step n of N" counter above each heading. Choices are native checkboxes and radios inside 2px-cornered chips or rows, with a Control Rule border, an ink border and Band fill when chosen, and a 2px ink focus ring. Errors use the explorer's red-brown error ink.
+- **Live preview:** the side column becomes "Your matches" or "Your contracts" under a purple list heading (counts in Lavender Mist). It has a count line, then one ruled row per record: buyer or supplier, a mono figure, the title, a 3px score bar for vendors, the explorer's pass or review badge, and the first issue in Review Ink.
+
+### Explorer Tour
+Eight steps for each side, started when setup finishes and replayed from *Take the tour* in the top bar.
+- **Spotlight:** the explorer, not the page, goes under the 50% ink scrim, in four blocks around the highlighted control. A 2px ink ring sits 6px outside the control, which stays usable.
+- **Card:** white, 1px Ink border, 4px corners, 340px wide, beside the control on the side with room. It has a mono "n of 8" counter, an underlined *Skip tour*, a 19px semi-condensed heading, 14px Graphite Violet text and the explorer's Back and Next buttons. Below 760px it docks to the bottom of the screen with 44px buttons. It appears with the route's one clip reveal and hides while the explorer is off screen or a dialog is open.
 
 ### Help Chat
 A fixed ink launcher, "Ask a question", 48px tall (44px on phones), at the bottom right of every viewport. It renders only after hydration, and the panel's code loads on first open.

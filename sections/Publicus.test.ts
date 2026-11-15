@@ -78,6 +78,8 @@ test("the CanadaBuys rows open in a dialog from the explorer and from record lin
   await expect(dialog.getByRole("heading", { name: "Row 01, as published" })).toBeVisible();
   expect(new URL(page.url()).hash).toBe("");
   await page.keyboard.press("Escape");
+  // The dialog's close event is asynchronous; wait for it so it can't close the next one.
+  await expect(dialog).toBeHidden();
 
   await page.goto("/publicus#cb-03");
   await expect(page.getByRole("dialog", { name: "CanadaBuys rows as published" }).getByRole("heading", { name: "Row 03, as published" })).toBeInViewport();
@@ -163,3 +165,171 @@ for (const width of [320, 390, 1440]) {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+// The explorer mounts as it approaches the viewport, and opens on its setup screen until a visitor finishes or skips it.
+async function openExplorer(page: Page) {
+  const shell = page.locator(".px-shell");
+  // The explorer can replace its placeholder mid-scroll, so scroll whichever is there until the explorer shows.
+  await expect(async () => {
+    await page.locator("#explorer .pu-demo-loading, #explorer .px-shell").first().scrollIntoViewIfNeeded({ timeout: 1000 });
+    await expect(shell).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  return shell;
+}
+
+test("the explorer opens on a setup screen that shows everything it does", async ({ page }) => {
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await expect(shell.getByRole("heading", { name: "Try it as a vendor or as a public buyer" })).toBeVisible();
+  await expect(shell.locator(".px-features li strong")).toHaveText(["For vendors", "Requirement checks", "For government", "Sources & imports", "Data problems"]);
+  await expect(shell.getByRole("tablist")).toHaveCount(0);
+  await expect(shell.getByRole("button", { name: "CanadaBuys rows" })).toBeVisible();
+  await checkAccessibility(page);
+});
+
+test("a vendor setup ranks the sample for that company, then the tour walks through it", async ({ page }) => {
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await shell.getByRole("button", { name: /I sell to government/ }).click();
+  await expect(shell.getByRole("heading", { name: "Your company" })).toBeFocused();
+  const summary = shell.locator(".px-preview-summary");
+  await expect(summary).toHaveText("0 fit your work, regions and size · 0 pass every check");
+  await shell.getByRole("button", { name: "Continue" }).click();
+  await expect(shell.getByRole("alert")).toHaveText("Enter your company’s name.");
+  await shell.getByLabel("Company name").fill("Harbour Data Co");
+  await shell.getByLabel("What does your company do? (optional)").fill("We run data analytics for city councils.");
+  await expect(shell.getByRole("checkbox", { name: "Data platforms" })).toBeChecked();
+  await expect(shell.locator(".px-preview .px-list-heading")).toContainText("Harbour Data Co");
+  await shell.getByRole("checkbox", { name: "Software development" }).check();
+  await shell.getByRole("button", { name: "Continue" }).click();
+  await shell.getByRole("checkbox", { name: "Ontario" }).check();
+  await expect(summary).not.toHaveText(/^0 fit/);
+  await shell.getByRole("radio", { name: "$1M" }).check();
+  await shell.getByRole("button", { name: "Continue" }).click();
+  await shell.getByRole("checkbox", { name: "Reliability status" }).check();
+  await expect(summary).toHaveText(/[1-9] pass every check$/);
+  await shell.getByRole("button", { name: "See my matches" }).click();
+
+  await expect(shell.getByRole("heading", { name: "Opportunities for Harbour Data Co" })).toBeVisible();
+  const tour = page.getByRole("dialog", { name: "Your matches, best first" });
+  await expect(tour).toBeVisible();
+  await expect(tour).toContainText("1 of 8");
+  await expect(tour.getByRole("heading", { name: "Your matches, best first" })).toBeFocused();
+  await expect(tour).toContainText("ranked against Harbour Data Co");
+  await checkAccessibility(page);
+  await tour.getByRole("button", { name: "Next" }).click();
+  await expect(page.getByRole("dialog", { name: "Requirements, checked against you" }).getByRole("heading")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".px-tour-card")).toHaveCount(0);
+
+  await page.reload();
+  const again = await openExplorer(page);
+  await expect(again.getByRole("heading", { name: "Opportunities for Harbour Data Co" })).toBeVisible();
+  await expect(page.locator(".px-tour-card")).toHaveCount(0);
+});
+
+test("a buyer setup opens the government view on that organisation's contracts", async ({ page }) => {
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await shell.getByRole("button", { name: /I buy for a public body/ }).click();
+  await shell.getByRole("button", { name: "Continue" }).click();
+  await expect(shell.getByRole("alert")).toHaveText("Choose an organisation.");
+  await shell.getByRole("radio", { name: /Town of Cedar Bay/ }).check();
+  await expect(shell.locator(".px-preview")).toContainText("Managed hosting & data operations");
+  await shell.getByRole("button", { name: "Continue" }).click();
+  await shell.getByRole("checkbox", { name: /Expires within six months/ }).uncheck();
+  await shell.getByRole("button", { name: "See my contracts" }).click();
+
+  await expect(shell.getByRole("tab", { name: "For government" })).toHaveAttribute("aria-selected", "true");
+  await expect(shell.getByRole("heading", { name: "Contracts for Town of Cedar Bay" })).toBeVisible();
+  await expect(shell.locator(".px-record")).toHaveCount(1);
+  await expect(shell.getByRole("combobox", { name: "Filter records" })).toHaveValue("mine");
+  const tour = page.getByRole("dialog", { name: "Town of Cedar Bay’s contracts" });
+  await expect(tour).toBeVisible();
+  await tour.getByRole("button", { name: "Skip tour" }).click();
+  await expect(tour).toBeHidden();
+  await expect(shell.locator(".px-issues li.is-muted")).toContainText("Expires within six months");
+  await expect(shell.locator(".px-elsewhere")).toHaveText("Northstar Digital Inc. also holds contracts with Lakeview Regional Council.");
+  await shell.getByRole("tab", { name: "For vendors" }).click();
+  await expect(shell.locator(".px-record", { hasText: "Your tender" })).toHaveCount(2);
+});
+
+test("skipping setup explores as Maple Systems, and the tour's try-it steps move on by themselves", async ({ page }) => {
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await shell.getByRole("button", { name: /Skip and explore as Maple Systems/ }).click();
+  await expect(shell.getByRole("heading", { name: "Opportunities for Maple Systems" })).toBeVisible();
+  await page.getByRole("dialog", { name: "Your matches, best first" }).getByRole("button", { name: "Next" }).click();
+  await page.getByRole("dialog", { name: "Requirements, checked against you" }).getByRole("button", { name: "Next" }).click();
+  await expect(page.getByRole("dialog", { name: "An explanation that cites its sources" })).toBeVisible();
+  await shell.getByRole("button", { name: "Explain this match" }).click();
+  const pipeline = page.getByRole("dialog", { name: "Keep track of what you’ll pursue" });
+  await expect(pipeline).toBeVisible();
+  await expect(shell.locator(".px-answer")).toBeVisible();
+  await pipeline.getByRole("button", { name: "Next" }).click();
+  await expect(shell.getByRole("tab", { name: "For government" })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("dialog", { name: "The buyer’s side" }).getByRole("button", { name: "Next" }).click();
+  await expect(shell.getByRole("tab", { name: "Sources & imports" })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("dialog", { name: "Bring real data" }).getByRole("button", { name: "Next" }).click();
+  await expect(page.getByRole("dialog", { name: "Break the data on purpose" })).toBeVisible();
+  await shell.getByRole("combobox", { name: "Evidence scenario" }).selectOption("conflict");
+  const last = page.getByRole("dialog", { name: "Make it yours" });
+  await expect(last).toContainText("8 of 8");
+  await last.getByRole("button", { name: "Finish" }).click();
+  await expect(last).toBeHidden();
+  await expect(shell.getByRole("button", { name: "Setup" })).toBeFocused();
+});
+
+test("Take the tour replays it, and resetting the workspace shows setup again", async ({ page }) => {
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await shell.getByRole("button", { name: /Skip and explore/ }).click();
+  await page.getByRole("dialog", { name: "Your matches, best first" }).getByRole("button", { name: "Skip tour" }).click();
+  await shell.getByRole("button", { name: "Take the tour" }).click();
+  await expect(page.getByRole("dialog", { name: "Your matches, best first" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".px-tour-card")).toHaveCount(0);
+  await shell.getByRole("button", { name: "Setup" }).click();
+  await expect(shell.getByRole("button", { name: /I sell to government/ })).toContainText("Current");
+  await shell.getByRole("button", { name: "Keep my current setup" }).click();
+  await shell.getByRole("button", { name: "Reset workspace" }).click();
+  await page.getByRole("dialog", { name: "Reset this workspace?" }).getByRole("button", { name: "Reset workspace" }).click();
+  await expect(shell.getByRole("heading", { name: "Try it as a vendor or as a public buyer" })).toBeVisible();
+});
+
+for (const width of [320, 390, 1440]) {
+  test(`setup and the tour fit a ${width}px screen`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/publicus");
+    const shell = await openExplorer(page);
+    const spill = (selector: string) => page.locator(selector).evaluate((element) => element.scrollWidth - element.clientWidth);
+    expect(await spill(".px-setup")).toBeLessThanOrEqual(0);
+    expect(await spill(".px-topbar")).toBeLessThanOrEqual(0);
+    await shell.getByRole("button", { name: /I sell to government/ }).click();
+    expect(await spill(".px-setup")).toBeLessThanOrEqual(0);
+    await shell.getByRole("button", { name: "Back" }).click();
+    await shell.getByRole("button", { name: /Skip and explore/ }).click();
+    const card = page.locator(".px-tour-card");
+    await expect(card).toBeVisible();
+    const box = await card.boundingBox();
+    expect(box && box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= 800).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+  });
+}
+
+test("the tour's spotlight stays on its target in full screen", async ({ page }) => {
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await shell.getByRole("button", { name: /Skip and explore/ }).click();
+  await page.getByRole("dialog", { name: "Your matches, best first" }).getByRole("button", { name: "Skip tour" }).click();
+  await shell.getByRole("button", { name: "Open full screen" }).click();
+  await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
+  await shell.getByRole("button", { name: "Take the tour" }).click();
+  await page.getByRole("dialog", { name: "Your matches, best first" }).getByRole("button", { name: "Next" }).click();
+  await expect(page.getByRole("dialog", { name: "Requirements, checked against you" })).toBeVisible();
+  // The ring sits 6px outside the section it highlights, wherever the shell has scrolled to.
+  await expect.poll(() => page.evaluate(() => {
+    const target = document.querySelector('[data-tour="requirements"]')!.getBoundingClientRect(), ring = document.querySelector(".px-tour-ring")!.getBoundingClientRect();
+    return [Math.round(ring.left - target.left), Math.round(ring.top - target.top)];
+  })).toEqual([-6, -6]);
+});

@@ -172,3 +172,12 @@ The Icon entry links to the App Store and Google Play, and Work ends with a butt
   - On a phone, choosing a record scrolls the dialog to its raw row.
 - `impeccable detect` reported only advisory type-ramp notes.
 - `publicus-chat` must be redeployed for the chat to use the new facts.
+
+## Explorer setup and tour — 15 November 2026
+
+The explorer now opens on a setup screen. It lists what the explorer does and asks whether the visitor sells to government or buys for a public body. Vendors name their company, describe it (keyword rules tick the matching capabilities), and pick regions, a contract-size limit and qualifications, while a preview re-ranks the six sample tenders as they answer. Buyers pick one of the four sample organisations with contracts and choose which review flags to watch; the government view then opens filtered to that organisation, its stats and badges count watched flags only, and the detail names the other buyers that use the same supplier. "Skip and explore as Maple Systems" keeps the old start.
+
+Finishing setup starts an eight-step tour that dims the explorer, cuts out the control being explained, and switches views itself. The explanation and data-problem steps move on when the visitor uses them. *Take the tour* and *Setup* in the top bar bring each back, and *Reset workspace* clears both. The vendor profile goes through the existing `Workspace.profile`, so a private workspace still saves it; the buyer choice and watch list stay in the browser (`publicus-setup-v1`, `publicus-tour-v1`). No backend or Edge Function changed.
+
+- `npm run test:publicus` adds `scripts/publicus-onboarding.test.mjs`: capability suggestions, the preview matching `matchRecord`, buyer options, the watch list covering every flag `contracts()` raises, stored-setup validation, the supplier's other buyers and both tours' steps.
+- The UI suite adds setup, vendor and buyer flows, try-it steps, replay and reset, focus on each tour step, full-screen alignment, axe checks on the setup screen and an open step, and no overflow at 320, 390 and 1440 px.
