@@ -349,7 +349,7 @@ A figure under the explorer, `#models`, with a 1.375–1.875rem semi-condensed h
 - **Accuracy:** an 8px bar from zero on a Hairline track, Ash Violet for most rows and Ink for the chosen one, with the percentage in Chivo Mono under it.
 - **Response time:** an 8px square at the median and a 2px line to the 90th percentile, on a log scale from 1 to 90 seconds, over 1px Hairline ticks that line up with the mono tick labels in the purple header. The figures sit under it in mono.
 - **Cost per 1,000 answers:** right-aligned mono dollars, or "Not published" in Ash Violet.
-- **Chosen row:** Active Row tint and a solid ink "Chosen" label beside the model name. No purple or highlighter in the data.
+- **In use and Eval pick:** the setting the site runs gets the Active Row tint and a solid ink "In use" label beside the model name. When that differs from the eval's winner, the winner gets an outlined ink "Eval pick" label, and a second lede paragraph gives the reason with both models' numbers. No purple or highlighter in the data.
 - **Phones:** the tables stack like the records table, under a 6px purple band, as label and value pairs; the time track is dropped and the figures stay.
 
 ### Help Chat

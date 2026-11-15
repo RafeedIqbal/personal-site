@@ -1,7 +1,7 @@
 // Runs every eval case against every current Gemini text model and writes:
 //   lib/publicus/model-evals.json   the summary the page and tests read
 //   output/evals/<date>.jsonl       one line per call (ignored by Git)
-// and rewrites the CHAT/DEMO picks in _shared/models.ts with pickModel().
+// and rewrites the EVAL_CHAT/EVAL_DEMO picks in _shared/models.ts with pickModel().
 // Usage: npm run eval:publicus  (needs GEMINI_API_KEY; calls the paid API, no quota reserved)
 import { callGemini, GeminiError, type Usage } from "../_shared/gemini.ts";
 import { pickModel, type TaskResult } from "../_shared/models.ts";
@@ -96,7 +96,7 @@ if (!DRY) await Deno.writeTextFile(new URL(`output/evals/${ranAt.slice(0, 19).re
 // Rewrite the picks. The demo timeout covers twice the pick's slowest typical answer, at least 60s.
 const demoTimeout = Math.max(60_000, Math.ceil((2 * (demoPick.p90Ms ?? 30_000)) / 1000) * 1000);
 const modelsFile = new URL("supabase/functions/_shared/models.ts", root);
-const picks = `// eval-picks:start\nexport const CHAT: Setting = { model: "${chatPick.model}", thinking: "${chatPick.thinking}", timeoutMs: 30_000 };\nexport const DEMO: Setting = { model: "${demoPick.model}", thinking: "${demoPick.thinking}", timeoutMs: ${demoTimeout.toLocaleString("en").replaceAll(",", "_")} };\n// eval-picks:end`;
+const picks = `// eval-picks:start\nexport const EVAL_CHAT: Setting = { model: "${chatPick.model}", thinking: "${chatPick.thinking}", timeoutMs: 30_000 };\nexport const EVAL_DEMO: Setting = { model: "${demoPick.model}", thinking: "${demoPick.thinking}", timeoutMs: ${demoTimeout.toLocaleString("en").replaceAll(",", "_")} };\n// eval-picks:end`;
 if (!DRY) await Deno.writeTextFile(modelsFile, (await Deno.readTextFile(modelsFile)).replace(/\/\/ eval-picks:start[\s\S]*?\/\/ eval-picks:end/, picks));
 
 const row = (r: TaskResult) => `${`${r.model}/${r.thinking}`.padEnd(32)} acc ${(r.accuracy * 100).toFixed(0).padStart(3)}%  median ${r.medianMs === null ? "   n/a" : `${(r.medianMs / 1000).toFixed(1).padStart(5)}s`}  p90 ${r.p90Ms === null ? "   n/a" : `${(r.p90Ms / 1000).toFixed(1).padStart(5)}s`}  errors ${(r.errorRate * 100).toFixed(0).padStart(3)}%  $/1k ${r.costPer1k ?? "n/a"}`;

@@ -25,7 +25,8 @@ test("the model eval shows both result tables with one chosen setting each", asy
   for (const table of await tables.all()) {
     expect(await table.locator("tbody tr").count()).toBeGreaterThanOrEqual(5);
     await expect(table.locator("tbody tr.is-chosen")).toHaveCount(1);
-    await expect(table.locator("tbody tr.is-chosen")).toContainText("Chosen");
+    await expect(table.locator("tbody tr.is-chosen")).toContainText("In use");
+    await expect(table.locator("tbody tr", { hasText: "Eval pick" })).toHaveCount(1);
   }
   await expect(page.locator("#explorer .pu-build").getByRole("link", { name: "model eval below the explorer" })).toHaveAttribute("href", "#models");
   await checkAccessibility(page);

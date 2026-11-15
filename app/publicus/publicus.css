@@ -395,6 +395,8 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .pu-evals tbody tr.is-chosen > * { background: var(--row-active); }
 .pu-evals-model { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-weight: 600; }
 .pu-evals-chosen { padding: 1px 6px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; }
+.pu-evals-pick { padding: 0 5px; border: 1px solid var(--ink); color: var(--ink); font-size: 12px; font-weight: 600; }
+.pu-evals-lede + .pu-evals-lede { margin-top: 10px; }
 .pu-evals-setting { display: block; font-size: 13px; color: var(--ink-3); }
 .pu-evals-note { font-size: 13px; color: var(--ink-3); }
 .pu-evals-failed { display: block; }

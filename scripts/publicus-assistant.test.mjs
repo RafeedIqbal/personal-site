@@ -80,7 +80,7 @@ test("the explorer view is re-read and capped before it reaches the model", () =
 });
 
 test("the model eval summary is complete and its picks follow the published rule", async () => {
-  const { CHAT, DEMO, pickModel, modelLabel } = await import("../supabase/functions/_shared/models.ts");
+  const { CHAT, CHOICE, DEMO, EVAL_CHAT, EVAL_DEMO, pickModel, modelLabel } = await import("../supabase/functions/_shared/models.ts");
   const evals = JSON.parse(readFileSync(new URL("../lib/publicus/model-evals.json", import.meta.url), "utf8"));
   for (const task of ["chat", "demo"]) {
     assert.ok(evals.tasks[task].length >= 5, `${task} should cover the current models`);
@@ -90,13 +90,17 @@ test("the model eval summary is complete and its picks follow the published rule
       assert.ok(r.costPer1k === null || r.costPer1k >= 0);
     }
   }
-  for (const [task, pick] of [["chat", CHAT], ["demo", DEMO]]) {
+  for (const [task, evalPick, used] of [["chat", EVAL_CHAT, CHAT], ["demo", EVAL_DEMO, DEMO]]) {
     const chosen = pickModel(evals.tasks[task]);
     assert.deepEqual({ model: chosen.model, thinking: chosen.thinking }, evals.picks[task]);
-    assert.deepEqual({ model: pick.model, thinking: pick.thinking }, evals.picks[task], `models.ts ${task} pick is stale; rerun npm run eval:publicus`);
+    assert.deepEqual({ model: evalPick.model, thinking: evalPick.thinking }, evals.picks[task], `models.ts ${task} eval pick is stale; rerun npm run eval:publicus`);
+    // A deliberate choice can override the eval, but only with a setting the eval measured.
+    assert.deepEqual({ model: used.model, thinking: used.thinking }, CHOICE ?? evals.picks[task]);
+    const measured = evals.tasks[task].find((r) => r.model === used.model && r.thinking === used.thinking);
+    assert.ok(measured && measured.medianMs !== null && measured.errorRate <= 0.05, `${task} runs a setting the eval measured without many failures`);
   }
   const fact = KNOWLEDGE.find((f) => f.id === "models");
-  assert.ok(fact && fact.text.includes(modelLabel(CHAT.model)) && fact.text.includes(modelLabel(DEMO.model)), "the chat's fact sheet must name both picks");
+  for (const name of [CHAT.model, DEMO.model, evals.picks.chat.model, evals.picks.demo.model]) assert.ok(fact?.text.includes(modelLabel(name)), `the chat's fact sheet must name ${modelLabel(name)}`);
 });
 
 test("pickModel takes the fastest accurate setting and breaks speed ties on cost", async () => {

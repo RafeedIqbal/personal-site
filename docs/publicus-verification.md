@@ -127,3 +127,10 @@ After the chat went live, `gemini-4-hydrogen` took 40–70 seconds per chat answ
 - 3.7 and 3.8 Flash each had one 503 error.
 
 **Picks.** Gemini 3.5 Flash at minimal thinking was 0.07 s faster on chat, but that is inside the 10% tie window. Google publishes no price for it, so the tie went to 3.6 Flash. The picks were written to `_shared/models.ts`, and `pickModel()` re-derives them in `npm run test:publicus`. The new figure under the explorer passed the UI suite (20/20) with axe and with no horizontal overflow at 320, 390 and 1440 px.
+
+**Override.** After reviewing the results, Rafeed chose Gemini 3.8 Flash at low thinking for both paths. It is the newest Flash model, and the differences from 3.6 Flash are small:
+- Chat: 96% against 100%, at a 2.8 s median against 1.4 s. 3.8 Flash's one miss was a 503 from Google, not a wrong answer.
+- Explorer: 100% for both, at 3.4 s against 2.1 s.
+- Cost per 1,000 answers: $3.22 against $3.16 for the chat, and $1.26 against $1.40 for the explorer.
+
+`CHOICE` in `_shared/models.ts` records the override. The eval's own picks stay in `EVAL_CHAT` and `EVAL_DEMO`. The page marks 3.8 Flash "In use" and 3.6 Flash "Eval pick". The hosted `GEMINI_MODEL` secret was removed, so the code's choice applies.
