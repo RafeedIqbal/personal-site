@@ -2,7 +2,7 @@ import Papa from "papaparse";
 import { extractText, getDocumentProxy } from "unpdf";
 import { admin, hash, HttpError, json, purgeWorkspace, readBounded } from "../_shared/server.ts";
 import { CONNECTORS, csvPrefix } from "../_shared/connectors.ts";
-import { ask, extractionSchema, generate } from "../_shared/gemini.ts";
+import { ask, extractionPrompt, extractionSchema, generate } from "../_shared/gemini.ts";
 import { contracts, inferMapping, inferTags, normalize, normalizeCsvRow, safeUrl, sourceDate } from "../_shared/domain.ts";
 import type { Answer, ColumnMapping, ProcurementRecord, RecordKind, Source, Workspace } from "../_shared/domain.ts";
 
@@ -71,7 +71,7 @@ async function process(job: Job) {
       } else text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
       if (!text.trim() || text.length > 120_000) throw new Error("Documents need readable text and must be under 120,000 characters.");
       const source: Source = { id: `upload-${checksum.slice(0, 24)}`, name, origin: "upload", format: path.endsWith(".pdf") ? "pdf" : "text", capturedAt: new Date().toISOString(), text, pages, checksum, storagePath: path };
-      const value = await generate(data.owner_id, JSON.stringify({ task: "Extract one procurement notice or contract. Return empty strings or null when absent. Keep dates as ISO 8601 with their stated offset; never guess an unstated date. amount is an award value, totalValue is the cumulative total only if explicitly stated. Requirements need verbatim quotes. If not a procurement document return an empty title.", text }), extractionSchema) as Record<string, unknown>;
+      const value = await generate(data.owner_id, extractionPrompt(text), extractionSchema) as Record<string, unknown>;
       const get = (field: string, limit = 1000) => typeof value[field] === "string" ? (value[field] as string).slice(0, limit) : "";
       if (!get("title")) throw new Error("No procurement notice was identified. Nothing was added.");
       const amount = (field: string) => typeof value[field] === "number" && Number.isFinite(value[field]) ? value[field] as number : null;

@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import DemoLoader from "@/components/publicus/DemoLoader";
 import HelpChat from "@/components/publicus/HelpChat";
+import ModelEvals from "@/components/publicus/ModelEvals";
+import { CHAT, DEMO, modelLabel } from "@/supabase/functions/_shared/models";
 import RecordSheet from "@/components/publicus/RecordSheet";
 
 const resume = "/publicus/Rafeed_Iqbal_Publicus_Resume.pdf";
@@ -129,9 +131,10 @@ export default function PublicusPage() {
             <ol className="pu-path" aria-label="Request path"><li>browser</li><li>publicus-api</li><li>Postgres job queue</li><li>publicus-worker</li><li>Gemini</li></ol>
             <p>An Edge Function checks each request and queues the job in Postgres. A worker claims it with a two-minute lease, tries it up to three times, and saves the result only while its lease holds. Gemini reads uploaded PDFs and answers questions, and each quote it cites is checked against the source text. A claim whose quote doesn’t match is marked for review.</p>
           </dd></div>
-          <div><dt>Stack</dt><dd><p>Next.js 16, React 19 and TypeScript on Vercel. Supabase for Postgres 17, Edge Functions on Deno, anonymous auth, storage and pg_cron. Google Gemini, Papa Parse for CSV and unpdf for PDF text. The help chat in the corner runs on the same functions and answers only from a fact sheet built from this page and my résumé.</p></dd></div>
+          <div><dt>Stack</dt><dd><p>Next.js 16, React 19 and TypeScript on Vercel. Supabase for Postgres 17, Edge Functions on Deno, anonymous auth, storage and pg_cron. Google Gemini, Papa Parse for CSV and unpdf for PDF text. The help chat in the corner runs on the same functions and answers only from a fact sheet built from this page and my résumé. {CHAT.model === DEMO.model ? `${modelLabel(CHAT.model)} answers the chat and the explorer’s questions and PDFs` : `${modelLabel(CHAT.model)} answers the chat and ${modelLabel(DEMO.model)} handles the explorer’s questions and PDFs`}, picked by the <a href="#models">model eval below the explorer</a>.</p></dd></div>
         </dl>
         <DemoLoader/>
+        <ModelEvals/>
       </section>
 
       <section id="approach" className="pu-section pu-container" aria-labelledby="approach-title">

@@ -42,6 +42,7 @@
     "supabase/functions/publicus-api",
     "supabase/functions/publicus-worker",
     "supabase/functions/publicus-chat",
+    "supabase/functions/evals",
     "supabase/functions/tests",
     "supabase/functions/_shared/server.ts",
     "supabase/functions/_shared/gemini.ts"

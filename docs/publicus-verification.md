@@ -103,3 +103,27 @@ A three-row note above the explorer now covers how it works, its architecture an
   - On phones the panel is a full-screen sheet, and a source chip closes the sheet and moves to its section.
 - `impeccable detect` reported only advisory type-ramp and colour notes. The same kind of notes exist on `main`.
 - Live Gemini answers are verified only after `publicus-chat` is deployed to the hosted project.
+
+## Model eval — 15 November 2026
+
+After the chat went live, `gemini-4-hydrogen` took 40–70 seconds per chat answer on the free key, and explorer questions hit the worker's 60-second timeout. With the paid key, `npm run eval:publicus` ran 14 chat cases and 6 explorer cases (3 questions, 3 document extractions), twice each, against every current Gemini text model. That was 560 scored calls across 14 model and thinking settings. Gemini Omni 1.2 Flash rejected text requests at both thinking levels and isn't scored. Every check is deterministic; the raw calls are in the ignored `output/evals/`.
+
+**Results.** Accuracy, then median and p90 time, then cost per 1,000 answers at list price. "Not published" means Google lists no price for that model.
+
+| Setting | Chat | Explorer |
+|---|---|---|
+| Gemini 3.6 Flash, minimal (chosen for both) | 100%, 1.4 s / 1.8 s, $3.16 | 100%, 2.1 s / 2.6 s, $1.40 |
+| Gemini 3.5 Flash, minimal | 100%, 1.3 s / 2.0 s, not published | 92%, 2.0 s / 2.8 s, not published |
+| Gemini 3.5 Flash, low | 100%, 2.3 s / 3.3 s, not published | 100%, 2.0 s / 2.6 s, not published |
+| Gemini 3.8 Flash, low | 96%, 2.8 s / 4.1 s, $3.22 | 100%, 3.4 s / 4.1 s, $1.26 |
+| Gemini 4 Hydrogen, low (previous model) | 100%, 3.8 s / 9.0 s, $9.23 | 100%, 4.8 s / 7.3 s, $7.22 |
+| Gemini 4 Argon, low | 100%, 7.1 s / 52 s, $9.40 | 100%, 7.5 s / 12 s, $5.29 |
+| Gemini 3.1 Pro Preview, low | 89%, 8.6 s / 16 s, $18.01 | 100%, 6.6 s / 8.1 s, $9.56 |
+| Flash Lite models (3.5 and 3.1) | 86–89% | 83% |
+
+**Common failures.**
+- Flash Lite models left out figures, the $1,073,002.14 contract amount and the conflicting totals.
+- Most models misread an amendment as an award when extracting a document.
+- 3.7 and 3.8 Flash each had one 503 error.
+
+**Picks.** Gemini 3.5 Flash at minimal thinking was 0.07 s faster on chat, but that is inside the 10% tie window. Google publishes no price for it, so the tie went to 3.6 Flash. The picks were written to `_shared/models.ts`, and `pickModel()` re-derives them in `npm run test:publicus`. The new figure under the explorer passed the UI suite (20/20) with axe and with no horizontal overflow at 320, 390 and 1440 px.

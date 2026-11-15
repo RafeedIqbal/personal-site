@@ -16,6 +16,21 @@ test("the explorer blurb covers how it works, the architecture and the stack", a
   await expect(page.locator("#explorer-title + p")).toContainText("the qualification checks, flags and explanations change with it");
 });
 
+test("the model eval shows both result tables with one chosen setting each", async ({ page }) => {
+  await page.goto("/publicus");
+  const figure = page.locator("figure#models");
+  await expect(figure.getByRole("heading", { level: 3 })).toContainText("runs the chat");
+  const tables = figure.getByRole("table");
+  await expect(tables).toHaveCount(2);
+  for (const table of await tables.all()) {
+    expect(await table.locator("tbody tr").count()).toBeGreaterThanOrEqual(5);
+    await expect(table.locator("tbody tr.is-chosen")).toHaveCount(1);
+    await expect(table.locator("tbody tr.is-chosen")).toContainText("Chosen");
+  }
+  await expect(page.locator("#explorer .pu-build").getByRole("link", { name: "model eval below the explorer" })).toHaveAttribute("href", "#models");
+  await checkAccessibility(page);
+});
+
 test("the help chat answers suggested questions without a backend and returns focus", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

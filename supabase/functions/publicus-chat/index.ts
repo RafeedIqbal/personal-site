@@ -1,5 +1,5 @@
 import { body, cors, HttpError, identity, json } from "../_shared/server.ts";
-import { chatQuota, generate } from "../_shared/gemini.ts";
+import { chatQuota, chatSetting, generate } from "../_shared/gemini.ts";
 import { buildChatPrompt, CHAT_SYSTEM, chatSchema, parseReply, readChatRequest } from "../_shared/assistant.ts";
 
 // Answers help-chat questions from the fixed fact sheet in _shared/assistant.ts. Synchronous:
@@ -12,7 +12,7 @@ Deno.serve(async (request: Request) => {
     const user = await identity(request), input = await body(request, 16_000);
     let parsed;
     try { parsed = readChatRequest(input); } catch (error) { throw new HttpError(400, error instanceof Error ? error.message : "Invalid question."); }
-    const result = await generate(user.id, buildChatPrompt(parsed.question, parsed.history, parsed.context), chatSchema, { system: CHAT_SYSTEM, quota: chatQuota(user.id), maxTokens: 1200 });
+    const result = await generate(user.id, buildChatPrompt(parsed.question, parsed.history, parsed.context), chatSchema, { system: CHAT_SYSTEM, quota: chatQuota(user.id), ...chatSetting(), maxTokens: 2000 });
     return json(parseReply(result), headers);
   } catch (error) {
     const known = error instanceof HttpError;

@@ -344,6 +344,14 @@ One record's CSV fields as published. A heading ("Row NN, as published") with th
 ### Build Notes
 A ruled definition list under the explorer's section lede, saying how the explorer works, its architecture and its stack. Terms sit in a 9rem column in 13px Ash Violet, values in 15px ink up to 66ch, with a Hairline above and between rows; below 760px each term stacks over its value. The architecture row opens with the request path as an ordered list in Chivo Mono (each step is an identifier), joined by Ash Violet arrows that screen readers skip.
 
+### Model Evals
+A figure under the explorer, `#models`, with a 1.375–1.875rem semi-condensed heading that states the two picks, a 66ch lede in Graphite Violet, two ruled results tables and a 14px caption. Each table has a caption, a Publicus purple header row and one row per model setting, sorted fastest first, with even rows on Band.
+- **Accuracy:** an 8px bar from zero on a Hairline track, Ash Violet for most rows and Ink for the chosen one, with the percentage in Chivo Mono under it.
+- **Response time:** an 8px square at the median and a 2px line to the 90th percentile, on a log scale from 1 to 90 seconds, over 1px Hairline ticks that line up with the mono tick labels in the purple header. The figures sit under it in mono.
+- **Cost per 1,000 answers:** right-aligned mono dollars, or "Not published" in Ash Violet.
+- **Chosen row:** Active Row tint and a solid ink "Chosen" label beside the model name. No purple or highlighter in the data.
+- **Phones:** the tables stack like the records table, under a 6px purple band, as label and value pairs; the time track is dropped and the figures stay.
+
 ### Help Chat
 A fixed ink launcher, "Ask a question", 48px tall (44px on phones), at the bottom right of every viewport. It renders only after hydration, and the panel's code loads on first open.
 - **Panel:** square and flat, with a 1px Ink border on white. It is 400 by 640px at most, 24px from the corner, and non-modal, so the explorer stays usable beside it. Below 760px it is a full-screen modal sheet with the explorer dialog's 50% ink backdrop. It opens with the route's one clip reveal.

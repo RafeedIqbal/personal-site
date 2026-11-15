@@ -6,6 +6,7 @@ import { EDUCATION, EXPERIENCE, PROFILE } from "../lib/content.ts";
 
 const page = readFileSync(new URL("../app/publicus/page.tsx", import.meta.url), "utf8");
 const sheet = readFileSync(new URL("../components/publicus/RecordSheet.tsx", import.meta.url), "utf8");
+const evalsFigure = readFileSync(new URL("../components/publicus/ModelEvals.tsx", import.meta.url), "utf8");
 const MONTHS = { Jan: "January", Feb: "February", Mar: "March", Apr: "April", May: "May", Jun: "June", Jul: "July", Aug: "August", Sep: "September", Oct: "October", Nov: "November", Dec: "December" };
 
 test("every fact points at a real place on the page or the résumé", () => {
@@ -15,7 +16,7 @@ test("every fact points at a real place on the page or the résumé", () => {
     if (fact.href === RESUME_HREF) continue;
     const id = fact.href.slice(1);
     if (/^cb-\d\d$/.test(id)) assert.match(sheet, /id=\{`cb-\$\{n\}`\}/, `${fact.id} needs the record anchors`);
-    else assert.ok(page.includes(`id="${id}"`) || sheet.includes(`id="${id}"`), `${fact.id} points at missing #${id}`);
+    else assert.ok([page, sheet, evalsFigure].some((file) => file.includes(`id="${id}"`)), `${fact.id} points at missing #${id}`);
   }
   assert.ok(existsSync(new URL(`../public${RESUME_HREF}`, import.meta.url)), "the résumé PDF must exist");
   assert.equal(CONTACT_EMAIL, PROFILE.email);
@@ -76,4 +77,34 @@ test("the explorer view is re-read and capped before it reaches the model", () =
   assert.equal(context.selected.match.regionFits, false, "only a real boolean counts as true");
   assert.equal("extra" in context, false);
   assert.ok(JSON.stringify(context).length <= CHAT_LIMITS.contextChars);
+});
+
+test("the model eval summary is complete and its picks follow the published rule", async () => {
+  const { CHAT, DEMO, pickModel, modelLabel } = await import("../supabase/functions/_shared/models.ts");
+  const evals = JSON.parse(readFileSync(new URL("../lib/publicus/model-evals.json", import.meta.url), "utf8"));
+  for (const task of ["chat", "demo"]) {
+    assert.ok(evals.tasks[task].length >= 5, `${task} should cover the current models`);
+    for (const r of evals.tasks[task]) {
+      assert.ok(r.accuracy >= 0 && r.accuracy <= 1 && r.errorRate >= 0 && r.errorRate <= 1 && r.calls > 0);
+      assert.ok(r.medianMs === null || (r.medianMs > 0 && r.p90Ms >= r.medianMs));
+      assert.ok(r.costPer1k === null || r.costPer1k >= 0);
+    }
+  }
+  for (const [task, pick] of [["chat", CHAT], ["demo", DEMO]]) {
+    const chosen = pickModel(evals.tasks[task]);
+    assert.deepEqual({ model: chosen.model, thinking: chosen.thinking }, evals.picks[task]);
+    assert.deepEqual({ model: pick.model, thinking: pick.thinking }, evals.picks[task], `models.ts ${task} pick is stale; rerun npm run eval:publicus`);
+  }
+  const fact = KNOWLEDGE.find((f) => f.id === "models");
+  assert.ok(fact && fact.text.includes(modelLabel(CHAT.model)) && fact.text.includes(modelLabel(DEMO.model)), "the chat's fact sheet must name both picks");
+});
+
+test("pickModel takes the fastest accurate setting and breaks speed ties on cost", async () => {
+  const { pickModel } = await import("../supabase/functions/_shared/models.ts");
+  const r = (model, accuracy, medianMs, costPer1k, errorRate = 0) => ({ model, thinking: "low", accuracy, medianMs, p90Ms: medianMs, errorRate, costPer1k, calls: 10 });
+  assert.equal(pickModel([r("slow-best", 1, 9000, 5), r("fast-close", 0.96, 2000, 3), r("fast-poor", 0.8, 1000, 1)]).model, "fast-close");
+  assert.equal(pickModel([r("a", 1, 2000, 4), r("b", 1, 2150, 1)]).model, "b", "within 10% counts as a tie");
+  assert.equal(pickModel([r("a", 1, 2000, null), r("b", 1, 2100, 2)]).model, "b", "an unpublished price never wins a tie");
+  assert.equal(pickModel([r("flaky", 1, 1000, 1, 0.2), r("steady", 0.98, 3000, 1)]).model, "steady", "too many failed calls disqualify");
+  assert.equal(pickModel([r("none", 1, null, 1, 1)]), undefined);
 });
