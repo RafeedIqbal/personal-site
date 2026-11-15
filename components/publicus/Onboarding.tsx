@@ -28,8 +28,10 @@ export default function Onboarding({ workspace, setup, finish, skip, cancel }: P
   const [step, setStep] = useState(0);
   const [role, setRole] = useState<Role>(setup?.role ?? "vendor");
   // A first setup starts blank so the preview visibly fills in; a later one starts from the current profile.
+  // Its capabilities are the ones ticked by hand; the description's suggestions are added on top below.
   const [profile, setProfile] = useState<Profile>(setup ? workspace.profile : BLANK_PROFILE);
   const [description, setDescription] = useState("");
+  // Suggestions the visitor unticked. Each one lasts only while the description still names it.
   const [dismissed, setDismissed] = useState<string[]>([]);
   const [buyer, setBuyer] = useState(setup?.buyer ?? "");
   const [watch, setWatch] = useState<string[]>(setup?.watch ?? ALL_FLAGS);
@@ -40,10 +42,13 @@ export default function Onboarding({ workspace, setup, finish, skip, cancel }: P
   useEffect(() => { if (moved.current) heading.current?.focus(); }, [step]);
 
   const sample = useMemo(() => workspace.records.filter((record) => record.origin === "sample"), [workspace.records]);
-  const matches = useMemo(() => vendorPreview(sample, profile, workspace.asOf), [sample, profile, workspace.asOf]);
+  // The ticks follow the description as it's typed or deleted, so they're derived rather than stored.
+  const inferred = useMemo(() => capabilitiesFromText(description), [description]);
+  const suggested = useMemo(() => inferred.filter((capability) => !dismissed.includes(capability)), [inferred, dismissed]);
+  const chosen = useMemo(() => ({ ...profile, capabilities: [...new Set([...profile.capabilities, ...suggested])] }), [profile, suggested]);
+  const matches = useMemo(() => vendorPreview(sample, chosen, workspace.asOf), [sample, chosen, workspace.asOf]);
   const buyers = useMemo(() => buyerOptions(sample, workspace.asOf), [sample, workspace.asOf]);
   const owned = useMemo(() => buyer ? buyerPreview(sample, buyer, watch, workspace.asOf) : [], [sample, buyer, watch, workspace.asOf]);
-  const inferred = capabilitiesFromText(description);
   const total = role === "vendor" ? 3 : 2;
   const presets = [...new Set([...VALUE_PRESETS, profile.maxValue])].sort((a, b) => a - b);
   const sampleName = workspace.profile.name === DEFAULT_PROFILE.name ? `${workspace.profile.name}, the sample company` : workspace.profile.name;
@@ -52,27 +57,27 @@ export default function Onboarding({ workspace, setup, finish, skip, cancel }: P
   function choose(next: Role) { setRole(next); go(1); }
   function describe(text: string) {
     setDescription(text);
-    const picked = capabilitiesFromText(text).filter((capability) => !dismissed.includes(capability) && !profile.capabilities.includes(capability));
-    if (picked.length) setProfile({ ...profile, capabilities: [...profile.capabilities, ...picked] });
+    // Deleting the words behind an unticked suggestion forgets the untick, so typing them again ticks it.
+    const named = capabilitiesFromText(text);
+    setDismissed(dismissed.filter((capability) => named.includes(capability)));
   }
   function toggle(key: "capabilities" | "regions" | "qualifications", value: string) {
-    const has = profile[key].includes(value);
-    // Unticking a capability the description suggested keeps it unticked while the visitor types.
-    if (key === "capabilities" && has) setDismissed([...dismissed, value]);
+    const has = chosen[key].includes(value);
+    if (key === "capabilities") setDismissed(has && inferred.includes(value) ? [...dismissed, value] : dismissed.filter((item) => item !== value));
     setProfile({ ...profile, [key]: has ? profile[key].filter((item) => item !== value) : [...profile[key], value] });
   }
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (role === "vendor" && step === 1 && !profile.name.trim()) return setError("Enter your company’s name.");
-    if (role === "vendor" && step === 1 && !profile.capabilities.length) return setError("Pick at least one thing your company delivers.");
-    if (role === "vendor" && step === 2 && !profile.regions.length) return setError("Pick at least one region you deliver in.");
+    if (role === "vendor" && step === 1 && !chosen.name.trim()) return setError("Enter your company’s name.");
+    if (role === "vendor" && step === 1 && !chosen.capabilities.length) return setError("Pick at least one thing your company delivers.");
+    if (role === "vendor" && step === 2 && !chosen.regions.length) return setError("Pick at least one region you deliver in.");
     if (role === "buyer" && step === 1 && !buyer) return setError("Choose an organisation.");
     if (step < total) return go(step + 1);
-    if (role === "vendor") finish({ role, watch: setup?.watch ?? ALL_FLAGS }, { ...profile, name: profile.name.trim() });
+    if (role === "vendor") finish({ role, watch: setup?.watch ?? ALL_FLAGS }, { ...chosen, name: chosen.name.trim() });
     else finish({ role, buyer, watch });
   }
 
-  const chip = (key: "capabilities" | "regions" | "qualifications", value: string) => <label key={value} className="px-chip"><input type="checkbox" checked={profile[key].includes(value)} onChange={() => toggle(key, value)}/>{value}</label>;
+  const chip = (key: "capabilities" | "regions" | "qualifications", value: string) => <label key={value} className="px-chip"><input type="checkbox" checked={chosen[key].includes(value)} onChange={() => toggle(key, value)}/>{value}</label>;
   const headingProps = { ref: heading, tabIndex: -1, id: `${id}-title` };
 
   return <section className="px-setup" aria-labelledby={`${id}-title`}>
@@ -93,7 +98,7 @@ export default function Onboarding({ workspace, setup, finish, skip, cancel }: P
           <p className="px-setup-lede">Tenders are ranked by how well they fit what you deliver. The preview updates as you answer.</p>
           <label className="px-setup-field">Company name<input value={profile.name} maxLength={100} autoComplete="organization" aria-invalid={error.startsWith("Enter") || undefined} onChange={(event) => setProfile({ ...profile, name: event.target.value })}/></label>
           <label className="px-setup-field">What does your company do? (optional)<textarea rows={2} maxLength={280} placeholder="We move municipal systems to the cloud and build analytics dashboards." value={description} onChange={(event) => describe(event.target.value)}/></label>
-          <p className="px-setup-hint" aria-live="polite">{description.trim() ? inferred.length ? `Picked from your description: ${inferred.join(", ")}.` : "Nothing recognised yet. Tick what fits below." : ""}</p>
+          <p className="px-setup-hint" aria-live="polite">{description.trim() ? suggested.length ? `Ticked from your description: ${suggested.join(", ")}.` : inferred.length ? "You unticked what your description suggested." : "Nothing recognised yet. Tick what fits below." : ""}</p>
           <fieldset><legend>What you deliver</legend><div className="px-chips">{CAPABILITIES.map((value) => chip("capabilities", value))}</div></fieldset>
         </>}
         {role === "vendor" && step === 2 && <>

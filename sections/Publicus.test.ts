@@ -197,8 +197,23 @@ test("a vendor setup ranks the sample for that company, then the tour walks thro
   await shell.getByRole("button", { name: "Continue" }).click();
   await expect(shell.getByRole("alert")).toHaveText("Enter your company’s name.");
   await shell.getByLabel("Company name").fill("Harbour Data Co");
-  await shell.getByLabel("What does your company do? (optional)").fill("We run data analytics for city councils.");
-  await expect(shell.getByRole("checkbox", { name: "Data platforms" })).toBeChecked();
+  const description = shell.getByLabel("What does your company do? (optional)");
+  const data = shell.getByRole("checkbox", { name: "Data platforms" });
+  await description.fill("We run data analytics for city councils.");
+  await expect(data).toBeChecked();
+  // The ticks follow the description both ways: deleting the words unticks what they suggested.
+  await description.fill("We run");
+  await expect(data).not.toBeChecked();
+  await description.fill("We run data analytics for city councils.");
+  await expect(data).toBeChecked();
+  // A suggestion the visitor unticks stays unticked while they keep typing, and a hand tick stays put.
+  await data.uncheck();
+  await description.fill("We run data analytics and dashboards for city councils.");
+  await expect(data).not.toBeChecked();
+  await expect(shell.locator(".px-setup-hint")).toHaveText("You unticked what your description suggested.");
+  await data.check();
+  await description.fill("");
+  await expect(data).toBeChecked();
   await expect(shell.locator(".px-preview .px-list-heading")).toContainText("Harbour Data Co");
   await shell.getByRole("checkbox", { name: "Software development" }).check();
   await shell.getByRole("button", { name: "Continue" }).click();
@@ -316,6 +331,26 @@ for (const width of [320, 390, 1440]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
   });
 }
+
+test("the page stays still while the tour moves between steps", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/publicus");
+  const shell = await openExplorer(page);
+  await shell.getByRole("button", { name: /Skip and explore/ }).click();
+  const card = page.locator(".px-tour-card");
+  await expect(card).toContainText("1 of 8");
+  // The tour frames the explorer once, sized to fit the window, and every later step happens inside it.
+  await expect.poll(() => shell.evaluate((node) => { const box = node.getBoundingClientRect(); return box.top >= 0 && box.bottom <= innerHeight; })).toBe(true);
+  const y = await page.evaluate(() => scrollY);
+  for (let step = 2; step <= 8; step++) {
+    await card.getByRole("button", { name: "Next" }).click();
+    await expect(card).toContainText(`${step} of 8`);
+    expect(await page.evaluate(() => scrollY)).toBe(y);
+  }
+  await expect(shell.getByRole("tab", { name: "For vendors" })).toHaveAttribute("aria-selected", "true");
+  await card.getByRole("button", { name: "Finish" }).click();
+  await expect(shell.locator(".px-record-list")).toHaveCSS("height", "830px");
+});
 
 test("the tour's spotlight stays on its target in full screen", async ({ page }) => {
   await page.goto("/publicus");

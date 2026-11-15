@@ -181,3 +181,16 @@ Finishing setup starts an eight-step tour that dims the explorer, cuts out the c
 
 - `npm run test:publicus` adds `scripts/publicus-onboarding.test.mjs`: capability suggestions, the preview matching `matchRecord`, buyer options, the watch list covering every flag `contracts()` raises, stored-setup validation, the supplier's other buyers and both tours' steps.
 - The UI suite adds setup, vendor and buyer flows, try-it steps, replay and reset, focus on each tour step, full-screen alignment, axe checks on the setup screen and an open step, and no overflow at 320, 390 and 1440 px.
+
+## Live capability ticks and a still page during the tour — 16 November 2026
+
+- **Capability ticks:** they now follow the company description as it's typed or deleted. Ticks made by hand are kept apart from the description's suggestions. A suggestion the visitor unticks stays off only while the description still names it. The hint lists only what is actually ticked.
+- **Page scrolling:** the tour no longer scrolls the page on every step. From 760px up, the list and detail panes shrink to whatever height makes the whole explorer fit the window. The page is framed once, and each step reveals its control by scrolling inside a pane. The data-problem step returns to the role's own view, so the bottom bar stays on screen.
+- **Phones:** below 760px the explorer can't fit beside the docked card, so the page still moves when a step's control is off screen.
+- **Checks:**
+  - lint and typecheck;
+  - `npm run test:publicus` (36), which now also checks each tour's data-problem view;
+  - `npm run test:dependencies` (9);
+  - `npm run test:ui` (41), with new assertions for unticking by deleting text and a test that `scrollY` doesn't change across all 8 steps at 1280 × 720;
+  - the Publicus UI file repeated 3 times (63/63);
+  - a headless run at 1440 × 900, 1280 × 720 and 1024 × 768, where `scrollY` stayed at one value for every step and screenshots showed the ring on each control.

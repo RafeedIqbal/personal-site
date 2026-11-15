@@ -42,7 +42,8 @@ export const VENDOR_TOUR: TourStep[] = [
   { id: "pipeline", target: "next-step", view: "vendor", pane: "detail", placement: "left", title: "Keep track of what you’ll pursue", body: "Give an opportunity a pipeline stage and notes. Export brief, above the list, downloads your saved opportunities as a Markdown brief." },
   { id: "government", target: "list", view: "government", pane: "list", placement: "right", title: "The buyer’s side", body: "For government groups awarded contracts across their amendments and flags the ones that need a look: values that jumped, terms that are ending and totals that disagree." },
   { id: "sources", target: "sources", view: "sources", placement: "bottom", title: "Bring real data", body: "Load ten CanadaBuys records exactly as published, import a CSV of your own, or start a private workspace for the live feed and PDF reading." },
-  scenario,
+  // Back on the home view, where the bottom bar is on screen and the checks visibly change.
+  { ...scenario, view: "vendor" },
   setup,
 ];
 
@@ -53,7 +54,7 @@ export const BUYER_TOUR: TourStep[] = [
   { id: "suppliers", target: "suppliers", view: "government", pane: "detail", placement: "left", title: "Who you depend on", body: "Each supplier’s share of reported value in this dataset, and the other buyers that hold contracts with this contract’s supplier." },
   { ...explain("Explain these changes"), view: "government" },
   { id: "vendor", target: "list", view: "vendor", pane: "list", placement: "right", title: "The vendor’s side", body: ({ company }) => `For vendors ranks open tenders against a company profile, here ${company}. Tenders your organisation published are marked Your tender.` },
-  scenario,
+  { ...scenario, view: "government" },
   setup,
 ];
 

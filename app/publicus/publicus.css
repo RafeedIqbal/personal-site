@@ -466,6 +466,12 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .px-tour-card.is-docked { inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px; width: auto; max-height: 50dvh; overflow: auto; }
 .px-tour-card.is-paused { display: none !important; }
 .px-tour-card.is-away { visibility: hidden; }
+/* During the tour on a wide screen the panes take the height the tour measures (--px-fit), so the whole
+   explorer fits the window and the page stays still between steps. */
+@media (min-width: 760px) {
+  .px-shell.is-touring .px-master-detail { min-height: 0; }
+  .px-shell.is-touring .px-record-list, .px-shell.is-touring .px-detail { height: var(--px-fit, 830px); max-height: none; min-height: 0; }
+}
 .px-tour-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .px-tour-count { font-family: var(--data); font-size: 12px; color: var(--ink-3); }
 .px-tour-card h3 { margin-top: 10px; font-size: 19px; line-height: 1.25; }

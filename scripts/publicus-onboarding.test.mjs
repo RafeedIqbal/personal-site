@@ -74,6 +74,8 @@ test("both tours cover the same ground, and every step reads on its own", () => 
     assert.equal(steps.length, 8);
     assert.deepEqual(steps.slice(-2).map((s) => s.id), ["scenario", "setup"]);
     assert.ok(steps.some((s) => s.advanceOn === "explain"));
+    // The data-problem step goes back to the role's own view, where the bottom bar fits on screen.
+    assert.equal(steps.find((s) => s.id === "scenario").view, steps[0].view);
     for (const step of steps) {
       assert.ok(tourText(step.title, { company: "Maple Systems", buyer: "Town of Cedar Bay" }).length > 5);
       assert.ok(tourText(step.body, { company: "Maple Systems", buyer: "Town of Cedar Bay" }).endsWith("."));

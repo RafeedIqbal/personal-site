@@ -6,8 +6,41 @@ import { tourText, type TourContext, type TourStep } from "@/lib/publicus/tour";
 type Box = { top: number; left: number; width: number; height: number };
 type Layout = { hole: Box | null; card: { top: number; left: number } | null; docked: boolean; away: boolean; size: { width: number; height: number } };
 type Side = "right" | "left" | "top" | "bottom";
-const GAP = 12, PAD = 6, EDGE = 12, PHONE = 760;
+const GAP = 12, PAD = 6, EDGE = 12, PHONE = 760, MIN_PANE = 240, MARGIN = 16;
 const opposite: Record<Side, Side> = { right: "left", left: "right", top: "bottom", bottom: "top" };
+
+// On a wide screen the tour shrinks the list and detail panes until the whole explorer fits the window,
+// so every step is on screen at once and the page never has to move. Phones can't fit it.
+function fit(shellNode: HTMLElement) {
+  const panes = shellNode.querySelector<HTMLElement>(".px-master-detail");
+  const top = shellNode.querySelector(".px-topbar"), bottom = shellNode.querySelector(".px-bottom");
+  if (window.innerWidth < PHONE || !panes || !top || !bottom) return;
+  // Measured from the content rather than the shell, which is the full screen's height in full screen.
+  const chrome = bottom.getBoundingClientRect().bottom - top.getBoundingClientRect().top - panes.offsetHeight + shellNode.offsetHeight - shellNode.clientHeight;
+  const height = `${Math.max(MIN_PANE, Math.floor(window.innerHeight - chrome - EDGE * 2))}px`;
+  if (shellNode.style.getPropertyValue("--px-fit") !== height) shellNode.style.setProperty("--px-fit", height);
+}
+// Scrolls the explorer's own panes, never the page, until the target is in view.
+function reveal(target: HTMLElement, shellNode: HTMLElement) {
+  for (let node: HTMLElement | null = target.parentElement; node; node = node === shellNode ? null : node.parentElement) {
+    if (!/auto|scroll/.test(getComputedStyle(node).overflowY) || node.scrollHeight <= node.clientHeight) continue;
+    const inner = node.getBoundingClientRect().top + node.clientTop, box = target.getBoundingClientRect();
+    if (box.top < inner || box.bottom > inner + node.clientHeight) node.scrollTop += box.top - inner - MARGIN;
+  }
+}
+// The page moves only when the explorer doesn't fit the window: once to frame it, or, on phones and short
+// screens, as little as the step needs. On phones the card covers the lower half, so the target goes on top.
+function settle(shellNode: HTMLElement, target: HTMLElement | null) {
+  const vh = window.innerHeight, frame = shellNode.getBoundingClientRect();
+  if (window.innerWidth >= PHONE && frame.height <= vh) {
+    if (frame.top < 0 || frame.bottom > vh) window.scrollBy({ top: frame.top - Math.max(0, (vh - frame.height) / 2) });
+    return;
+  }
+  const box = target?.getBoundingClientRect();
+  if (!target || !box) return;
+  if (window.innerWidth < PHONE) { if (box.top < 0 || box.top > vh * 0.4) target.scrollIntoView({ block: "start" }); }
+  else if (box.top < 0 || box.bottom > vh) target.scrollIntoView({ block: "nearest" });
+}
 
 function find(shell: HTMLElement, target: string) {
   const element = shell.querySelector<HTMLElement>(`[data-tour="${target}"]`);
@@ -71,18 +104,21 @@ export default function Tour({ shell, steps, index, context, paused, next, back,
     const node = card.current;
     if (node && "showPopover" in node && !node.matches(":popover-open")) node.showPopover();
   }, []);
-  // Each step brings its target into view and moves focus to the card's heading.
+  // The panes go back to their usual height when the tour ends.
+  useEffect(() => { const node = shell.current; return () => { node?.style.removeProperty("--px-fit"); }; }, [shell]);
+  // Each step brings its target into view inside the explorer and moves focus to the card's heading.
   useLayoutEffect(() => {
     const shellNode = shell.current;
     if (!shellNode) return;
+    fit(shellNode);
     const target = find(shellNode, step.target);
-    if (target) target.scrollIntoView({ block: window.innerWidth < PHONE || target.getBoundingClientRect().height > window.innerHeight * 0.6 ? "start" : "center", inline: "nearest" });
-    else shellNode.scrollIntoView({ block: "nearest" });
+    if (target) reveal(target, shellNode);
+    settle(shellNode, target);
     heading.current?.focus({ preventScroll: true });
   }, [index, shell, step.target]);
   useEffect(() => {
     if (paused) return;
-    const measure = () => { if (shell.current && card.current) setLayout(placement(shell.current, card.current, step.target, step.placement)); };
+    const measure = () => { if (!shell.current || !card.current) return; fit(shell.current); setLayout(placement(shell.current, card.current, step.target, step.placement)); };
     let frame = requestAnimationFrame(measure);
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure); };
     const observer = new ResizeObserver(schedule);
