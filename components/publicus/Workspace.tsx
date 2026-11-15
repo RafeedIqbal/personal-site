@@ -6,6 +6,7 @@ import { CAPABILITIES, CSV_FIELDS, LIMITS, QUALIFICATIONS, REGIONS, contracts, d
 import type { Answer, Citation, ColumnMapping, ProcurementRecord, Profile, Run, Source, Stage, Workspace as WorkspaceData } from "@/supabase/functions/_shared/domain";
 import { applyScenario, initialWorkspace, preparedAnswer, PUBLIC_SNAPSHOT, SCENARIOS } from "@/lib/publicus/seed";
 import { api, backendConfigured, connectWorkspace, downloadText, readWorkspace, upload, type Session } from "@/lib/publicus/client";
+import { setExplorerContext } from "@/lib/publicus/explorer-context";
 
 type View = "vendor" | "government" | "sources";
 type Dataset = "sample" | "public" | "upload";
@@ -96,6 +97,22 @@ export default function Workspace() {
   const selectedSource = source && workspace.sources.find((s) => s.id === source.id);
   const latestAnswer = workspace.answers.filter((answer) => answer.recordIds?.includes(selected?.id || "")).at(-1);
   const savedCount = opportunities.filter((r) => workspace.saved[r.id]).length;
+  // Tell the help chat what is on screen; values come from the same rules the panel shows.
+  useEffect(() => {
+    const record = view === "sources" ? undefined : selected;
+    const match = record?.kind === "tender" ? matchRecord(record, workspace.profile, sampleTime(record, workspace)) : undefined;
+    const group = view === "government" ? selectedGroup : undefined;
+    setExplorerContext({
+      view, dataset, scenario: SCENARIOS.find((s) => s.id === workspace.scenario)?.label || workspace.scenario,
+      clock: dataset === "sample" ? dateLabel(workspace.asOf) : "Today", profile: workspace.profile,
+      selected: record && {
+        title: record.title, buyer: record.buyer, kind: record.kind, reference: record.contractId || record.reference, origin: record.origin, region: record.region,
+        closes: record.closingAt ? dateLabel(record.closingAt) : undefined, requirements: record.requirements.map((r) => r.text),
+        match: match && { score: match.score, matched: match.relevant, regionFits: match.geography, valueFits: match.withinBudget, passes: match.canQualify, issues: match.issues },
+        contract: group && { value: money(group.value, record.currency), change: group.change === null ? "Not comparable" : `${group.change >= 0 ? "+" : ""}${group.change.toFixed(0)}%`, amendments: group.amendments, endDate: dateLabel(record.endDate), flags: group.flags, conflicting: group.conflicting, supplier: record.supplier },
+      },
+    });
+  }, [view, dataset, workspace, selected, selectedGroup]);
 
   function update(next: WorkspaceData, persist = true) {
     stateRef.current = next; setWorkspace(next);

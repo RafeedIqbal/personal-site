@@ -33,3 +33,6 @@ verify_jwt = false
 
 [functions.publicus-worker]
 verify_jwt = false
+
+[functions.publicus-chat]
+verify_jwt = false

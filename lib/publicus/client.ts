@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Run, Workspace } from "@/supabase/functions/_shared/domain";
+import type { ExplorerContext, Reply, Turn } from "@/supabase/functions/_shared/assistant";
 import { initialWorkspace } from "./seed";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -29,6 +30,22 @@ export async function api<T>(action: string, payload: Record<string, unknown> = 
     throw new Error(body?.error || "The workspace could not connect. Please retry.");
   }
   return data as T;
+}
+export class ChatError extends Error { constructor(public status: number, message: string) { super(message); } }
+// The help chat shares the explorer's anonymous session, so its daily quota follows the visitor.
+export async function chat(payload: { question: string; history: Turn[]; context?: ExplorerContext }, retryAuth = true): Promise<Reply> {
+  const db = supabase();
+  const { data: auth } = await db.auth.getSession();
+  if (!auth.session) {
+    const { error } = await db.auth.signInAnonymously();
+    if (error) throw new ChatError(503, error.message);
+  }
+  const { data, error } = await db.functions.invoke("publicus-chat", { body: payload });
+  if (!error) return data as Reply;
+  const response = error.context as Response | undefined;
+  if (response?.status === 401 && retryAuth) { await db.auth.signOut({ scope: "local" }); return chat(payload, false); }
+  const body = response && typeof response.json === "function" ? await response.json().catch(() => null) : null;
+  throw new ChatError(response?.status || 503, body?.error || "The chat couldn’t connect.");
 }
 export type Session = { workspace: Workspace; aiEnabled: boolean; workerEnabled: boolean; runs: Run[] };
 export const connectWorkspace = () => api<Session>("bootstrap", { seed: initialWorkspace() });

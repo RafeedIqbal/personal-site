@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import DemoLoader from "@/components/publicus/DemoLoader";
+import HelpChat from "@/components/publicus/HelpChat";
 import RecordSheet from "@/components/publicus/RecordSheet";
 
 const resume = "/publicus/Rafeed_Iqbal_Publicus_Resume.pdf";
@@ -120,8 +121,16 @@ export default function PublicusPage() {
       <section id="explorer" className="pu-section pu-section-wide pu-container" aria-labelledby="explorer-title">
         <div className="pu-section-head">
           <h2 id="explorer-title">A procurement explorer I built for this application</h2>
-          <p>Start in the vendor view, then switch to the buyer view. The scenario menu at the bottom adds a late security requirement, two amendment values that disagree, or a missing source document, and the rankings, qualification checks and explanations change with it.</p>
+          <p>Start in the vendor view, then switch to the buyer view. The scenario menu at the bottom adds a late security requirement, two amendment values that disagree, or a missing source document, and the qualification checks, flags and explanations change with it.</p>
         </div>
+        <dl className="pu-build">
+          <div><dt>How it works</dt><dd><p>Everything you click runs in your browser. Ranking, qualification checks, contract grouping and the prepared explanations come from plain rules in one TypeScript file, with no model involved, and the same file runs in the Node tests and on the server. If you start a private workspace, your copy moves to Supabase, where the live CanadaBuys feed, PDF uploads and open questions run as background jobs.</p></dd></div>
+          <div><dt>Architecture</dt><dd>
+            <ol className="pu-path" aria-label="Request path"><li>browser</li><li>publicus-api</li><li>Postgres job queue</li><li>publicus-worker</li><li>Gemini</li></ol>
+            <p>An Edge Function checks each request and queues the job in Postgres. A worker claims it with a two-minute lease, tries it up to three times, and saves the result only while its lease holds. Gemini reads uploaded PDFs and answers questions, and each quote it cites is checked against the source text. A claim whose quote doesn’t match is marked for review.</p>
+          </dd></div>
+          <div><dt>Stack</dt><dd><p>Next.js 16, React 19 and TypeScript on Vercel. Supabase for Postgres 17, Edge Functions on Deno, anonymous auth, storage and pg_cron. Google Gemini, Papa Parse for CSV and unpdf for PDF text. The help chat in the corner runs on the same functions and answers only from a fact sheet built from this page and my résumé.</p></dd></div>
+        </dl>
         <DemoLoader/>
       </section>
 
@@ -147,5 +156,6 @@ export default function PublicusPage() {
       <p><Link href="/">Rafeed Iqbal</Link>. Written and built in November 2026.</p>
       <p><a href="https://github.com/RafeedIqbal" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://www.linkedin.com/in/rafeediqbal/" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
     </footer>
+    <HelpChat/>
   </>;
 }

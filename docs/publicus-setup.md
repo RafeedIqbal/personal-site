@@ -26,14 +26,14 @@ Open `http://localhost:3001/publicus`. Under **Sources & imports**, select **Sta
 
 1. Create a separate Supabase project for this demo. Enable anonymous sign-ins. Select a region appropriate to your intended users; no residency claim is made by the application.
 2. `supabase link --project-ref YOUR_PROJECT_REF`, then `supabase db push --remote`. Review the migrations before applying them; they create only `publicus_*` tables/functions, a private `publicus-documents` bucket and a cron job.
-3. Deploy `publicus-api` and `publicus-worker` with `supabase functions deploy publicus-api publicus-worker --remote=YOUR_PROJECT_REF`. JWT gateway verification is disabled in the function config because the API verifies the user token with `auth.getUser` itself, and the worker uses a separate secret. Neither endpoint is unauthenticated internally.
+3. Deploy the functions with `supabase functions deploy publicus-api publicus-worker publicus-chat --remote=YOUR_PROJECT_REF`. JWT gateway verification is disabled in the function config because the API and the chat verify the user token with `auth.getUser` themselves, and the worker uses a separate secret. No endpoint is unauthenticated internally.
 4. Set the Edge secrets from the ignored functions environment file with `supabase secrets set --env-file .env.publicus-functions --remote=YOUR_PROJECT_REF`. Supabase supplies its URL and service-role key to the function runtime. Set the website's two public Supabase environment values and rebuild the frontend.
 5. In Supabase Vault create `publicus_worker_url` with `https://YOUR_PROJECT_REF.supabase.co/functions/v1/publicus-worker`, and `publicus_worker_secret` matching `PUBLICUS_WORKER_SECRET`. Use the dashboard or a parameterized administrative query; do not commit values. The migration's minute cron tick is a no-op until both entries exist.
 6. Test upload, source access and a model answer. Configure Supabase anonymous-auth rate limits and CAPTCHA for a widely shared deployment. Confirm the daily AI cap fits the project's budget before adding a model key.
 
 The configured hosted project is **personal-site-publicus** (`clfgowkxumajjjfxkfwa`) in Canada Central, separate from other applications. Its [dashboard](https://supabase.com/dashboard/project/clfgowkxumajjjfxkfwa) contains both deployed functions, the three migrations, the private storage bucket and the scheduled worker. Anonymous sign-ins are enabled with a limit of 10 per IP per hour. The auth site URL is `https://www.rafeed.dev`; allowed application origins are `https://www.rafeed.dev` and `https://rafeed.dev`.
 
-Vercel's `personal-site` project uses the hosted URL and publishable key in **Production**. Gemini runs in Supabase: `GEMINI_API_KEY`, `GEMINI_MODEL`, `ALLOWED_ORIGINS`, `PUBLICUS_WORKER_SECRET` and `PUBLICUS_AI_DAILY_LIMIT` are configured as Edge Function secrets. A Gemini key in Vercel alone does not configure the worker. Keep database credentials, worker secrets and model keys out of Git and browser bundles.
+Vercel's `personal-site` project uses the hosted URL and publishable key in **Production**. Gemini runs in Supabase: `GEMINI_API_KEY`, `GEMINI_MODEL`, `ALLOWED_ORIGINS`, `PUBLICUS_WORKER_SECRET` and `PUBLICUS_AI_DAILY_LIMIT` are configured as Edge Function secrets. `PUBLICUS_CHAT_DAILY_LIMIT` is optional and defaults to 200. A Gemini key in Vercel alone does not configure the worker. Keep database credentials, worker secrets and model keys out of Git and browser bundles.
 
 ## Backend behavior
 
@@ -45,6 +45,7 @@ Vercel's `personal-site` project uses the hosted URL and publishable key in **Pr
 - Text-based PDFs use `unpdf`; password-protected, corrupt or scanned/image-only files fail clearly. There is no OCR service in this version. PDF/TXT extraction and free-form questions require Gemini; CSV/feed ingestion does not.
 - AI source text and questions are treated as untrusted data. The model is schema-constrained and has no execution tools. Output is validated again; source IDs, pages, rows and quotations must exist. This checks citation presence, not semantic truth. Generated fields require human review before qualification; a listing may omit requirements, so users must inspect the full tender.
 - Vendor matching is deterministic and explained in the UI. Government totals use the latest cumulative contract value, never a sum across amendments. Conflicting latest values are withheld. Supplier grouping uses exact normalized names plus explicit fictional aliases; it does not infer beneficial ownership.
+- The help chat (`publicus-chat`) answers synchronously, outside the job queue. It sends Gemini a fixed fact sheet from `supabase/functions/_shared/assistant.ts`, the visitor's question, the last six turns and a capped summary of the explorer view, and accepts only the fact ids in that sheet as sources. It reuses the visitor's anonymous session and has its own quota, separate from the explorer's: 20 questions per visitor per day and 200 in total by default (`PUBLICUS_CHAT_DAILY_LIMIT`, capped at 1,000). The four suggested questions have prepared answers and never call the model. Nothing is stored, and the browser keeps the conversation in session storage only. When the chat is unavailable, over quota or the facts don't cover a question, the panel offers Rafeed's email address.
 - The worker removes expired objects through Storage API before deleting their workspace and anonymous account. Reset uses the same Storage-first path. Expired rows are inaccessible even if a cleanup tick is delayed. Configure and monitor the cron tick; it is required for physical cleanup and durable recovery. Local browser data is discarded on the next visit after expiry.
 
 ## Verification
@@ -55,7 +56,8 @@ npm run typecheck
 npm run test:publicus
 npm run test:belong
 npm run build
-deno check --config supabase/functions/deno.json supabase/functions/publicus-api/index.ts supabase/functions/publicus-worker/index.ts
+deno check --config supabase/functions/deno.json supabase/functions/publicus-api/index.ts supabase/functions/publicus-worker/index.ts supabase/functions/publicus-chat/index.ts
+(cd supabase/functions && deno test --allow-env --allow-net=127.0.0.1 tests/)
 # With the local stack and functions running, without a Gemini key:
 npm run test:publicus:integration
 ```

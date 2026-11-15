@@ -81,7 +81,7 @@ export default function RecordSheet() {
         {rows.map(({ record, n, source }) => (
           <section key={record.id} id={`cb-${n}`} className="pu-raw" data-default={n === DEFAULT_ROW || undefined} aria-label={`Raw CSV row for record ${n}`}>
             <header>
-              <h3>Row {n}, as published</h3>
+              <h2>Row {n}, as published</h2>
               <span>{fileName(source)}{source?.row ? `, CSV row ${source.row}` : ""}</span>
             </header>
             <dl>

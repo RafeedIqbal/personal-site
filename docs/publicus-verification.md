@@ -73,3 +73,33 @@ The page was rebuilt as an open-data record (see the "Design" section of `docs/p
 - Driven in the browser: the raw-row panels switch through `#cb-NN` anchors and show only structured CanadaBuys fields, with no descriptions, contact emails, attachments or URLs. Also checked: vendor and government tabs, the conflict scenario, the source dialog closing on Escape, and the profile modal.
 - `impeccable detect` on `app/publicus` and `components/publicus` returned no findings.
 - Review captures are in the ignored `.impeccable/review/` directory.
+
+## Explorer blurb and help chat — 15 November 2026
+
+A three-row note above the explorer now covers how it works, its architecture and its stack. The lede no longer says that scenarios change rankings; they change qualification, flags and explanations, and only profile edits re-rank. A floating help chat (`components/publicus/HelpChat.tsx` and `ChatPanel.tsx`, Edge Function `publicus-chat`) answers questions from the fact sheet in `supabase/functions/_shared/assistant.ts`, along with a summary of the visitor's explorer view.
+
+- `npm run lint`, `npm run typecheck`, `npm audit --audit-level=moderate` and the production build passed. Deno checks of all three functions passed.
+- Test results:
+
+  | Suite | Result |
+  |---|---|
+  | `npm run test:publicus` (13 domain and 6 fact-sheet tests) | 19/19 |
+  | `npm run test:belong` | 14/14 |
+  | `npm run test:dependencies` | 9/9 |
+  | `npm run test:ui`, including 5 new `/publicus` tests | 19/19 |
+  | Deno tests, including a mocked chat request | 3/3 |
+
+- The new UI tests cover:
+  - The blurb.
+  - Offline suggested answers and their source links.
+  - Escape and close buttons returning focus to the launcher.
+  - Start over.
+  - Axe (WCAG 2.0–2.2 A/AA and best practice) with the panel open.
+  - No horizontal overflow at 320, 390 and 1440px.
+- Axe found that the raw-row heading skipped from h1 to h3. It is now an h2.
+- Driven in the browser against a dev server whose Supabase calls were intercepted:
+  - The explorer view is sent with each question, and fact ids that don't exist are dropped.
+  - The "Checking the record…" state, the email fallback for questions the facts don't cover, and the daily-limit state all work.
+  - On phones the panel is a full-screen sheet, and a source chip closes the sheet and moves to its section.
+- `impeccable detect` reported only advisory type-ramp and colour notes. The same kind of notes exist on `main`.
+- Live Gemini answers are verified only after `publicus-chat` is deployed to the hosted project.

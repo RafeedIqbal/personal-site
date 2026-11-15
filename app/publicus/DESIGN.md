@@ -202,14 +202,14 @@ The embedded procurement explorer is working software placed on the record. It s
 - A highlighter on values that disagree and on passages a reviewer has to check.
 - Archivo, semi-condensed for headings and normal width for reading; Chivo Mono for anything that is data.
 - Square and flat on the page; small corners only inside the explorer.
-- One motion: a 220ms top-down clip reveal of a raw row.
+- One motion: a 220ms top-down clip reveal, used when a raw row opens and when the help chat opens.
 
 ## Colors
 
 One brand colour with one job, one reviewer's highlighter, and a family of cool violet-greys on near-white paper.
 
 ### Primary
-- **Publicus Purple** (#634086): header bands only. It fills the masthead, every table header row (the records table, the vendors and buyers table, the explorer's results heading and source index) and the 6px band that takes the header row's place when the records table stacks. It is the route's one nod to Publicus's brand. The share image uses Publicus's deeper purple (#2e1e44) for its record band; the page never does.
+- **Publicus Purple** (#634086): header bands only. It fills the masthead, every table header row (the records table, the vendors and buyers table, the explorer's results heading and source index), the 6px band that takes the header row's place when the records table stacks, and the title band of the help chat, which heads its conversation. It is the route's one nod to Publicus's brand. The share image uses Publicus's deeper purple (#2e1e44) for its record band; the page never does.
 - **Lavender Mist** (#e6ddf0): secondary text on purple, such as the metadata terms in the masthead and the counts in explorer headings.
 
 ### Secondary
@@ -340,6 +340,18 @@ The signature component. A purple header row with 13px semibold white labels; a 
 
 ### Raw Row Panel
 One record's CSV fields as published. A heading ("Row NN, as published") with the source file and CSV row in mono on the right, then a two-column grid of mono field and value pairs separated by hairlines, inside a 1px ink frame. Only one is open at a time. Choosing a record opens its panel with the route's only animation: a clip reveal from top to bottom over 220ms on an exponential ease-out (cubic-bezier(0.16, 1, 0.3, 1)). Colour changes on hover share that duration and curve. With reduced motion requested, every animation and transition is removed.
+
+### Build Notes
+A ruled definition list under the explorer's section lede, saying how the explorer works, its architecture and its stack. Terms sit in a 9rem column in 13px Ash Violet, values in 15px ink up to 66ch, with a Hairline above and between rows; below 760px each term stacks over its value. The architecture row opens with the request path as an ordered list in Chivo Mono (each step is an identifier), joined by Ash Violet arrows that screen readers skip.
+
+### Help Chat
+A fixed ink launcher, "Ask a question", 48px tall (44px on phones), at the bottom right of every viewport. It renders only after hydration, and the panel's code loads on first open.
+- **Panel:** square and flat, with a 1px Ink border on white. It is 400 by 640px at most, 24px from the corner, and non-modal, so the explorer stays usable beside it. Below 760px it is a full-screen modal sheet with the explorer dialog's 50% ink backdrop. It opens with the route's one clip reveal.
+- **Head:** a Publicus purple band with the 17px semi-condensed title "Questions about this application" and a 44px white close button.
+- **Conversation:** a log of ruled rows. Questions sit on Band in 600 weight; answers sit on white in 15px paragraphs, each followed by "From" chips (Band, 13px Archivo, square) that link to the page section or the résumé the answer drew on.
+- **Suggested questions:** a ruled list under a 1px ink rule, like the resources list, with a 14px arrow. Asked ones drop out of the list.
+- **Form:** one 12px Ash Violet line naming the explorer view sent with each question, a square textarea with a Control Rule border, a mono character count, an underlined "Start over" and a solid ink "Ask" button.
+- **States:** "Checking the record…" as static Ash Violet text while waiting; a Band notice with the email address when the chat is offline, over its daily limit or failed. When typed questions are unavailable, the textarea is removed and the suggested questions still work.
 
 ### Masthead
 A full-bleed purple band holding the display title and a metadata row (Publisher, Modified, Contents, Format): 13px Lavender Mist terms over 15px white values, with the date in 14px mono, under a 1px white rule at 32% opacity. Top padding runs 36 to 60px, fluid, with 24px below. It is typeset only.

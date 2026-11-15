@@ -107,7 +107,7 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .pu-raw:target, .pu-raw-list:not(:has(.pu-raw:target)) .pu-raw[data-default] { display: block; }
 .pu-raw:target { animation: pu-open var(--dur) var(--ease) both; }
 .pu-raw header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 20px; margin-bottom: 14px; }
-.pu-raw h3 { font-size: 19px; }
+.pu-raw h2 { font-size: 19px; }
 .pu-raw header span { font-family: var(--data); font-size: 13px; color: var(--ink-3); overflow-wrap: anywhere; }
 .pu-raw dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; font-family: var(--data); font-size: 13px; line-height: 1.45; }
 .pu-raw dl > div { padding: 7px 0; border-top: 1px solid var(--rule); }
@@ -161,7 +161,7 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
 .pu-button { display: inline-flex; align-items: center; min-height: 48px; padding: 12px 20px; background: var(--ink); color: #fff !important; font-weight: 600; text-decoration: none; overflow-wrap: anywhere; transition: background-color var(--dur) var(--ease); }
 .pu-button:hover { background: var(--ink-hover); }
 
-.pu-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: clamp(64px, 8vw, 112px); padding: 20px 0 40px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-3); }
+.pu-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: clamp(64px, 8vw, 112px); padding: 20px 0 96px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-3); }
 .pu-footer p:last-child { display: flex; gap: 20px; }
 .pu-footer a { color: var(--ink); }
 
@@ -368,6 +368,62 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
   .pu-section-wide h2 { grid-row: 1; position: static; }
 }
 
+/* How the explorer is built: a ruled definition list under the section lede */
+.pu-build { max-width: calc(66ch + 10rem); border-top: 1px solid var(--rule); }
+.pu-build > div { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 4px 24px; padding: 14px 0 16px; border-bottom: 1px solid var(--rule); }
+.pu-build dt { padding-top: 2px; font-size: 13px; color: var(--ink-3); }
+.pu-build dd { max-width: 66ch; font-size: 15px; line-height: 1.6; }
+.pu-build dd > * + * { margin-top: 10px; }
+.pu-path { display: flex; flex-wrap: wrap; row-gap: 2px; padding: 0; list-style: none; font-family: var(--data); font-size: 13px; }
+.pu-path li + li::before { content: "→" / ""; padding: 0 8px; color: var(--ink-3); }
+
+/* Help chat: an ink launcher, and a square, flat panel whose log is headed by a purple band */
+.pu-chat-launch { position: fixed; right: 24px; bottom: 24px; z-index: 40; min-height: 48px; padding: 12px 20px; border: 0; background: var(--ink); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color var(--dur) var(--ease); }
+.pu-chat-launch:hover { background: var(--ink-hover); }
+.pu-chat-launch[hidden] { display: none; }
+.pu-chat { position: fixed; inset: auto 24px 24px auto; z-index: 40; width: min(400px, calc(100vw - 48px)); height: min(640px, calc(100dvh - 48px)); max-width: none; max-height: none; margin: 0; padding: 0; border: 1px solid var(--ink); background: #fff; color: var(--ink); font-family: var(--font-publicus-text), system-ui, sans-serif; font-size: 15px; line-height: 1.55; }
+.pu-chat[open] { display: flex; flex-direction: column; animation: pu-open var(--dur) var(--ease) both; }
+.pu-chat[data-sheet] { inset: 0; width: 100%; height: 100dvh; border: 0; }
+.pu-chat::backdrop { background: rgb(26 24 32 / 0.5); }
+.pu-chat-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 16px; background: var(--purple); color: #fff; }
+.pu-chat-head h2 { font-size: 17px; line-height: 1.25; }
+.pu-chat-head :focus-visible { outline-color: #fff; outline-offset: 2px; }
+.pu-chat-close { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; background: transparent; color: #fff; cursor: pointer; }
+.pu-chat-body { position: relative; flex: 1; min-height: 0; padding: 16px 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #c9c4d0 #fff; }
+.pu-chat-intro { font-size: 14px; color: var(--ink-2); }
+.pu-chat-log { padding: 0; list-style: none; }
+.pu-chat-log:not(:empty) { margin-top: 16px; }
+.pu-chat-q { margin-top: 18px; padding: 10px 12px; background: var(--band); font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
+.pu-chat-q:first-child { margin-top: 0; }
+.pu-chat-a { padding: 12px 0 14px; border-bottom: 1px solid var(--rule); overflow-wrap: anywhere; }
+.pu-chat-a > p + p { margin-top: 8px; }
+.pu-chat-a:last-child { border-bottom: 0; padding-bottom: 4px; }
+.pu-chat-from { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; padding-top: 4px; font-size: 13px; }
+.pu-chat-from > span { margin-right: 2px; color: var(--ink-3); }
+.pu-chat-from a { padding: 2px 7px; background: var(--band); text-decoration: none; transition: background-color var(--dur) var(--ease); }
+.pu-chat-from a:hover { background: var(--row-active); }
+.pu-chat-mail { padding-top: 6px; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.pu-chat-suggest { margin-top: 16px; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
+.pu-chat-suggest button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 10px 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: var(--ink); font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; }
+.pu-chat-suggest button:hover span { text-decoration: underline; }
+.pu-chat-suggest svg { flex-shrink: 0; color: var(--ink-2); }
+.pu-chat-pending { margin-top: 14px; font-size: 14px; color: var(--ink-3); }
+.pu-chat-notice { margin-top: 14px; padding: 10px 12px; background: var(--band); font-size: 14px; color: var(--ink-2); }
+.pu-chat-notice a { color: var(--ink); overflow-wrap: anywhere; }
+.pu-chat-form { padding: 12px 16px 14px; border-top: 1px solid var(--rule); }
+.pu-chat-context { margin-bottom: 8px; font-size: 12px; line-height: 1.45; color: var(--ink-3); overflow-wrap: anywhere; }
+.pu-chat-form textarea { display: block; width: 100%; min-height: 64px; padding: 8px 10px; border: 1px solid #cfcad6; border-radius: 0; background: #fff; color: var(--ink); font-size: 15px; line-height: 1.45; resize: none; }
+.pu-chat-form textarea::placeholder { color: var(--ink-3); opacity: 1; }
+.pu-chat-form textarea:focus-visible { outline-offset: 0; }
+.pu-chat-actions { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 10px; }
+.pu-chat-form.pu-chat-actions { margin-top: 0; padding-block: 8px; }
+.pu-chat-count { margin-right: auto; font-family: var(--data); font-size: 12px; color: var(--ink-3); }
+.pu-chat-reset { min-height: 40px; padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.pu-chat-send { min-height: 40px; padding: 8px 18px; border: 0; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color var(--dur) var(--ease); }
+.pu-chat-send:hover:not(:disabled) { background: var(--ink-hover); }
+.pu-chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
+@media print { .pu-chat-launch, .pu-chat { display: none !important; } }
+
 @media (max-width: 1100px) {
   .px-stats strong { flex-direction: column; gap: 0; }
   .px-detail { padding: 22px 20px; }
@@ -433,6 +489,10 @@ html:has(.publicus) { scrollbar-color: #bdb8c4 #fcfcfb; }
   .pu-sides td { font-size: 15px; }
   .pu-steps li { gap: 6px; }
   .pu-footer { flex-direction: column; }
+  .pu-build > div { grid-template-columns: minmax(0, 1fr); padding: 12px 0 14px; }
+  .pu-chat-launch { right: 16px; bottom: 16px; min-height: 44px; padding: 10px 16px; font-size: 14px; }
+  .pu-chat-form { padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+  .pu-chat-form textarea { font-size: 16px; }
 
   .px-topbar { padding: 12px; gap: 8px; }
   .px-brand > .px-badge { display: none; }
