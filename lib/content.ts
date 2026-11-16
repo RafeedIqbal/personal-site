@@ -83,6 +83,8 @@ export interface Project {
   approach: string;
   result: string;
   image: PortfolioImage;
+  // A featured case with a video shows it in place of the screenshot.
+  video?: PortfolioVideo;
   websiteUrl?: string;
   featured?: boolean;
 }
@@ -91,6 +93,16 @@ export interface PortfolioImage {
   src: string;
   alt: string;
   label: string;
+  width: number;
+  height: number;
+}
+
+export interface PortfolioVideo {
+  src: string;
+  poster: string;
+  captions: string;
+  label: string;
+  duration: string;
   width: number;
   height: number;
 }
@@ -246,6 +258,15 @@ export const PROFESSIONAL_WORK: Project[] = [
       "BaseNote Solutions private-label fragrance website",
       "Private-label fragrance website",
     ),
+    video: {
+      src: "/videos/blend-alchemy-demo.mp4",
+      poster: "/images/work/basenote-demo.webp",
+      captions: "/videos/blend-alchemy-demo.en.vtt",
+      label: "Blend & Alchemy product demo",
+      duration: "2:59",
+      width: 1920,
+      height: 1080,
+    },
   },
   {
     slug: "icon",

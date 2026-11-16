@@ -34,7 +34,7 @@ test("work outcomes are visible and all seven cases remain accessible", async ({
     await expect(details).toHaveAttribute("open", "");
     await expect(details.getByText("The approach", { exact: true })).toBeVisible();
   }
-  await expect(page.getByRole("link", { name: /View image$/ })).toHaveCount(10);
+  await expect(page.getByRole("link", { name: /View image$/ })).toHaveCount(9);
   const captions = await page.locator(".screenshot-caption").allTextContents();
   expect(new Set(captions).size).toBe(captions.length);
   await checkAccessibility(page);
@@ -43,9 +43,9 @@ test("work outcomes are visible and all seven cases remain accessible", async ({
 
 test("image labels, full-size access, and dialog focus work together", async ({ page }) => {
   await page.goto("/");
-  const trigger = page.getByRole("link", { name: "Private-label fragrance website View image" });
+  const trigger = page.getByRole("link", { name: "Icon Training product website View image" });
   await trigger.click();
-  const dialog = page.getByRole("dialog", { name: "Private-label fragrance website" });
+  const dialog = page.getByRole("dialog", { name: "Icon Training product website" });
   const close = dialog.getByRole("button", { name: "Close", exact: true });
   await expect(close).toBeFocused();
   // The native modal keeps the page inert; no script wraps Tab around inside it.
@@ -59,11 +59,36 @@ test("image labels, full-size access, and dialog focus work together", async ({ 
   await fullSize.click();
   const popup = await popupPromise;
   await popup.waitForLoadState();
-  expect(popup.url()).toContain("/images/sites/basenote-solutions.webp");
+  expect(popup.url()).toContain("/images/sites/icon-training.webp");
   await popup.close();
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
+});
+
+test("the BaseNote demo video loads on demand with a captions track", async ({ page, request }) => {
+  await page.goto("/");
+  const video = page.locator("#work-basenote video");
+  await expect(video).toBeVisible();
+  await expect(page.locator("#work-basenote .screenshot")).toHaveCount(0);
+  await expect(video).toHaveAttribute("controls", "");
+  await expect(video).toHaveAttribute("preload", "none");
+  await expect(video).toHaveAttribute("poster", "/images/work/basenote-demo.webp");
+  await expect(video.locator("source")).toHaveAttribute("type", "video/mp4");
+  await expect(video.locator('track[kind="captions"]')).toHaveAttribute("srclang", "en");
+  await expect(page.locator("#work-basenote figcaption")).toContainText("Blend & Alchemy product demo");
+  await checkAccessibility(page);
+
+  const media = await request.get("/videos/blend-alchemy-demo.mp4", { headers: { Range: "bytes=0-1023" } });
+  expect(media.status()).toBe(206);
+  expect(media.headers()["content-type"]).toContain("video/mp4");
+  const captions = await request.get("/videos/blend-alchemy-demo.en.vtt");
+  expect(captions.status()).toBe(200);
+  expect(captions.headers()["content-type"]).toContain("text/vtt");
+  expect(await captions.text()).toMatch(/^WEBVTT/);
+  const poster = await request.get("/images/work/basenote-demo.webp");
+  expect(poster.status()).toBe(200);
+  expect(poster.headers()["content-type"]).toContain("image/webp");
 });
 
 test("terminal uses a modifier shortcut and preserves help, history, and website commands", async ({ page }) => {

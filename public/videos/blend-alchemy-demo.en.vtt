@@ -1,0 +1,193 @@
+WEBVTT
+
+00:02.049 --> 00:04.487
+Hello, so this is gonna
+be a very quick demo
+
+00:04.758 --> 00:07.762
+of Blend and Alchemy
+from Base Note Solutions.
+
+00:07.762 --> 00:11.357
+So, this is an implementation of Blend
+for our client VEXERA Fragrances.
+
+00:12.128 --> 00:13.550
+This is the customer's storefront.
+
+00:13.550 --> 00:15.092
+It's just a website where they can learn
+
+00:15.092 --> 00:17.385
+more about how the whole process works.
+
+00:17.774 --> 00:19.867
+The first step is you take an assessment.
+
+00:19.898 --> 00:22.472
+to see what your fragrance
+profile would be like.
+
+00:22.472 --> 00:26.470
+This is just to give our AI more
+context on what the user likes.
+
+00:27.590 --> 00:30.502
+Once you save your profile,
+you can reserve a spot in the lab,
+
+00:30.533 --> 00:36.394
+or you can have an online online
+to create a fragrance of your own.
+
+00:36.976 --> 00:39.969
+Here you can give it
+a natural language prompt
+
+00:39.969 --> 00:41.603
+on what type of fragrances you like.
+
+00:42.045 --> 00:45.041
+“Something cool and airy.”
+
+00:45.340 --> 00:49.175
+I've been very vague; it'll guide me
+through it, giving me further questions.
+
+00:49.670 --> 00:52.756
+Alternatively, I can give
+it a very specific brief,
+
+00:53.083 --> 00:56.629
+which will just give me a blend right
+away that I can continue in the store.
+
+00:57.957 --> 00:59.461
+Once you've confirmed your reservation,
+
+00:59.461 --> 01:01.688
+it goes on to this ERP
+platform that we've built,
+
+01:01.688 --> 01:02.872
+for VEXERA Fragrances,
+
+01:02.872 --> 01:06.559
+where they can see users that have
+booked times in the store.
+
+01:06.929 --> 01:08.773
+Once they walk in, you can check them in,
+
+01:08.773 --> 01:11.209
+and then open a consultation for them.
+
+01:11.555 --> 01:13.391
+The staff can see their preferences,
+
+01:13.520 --> 01:16.581
+as well as context on how
+they answered online.
+
+01:16.973 --> 01:20.364
+Here, in store, you can create
+an even more specific brief.
+
+01:20.454 --> 01:23.498
+for the type of fragrance
+that the customer is trying to create.
+
+01:24.188 --> 01:27.423
+You should be able to explore
+fragrance directions,
+
+01:27.534 --> 01:30.761
+three ways that the customer
+can go moving forward.
+
+01:31.780 --> 01:35.169
+And then, it just gets sent
+over to production for them
+
+01:35.199 --> 01:39.067
+to create the perfumes based
+on the blends generated.
+
+01:39.367 --> 01:42.939
+So, that's Blend,
+and Alchemy is very similar,
+
+01:42.939 --> 01:47.078
+but it is more tuned
+towards manufacturers.
+
+01:47.190 --> 01:50.779
+It's a manufacturing ERP
+instead of retail one.
+
+01:51.179 --> 01:54.261
+Alchemy Assistant is more
+of a market research tool.
+
+01:54.261 --> 01:56.250
+alongside Blend creation as well.
+
+01:56.505 --> 02:01.035
+You can ask it for three popular
+oud perfumes from the UK.
+
+02:01.547 --> 02:04.923
+And it will search
+our proprietary perfume database
+
+02:05.195 --> 02:09.378
+to see what perfumes match up
+with what I am looking for.
+
+02:11.006 --> 02:15.302
+And then, the other way this tool can
+be used, it will give you a blend.
+
+02:16.138 --> 02:18.669
+It does deterministic checks on cost,
+
+02:18.669 --> 02:20.591
+and then what materials you have in stock,
+
+02:20.591 --> 02:24.617
+and then how much it can use
+for the regions you want to sell in,
+
+02:24.617 --> 02:26.368
+in terms of compliance and regulations.
+
+02:27.872 --> 02:32.918
+So here it's given me a blend
+of chemicals, instead of here,
+
+02:33.258 --> 02:36.072
+it gives you a blend of oils,
+
+02:36.162 --> 02:38.473
+perfume oils that we
+provide to the store to use.
+
+02:40.008 --> 02:42.209
+It'll give instructions on how to make it.
+
+02:42.617 --> 02:45.088
+And then it also shows you
+
+02:45.099 --> 02:49.212
+the compliance requirements
+that it checked it against.
+
+02:49.532 --> 02:51.138
+And then if you are missing materials,
+
+02:51.138 --> 02:53.516
+it will give you the materials
+that you need to purchase.
+
+02:53.672 --> 02:55.406
+And our short demo, thank you!

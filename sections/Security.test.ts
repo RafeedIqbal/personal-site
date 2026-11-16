@@ -59,8 +59,8 @@ test("the portfolio's terminal, help and image dialog run without CSP violations
   await page.keyboard.press("Escape");
   await page.keyboard.press("Escape");
   await page.keyboard.press("Escape");
-  await page.getByRole("link", { name: "Private-label fragrance website View image" }).click();
-  await expect(page.getByRole("dialog", { name: "Private-label fragrance website" }).locator("img")).toBeVisible();
+  await page.getByRole("link", { name: "Icon Training product website View image" }).click();
+  await expect(page.getByRole("dialog", { name: "Icon Training product website" }).locator("img")).toBeVisible();
   await page.keyboard.press("Escape");
   expect(violations).toEqual([]);
 });

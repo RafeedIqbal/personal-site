@@ -333,6 +333,19 @@ main:focus {
   font-size: 12px;
   line-height: 1.5;
 }
+.demo-figure {
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-surface);
+}
+.demo-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
 .screenshot-caption > span:last-child {
   flex-shrink: 0;
   color: var(--color-fg);

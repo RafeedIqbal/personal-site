@@ -1,3 +1,4 @@
+import DemoVideo from "@/components/DemoVideo";
 import SectionHeader from "@/components/SectionHeader";
 import Screenshot from "@/components/Screenshot";
 import { SELECTED_WORK, type Project } from "@/lib/content";
@@ -120,7 +121,11 @@ export default function Projects() {
               <CaseDetails project={project} />
             </div>
             <div className="project-image">
-              <Screenshot image={project.image} eager={index === 0} />
+              {project.video ? (
+                <DemoVideo video={project.video} />
+              ) : (
+                <Screenshot image={project.image} eager={index === 0} />
+              )}
             </div>
           </article>
         ))}

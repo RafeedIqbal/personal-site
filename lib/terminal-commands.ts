@@ -178,6 +178,7 @@ ${PROFILE.bio}`,
         `Stack:       ${project.stack.join(", ")}`,
         project.githubUrl ? `GitHub:      ${project.githubUrl}` : null,
         project.websiteUrl ? `Website:     ${project.websiteUrl}` : null,
+        project.video ? `Demo:        ${project.video.src}` : null,
         `Contribution: ${project.contribution}`,
       ]
         .filter(Boolean)
