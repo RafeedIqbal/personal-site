@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { extractText } from "unpdf";
 
 const vaultRepository = "https://github.com/RafeedIqbal/whatsapp-mcp-vault";
 
@@ -29,7 +30,8 @@ test("work outcomes are visible and all project cases remain accessible", async 
   await expect(page.locator(".featured-project h3")).toHaveText(["BaseNote", "Icon Training", "Palette Knife", "WhatsApp MCP Vault"]);
   await expect(page.locator(".supporting-project").getByRole("heading", { level: 4 })).toHaveText(["Bajan", "id8", "E-Predict", "SyncMaster"]);
   await expect(page.locator(".website-gallery h3")).toHaveText(["alpaclondon.com", "arizmilabs.com", "rivelimn.com"].map((name) => new RegExp(name)));
-  await expect(page.locator("#work-icon .project-outcome")).toContainText("grew the team from 2 to 8");
+  await expect(page.locator("#work-icon .project-outcome")).toContainText("3,000 downloads, 30 paying subscribers");
+  await expect(page.locator("#work-basenote .project-outcome")).toContainText("US$45,000 Blend pilot licence");
   const vault = page.locator("#work-whatsapp-mcp-vault");
   await expect(vault.getByRole("link", { name: /View repository/ })).toHaveAttribute("href", vaultRepository);
   await expect(vault.getByRole("link", { name: "Connected apps · Local demo View image" })).toHaveAttribute("href", "/images/work/whatsapp-mcp-vault.webp");
@@ -291,6 +293,10 @@ test("clipboard reports both success and failure, and the résumé is a PDF", as
   const response = await request.get("/Rafeed_Iqbal_Resume.pdf");
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toContain("application/pdf");
+  const resume = await extractText(new Uint8Array(await response.body()), { mergePages: true });
+  expect(resume.totalPages).toBe(1);
+  expect(resume.text).toContain("US$45,000");
+  expect(resume.text).toContain("30 paying subscribers");
 });
 
 test("skip link and reduced motion preserve a direct reading path", async ({ page }) => {

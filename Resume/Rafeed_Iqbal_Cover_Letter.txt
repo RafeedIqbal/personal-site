@@ -1,0 +1,15 @@
+Dear Hiring Manager,
+
+When I joined Icon Training, two developers had a set of Figma screens for a coaching app. There was no working product yet. My job was to decide what a trainer and a subscriber would each need on launch day, hire the team to build it and write part of the software myself. That combination of product responsibility and hands-on engineering is what I’m looking for in my next role.
+
+At Icon I grew the team from two people to ten and led development through the MVP and public launch. I also rebuilt part of the coaching backend. When an athlete logged several activities at once, we were processing the records one by one. I batched those updates and added a nightly check that put missing records back into search, so the coach could draw on the athlete’s training history. On the trainer side, I worked out how coaches should review flagged conversations and track subscription earnings. In the first few weeks after launch, the app reached about 3,000 downloads and 30 paying subscribers through organic sharing.
+
+I now co-own BaseNote, where I built two products as the sole engineer. Our team uses Alchemy to take a custom fragrance from a client brief through lab work and orders. Blend serves a different customer, a fragrance studio that wants to create a formula from the oils it actually has on hand. I built the assistant to consult inventory and chemists’ experiments, then check the quantities in the proposed formula. The first studio bought a US$45,000 pilot licence.
+
+That pilot put me on both sides of the handoff between the studio’s storefront agency and our API. We disagreed on details as basic as how a customer signed in. I compared the agency’s specification with the running software, agreed with the partner on the expected behaviour and implemented the changes. Four days after the review, all six integration issues were closed. I also wrote an in-app guide so the studio’s staff could work through the new process themselves.
+
+I’d welcome the chance to bring that experience to your team. I’m happy to walk through the coaching release or the fragrance pilot in detail, from the first product decision to the code that made it work.
+
+Sincerely,
+
+Rafeed Iqbal

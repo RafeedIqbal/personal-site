@@ -9,7 +9,7 @@ This repository is centered on the Next.js app in the repository root. Work from
 - `lib/`: content and command helpers.
 - `public/`: static assets.
 
-The `Resume/` directory holds the source résumé files (the published copy lives in `public/`); it is not runtime code.
+The private résumé workspace holds the editable master and role-specific applications. Publish its general résumé with public contact details at `public/Rafeed_Iqbal_Resume.pdf`. The general cover letter in `Resume/` supplies first-person material for the About section.
 
 ## Build, Test, and Development Commands
 Run commands from the repository root.

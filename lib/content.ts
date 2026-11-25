@@ -23,49 +23,51 @@ export interface Experience {
 export const EXPERIENCE: Experience[] = [
   {
     date: "Jul 2026 – Present",
-    impact: "From architecture to rollout",
+    impact: "Two products built as sole engineer · US$45,000 first pilot",
     role: "Founding Engineer",
     company: "BaseNote Solutions LTD",
     location: "United Kingdom (Remote)",
     bullets: [
-      "Sole engineer building a multi-tenant ERP for perfumers, connecting inventory, production, and client storefronts.",
-      "Building Blend Engine and Alchemy Engine: RAG assistants grounded in the in-house chemists’ experimental data.",
-      "Own architecture, implementation, and pilot rollout for the first licensed client; launched a Shopify Hydrogen storefront connected to production and fulfilment.",
+      "Co-founded BaseNote and built Blend for fragrance studios. I work directly with the first licensee on how staff consult with customers and create a custom blend.",
+      "Built Alchemy for our own team. It connects a client’s fragrance brief to lab experiments, sourcing, and sales and service orders.",
+      "Designed Blend’s assistant to search chemists’ experiments, check live oil inventory, and validate the quantities in a proposed formula.",
+      "Closed six gaps between our API and a partner’s storefront in four days. For a separate client, ALPAC London, I launched a Shopify Hydrogen store connected to production and fulfilment.",
     ],
   },
   {
     date: "Jul 2025 – Jun 2026",
-    impact: "Grew the team from 2 to 8",
+    impact: "3,000 early downloads · Team grew from 2 to 10",
     role: "Head of Product and Engineering",
     company: "Icon Train Smarter LTD",
     location: "United Kingdom (Remote)",
     bullets: [
-      "Led an AI fitness coaching product from MVP to production-ready launch, connecting product direction with frontend and backend delivery.",
-      "Grew the team from 2 to 8, owning recruitment, sprint planning, and day-to-day operations.",
-      "Contributed directly to AI features and the company website, alongside architecture and implementation decisions.",
+      "Led the subscription coaching app from Figma designs through the MVP and public launch. Organic sharing brought about 30 paying users and roughly US$600 in monthly recurring revenue in the first few weeks.",
+      "Hired across engineering, QA and operations. I set release priorities, led the Flutter and Django teams, and defined how trainers manage clients, review flagged conversations and track earnings.",
+      "Rebuilt part of the AI coach’s search. I indexed athletes’ training records, batched updates and added a nightly repair job so missing records could be found again.",
+      "Trained developers to turn a specification into a tested change with Claude Code and Codex. We used the same review and testing standards for the resulting code.",
     ],
   },
   {
     date: "Sep 2023 – Aug 2024",
-    impact: "255 interface errors reduced to 0; average resolution under one day",
+    impact: "255 warehouse interface errors cleared",
     role: "SAP Analyst, S/4HANA Key User (Co-op)",
     company: "Sanofi Pasteur",
     location: "Toronto, Canada",
     bullets: [
-      "Reduced a backlog of 255 S/4HANA–EWM interface errors to zero and brought average resolution time below one day.",
-      "Documented causes, prevention, and fixes so recurring production issues could be handled without escalation.",
-      "Traced a persistent stock-movement blocker to incorrect storage-temperature settings and resolved it with functional experts.",
+      "Cleared the SAP S/4HANA warehouse backlog and brought new errors down to a one-day turnaround.",
+      "Traced blocked inspection lots to temperature settings on warehouse bins. Wrote troubleshooting guides used across the company and tested fixes with manufacturing and supply chain teams.",
+      "Used warehouse task times to estimate staffing needs and forecasted when supplies would need replenishment from usage, shelf time and transfers between buildings.",
     ],
   },
   {
     date: "May 2023 – Aug 2023",
-    impact: "Enterprise reporting & mobile banking",
+    impact: "Weekly report conversions rose from 4–5 to 10–15 per analyst",
     role: "IT Intern",
     company: "Eastern Bank PLC",
     location: "Dhaka, Bangladesh",
     bullets: [
-      "Led the BI team in reports migrated during a 1,800-report move from SAP BusinessObjects to Oracle ERP, and improved the migration workflow.",
-      "Contributed to development, product direction, and sprint planning for the bank’s new mobile app.",
+      "Automated steps in a planned migration of 1,800 reports from SAP BusinessObjects to Oracle and wrote the team’s migration guide. I converted about 55 reports in three weeks.",
+      "Built an internal tool to route IT support requests to the right employee. During the mobile banking rotation, I estimated development time and cost from the proposed app screens.",
     ],
   },
 ];
@@ -264,18 +266,18 @@ export const PROFESSIONAL_WORK: Project[] = [
     name: "BaseNote",
     category: "Fragrance technology",
     featured: true,
-    stack: ["Multi-tenant SaaS", "RAG", "Shopify Hydrogen"],
+    stack: ["Django", "PostgreSQL", "LangGraph"],
     summary:
-      "Sole engineer building an ERP for perfumers, connecting inventory, production, AI assistants, and storefronts.",
+      "Two products for perfumers, built from the first client and lab requirements.",
     description:
-      "Connecting fragrance creation with the systems that turn it into a product: AI assistants, inventory, production, and storefronts.",
-    contribution: "Founding engineer · Architecture through rollout",
+      "Blend helps studios design custom fragrances. Alchemy runs the lab and order workflows at BaseNote.",
+    contribution: "Co-founder and sole engineer",
     problem:
-      "Perfumers need their formulation knowledge, inventory, production workflows, and customer experience to work together.",
+      "A studio needs a blend it can make from the oils on hand. Our own perfumers also need to follow a customer brief from the first trial to a finished order.",
     approach:
-      "Build the ERP and storefronts as one connected platform, with Blend Engine and Alchemy Engine using retrieval to ground recommendations in the chemists’ experimental data.",
+      "I built both MVPs. Blend searches inventory and chemists’ experiments and checks the formula in code. In Alchemy, our staff record lab trials, source materials and manage orders.",
     result:
-      "Ownership of the first licensed-client pilot, plus a launched Shopify Hydrogen storefront connected to production and fulfilment.",
+      "A fragrance studio bought a US$45,000 Blend pilot licence. BaseNote uses Alchemy internally for custom fragrance work.",
     websiteUrl: "https://www.basenotesolutions.com/private-label",
     image: screenshot(
       "sites/basenote-solutions",
@@ -297,18 +299,18 @@ export const PROFESSIONAL_WORK: Project[] = [
     name: "Icon Training",
     category: "AI fitness coaching",
     featured: true,
-    stack: ["AI features", "Product strategy", "Next.js"],
+    stack: ["Flutter", "Django", "PostgreSQL"],
     summary:
-      "Led product direction and engineering for an AI fitness coaching app.",
+      "Took a subscription coaching app from its first designs to its first paying users.",
     description:
-      "Helped trainers and athletes scale their coaching through AI avatars, while building the team and product behind the experience.",
+      "Trainers and athletes offer subscribers an AI coach that can draw on their training history.",
     contribution: "Head of Product and Engineering",
     problem:
-      "Taking an AI coaching app beyond its MVP required product direction, coordinated engineering, and a team that could deliver it.",
+      "Two developers had Figma screens. Trainers needed a way to manage subscribers, and the coach needed to find the right athlete’s records.",
     approach:
-      "Connected business goals to sprint planning and architecture decisions. Recruited across product and engineering, and contributed directly to AI features and the website.",
+      "I grew the team from two people to ten, led the mobile and backend releases, specified the trainer dashboard, and wrote the search and recovery jobs behind the coach.",
     result:
-      "Led the product to a production-ready launch and grew the team from 2 to 8 employees.",
+      "About 3,000 downloads, 30 paying subscribers and US$600 in monthly recurring revenue in the first few weeks after launch.",
     websiteUrl: "https://icontraining.app",
     image: screenshot(
       "sites/icon-training",

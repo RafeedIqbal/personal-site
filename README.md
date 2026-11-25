@@ -50,7 +50,7 @@ Dependency security updates and the ESLint dependency overrides (fast-glob and m
 - `lib/`: typed content and terminal command helpers
 - `public/`: static assets (including `Rafeed_Iqbal_Resume.pdf`, the downloadable résumé)
 
-The current résumé source is `Resume/Rafeed_Iqbal_Resume_2026.pdf`; the published copy is byte-identical at `public/Rafeed_Iqbal_Resume.pdf`. Older source files remain in `Resume/` for reference.
+Publish the public-contact export of the general résumé at `public/Rafeed_Iqbal_Resume.pdf`. The editable master and tailoring knowledge base live in the private résumé workspace. `Resume/Rafeed_Iqbal_Cover_Letter.txt` contains the general letter used for the About copy.
 
 ## Content and metadata
 

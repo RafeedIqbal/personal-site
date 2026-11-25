@@ -40,8 +40,8 @@ The application pages prove fit with working software rather than adjectives. `/
 
 ## Evidence on Hand
 
-- **Basenote, July 2026–present:** sole engineer. Built Blend, a LangGraph tool-calling formulation agent, on a multi-tenant Django/PostgreSQL ERP, with pgvector retrieval over in-house chemist data and live inventory. Formulation checks run in code. Also owns queues, recovery paths and storefront integrations. The first licensed-client pilot is still in progress. Public site: basenotesolutions.com/private-label.
-- **Icon, July 2025–June 2026:** Head of Product & Engineering. AI coaching avatars of trainers and athletes, sold through paid subscriptions. Took the product from MVP to a production-ready launch and grew engineering from two to eight people. Public site: icontraining.app.
+- **BaseNote, July 2026–present.** Co-founder and sole engineer for two products. Staff use Alchemy for lab and operations work. Blend's first studio bought a US$45,000 pilot licence. Its LangGraph assistant searches live stock and chemists’ experiments with pgvector. Application code validates the formula. Keep the studio anonymous. Public site: basenotesolutions.com/private-label.
+- **Icon, July 2025–June 2026.** Head of Product and Engineering. Led the coaching app from Figma through MVP to public launch and grew the team from two developers to ten people across engineering, QA and operations. About 3,000 downloads and 30 paying subscribers generated roughly US$600 in monthly recurring revenue in the first few weeks. Public site: icontraining.app.
 - **Palette Knife:** an open-source Python toolkit for resumable public-data collection (github.com/RafeedIqbal/palette-knife).
 - **Public data:** ten CanadaBuys records captured 14 November 2026 in `lib/publicus/public-records.json`, each with its source row, reused under the Open Government Licence – Canada.
 - **Résumé:** `public/publicus/Rafeed_Iqbal_Publicus_Resume.pdf`.

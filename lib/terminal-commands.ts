@@ -127,7 +127,7 @@ ${EDUCATION.years} | ${EDUCATION.location}
 
 BIO
 ---
-${PROFILE.bio}`,
+${PROFILE.bio.join("\n\n")}`,
       scrollTarget: "about",
     };
   }

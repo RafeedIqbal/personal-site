@@ -14,9 +14,9 @@ export default function About() {
         title="A little background"
       />
       <div className="grid items-start gap-9 xl:grid-cols-[1.6fr_1fr] xl:gap-14">
-        <p className="max-w-[64ch] text-base leading-[1.85] text-body">
-          {PROFILE.bio}
-        </p>
+        <div className="max-w-[64ch] space-y-4 text-base leading-[1.85] text-body">
+          {PROFILE.bio.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        </div>
         <div className="border-l border-line pl-6">
           <p className="mb-3 font-mono text-xs text-muted">Education</p>
           <h3 className="text-xl font-medium tracking-[-0.02em]">
