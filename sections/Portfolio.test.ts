@@ -1,6 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+const vaultRepository = "https://github.com/RafeedIqbal/whatsapp-mcp-vault";
+
 async function checkAccessibility(page: Page) {
   const { violations } = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
@@ -19,14 +21,18 @@ async function runCommand(page: Page, command: string) {
   await prompt.press("Enter");
 }
 
-test("work outcomes are visible and all seven cases remain accessible", async ({ page }) => {
+test("work outcomes are visible and all project cases remain accessible", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await expect(page.locator(".featured-project h3")).toHaveText(["BaseNote", "Icon Training", "Palette Knife"]);
+  await expect(page.getByText("4 featured / 8 projects", { exact: true })).toBeVisible();
+  await expect(page.locator(".featured-project h3")).toHaveText(["BaseNote", "Icon Training", "Palette Knife", "WhatsApp MCP Vault"]);
   await expect(page.locator(".supporting-project").getByRole("heading", { level: 4 })).toHaveText(["Bajan", "id8", "E-Predict", "SyncMaster"]);
   await expect(page.locator(".website-gallery h3")).toHaveText(["alpaclondon.com", "arizmilabs.com", "rivelimn.com"].map((name) => new RegExp(name)));
   await expect(page.locator("#work-icon .project-outcome")).toContainText("grew the team from 2 to 8");
+  const vault = page.locator("#work-whatsapp-mcp-vault");
+  await expect(vault.getByRole("link", { name: /View repository/ })).toHaveAttribute("href", vaultRepository);
+  await expect(vault.getByRole("link", { name: "Connected apps · Local demo View image" })).toHaveAttribute("href", "/images/work/whatsapp-mcp-vault.webp");
   await checkAccessibility(page);
 
   for (const details of await page.locator(".case-details").all()) {
@@ -34,7 +40,7 @@ test("work outcomes are visible and all seven cases remain accessible", async ({
     await expect(details).toHaveAttribute("open", "");
     await expect(details.getByText("The approach", { exact: true })).toBeVisible();
   }
-  await expect(page.getByRole("link", { name: /View image$/ })).toHaveCount(9);
+  await expect(page.getByRole("link", { name: /View image$/ })).toHaveCount(10);
   const captions = await page.locator(".screenshot-caption").allTextContents();
   expect(new Set(captions).size).toBe(captions.length);
   await checkAccessibility(page);
@@ -125,6 +131,10 @@ test("terminal uses a modifier shortcut and preserves help, history, and website
   await help.getByRole("button", { name: "whoami display identity" }).click();
   await expect(prompt).toHaveValue("whoami");
   await expect(prompt).toBeFocused();
+  await runCommand(page, "ls projects/");
+  await expect(page.getByRole("log")).toContainText("whatsapp-mcp-vault/");
+  await runCommand(page, "cat projects/whatsapp-mcp-vault");
+  await expect(page.getByRole("log")).toContainText(vaultRepository);
   await runCommand(page, "ls websites/");
   for (const site of ["rafeed.dev", "icontraining.app", "alpaclondon.com", "arizmilabs.com", "basenotesolutions.com", "rivelimn.com"]) {
     await expect(page.getByRole("log")).toContainText(site);

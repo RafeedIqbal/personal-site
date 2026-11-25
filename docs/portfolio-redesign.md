@@ -141,3 +141,7 @@ After the fixes, all 14 UI tests, 9 dependency tests, lint, typecheck, and the p
 The intended release target is the existing Vercel `personal-site` project serving `https://www.rafeed.dev`, using the repository's `main` branch. The ignored local Vercel project link was corrected after checking the current project and production deployment. `/belong`, the pre-existing résumé edits, and the local launch configuration remain outside this change.
 
 A focused Opus follow-up confirmed all 12 fixes and the resize handling, found no regression, and returned “Ship.” Its final focus-ring suggestion was applied by drawing help-button outlines inside their bounds so the scroll container cannot clip them. The CLI version, configured effort, and local Vercel-link correction above were verified directly by the implementing agent.
+
+## WhatsApp MCP Vault screenshot
+
+`public/images/work/whatsapp-mcp-vault.webp` shows the Connected apps section of the vault’s owner page. The 1440 × 900 capture uses the original Go template in dark mode with the example address `https://vault.example/mcp` and two local fixture connections. ChatGPT has read access and Claude has read and send access. [Owner page template at the captured revision](https://github.com/RafeedIqbal/whatsapp-mcp-vault/blob/798a2a2d5bcccaf99c9060f3ba65bcbc014e26d0/internal/gateway/gateway.go#L691-L702).

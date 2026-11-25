@@ -145,6 +145,30 @@ export const PROJECTS: Project[] = [
     featured: true,
   },
   {
+    slug: "whatsapp-mcp-vault",
+    name: "WhatsApp MCP Vault",
+    summary:
+      "Pair WhatsApp once, then search your synced conversations from ChatGPT or Claude. You control what each assistant can access.",
+    stack: ["Go", "MCP", "SQLCipher", "OAuth"],
+    description:
+      "A work-in-progress fork of Sealjay/mcp-whatsapp that gives one person an encrypted WhatsApp archive. ChatGPT and Claude search it through the same Model Context Protocol (MCP) server, each with its own permissions.",
+    githubUrl: "https://github.com/RafeedIqbal/whatsapp-mcp-vault",
+    category: "Open source · Work in progress",
+    contribution: "Vault design and development · Fork of Sealjay/mcp-whatsapp",
+    problem:
+      "Looking up a decision from a WhatsApp chat can mean copying a conversation into an assistant, then finding the message again to check the original wording.",
+    approach:
+      "I extended the Go server to run one vault per person. SQLCipher encrypts the message archive and linked-device database on disk. Each assistant has its own OAuth grant, so you can allow replies in one and keep the other read-only.",
+    result:
+      "Either assistant can cite a message with a link that opens its text, sender, and timestamp in your vault.",
+    image: screenshot(
+      "work/whatsapp-mcp-vault",
+      "The vault lists ChatGPT with read access and Claude with read and send access, each with a Disconnect button",
+      "Connected apps · Local demo",
+    ),
+    featured: true,
+  },
+  {
     slug: "bajan",
     name: "Bajan",
     summary:
